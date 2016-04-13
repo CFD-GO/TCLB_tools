@@ -2,7 +2,7 @@
 Various tools for the TCLB project
 
 ## Structure
-All tools are divided by language: [R](R/)
+All tools are divided by language: [R](R/), [Python](py/), etc. In each directory, the subdirectories should be specific packages related to different aspects of interaction with TCLB
 
 ## Installation
 ### R
