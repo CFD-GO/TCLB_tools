@@ -2,12 +2,19 @@
 Various tools for the TCLB project
 
 ## Structure
-All tools are divided by language: [R](R/), [Python](py/), etc. In each directory, the subdirectories should be specific packages related to different aspects of interaction with TCLB
+All tools are divided by language: [R](R/), [Python](Python/), etc. In each directory, the subdirectories should be specific packages related to different aspects of interaction with TCLB
 
 ## Installation
 ### R
+
+Supervisor: [Łukasz Łaniewski-Wołłk](https://github.com/llaniewski)
+
 ```R
 devtools::install_github("CFD-GO/TCLB_tools/R/TCLBtools")
 ```
+
 ### Python
-...
+
+Supervisor: [Michał Dzikowski](https://github.com/mdzik)
+
+Content of Python/ directory is meant as a packages repository. Add XXXX/Python to your PYTHONPATH than import packages by subdirectory name.
