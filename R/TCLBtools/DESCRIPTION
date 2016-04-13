@@ -1,0 +1,9 @@
+Package: TCLBtools
+Type: Package
+Title: Various tools for TCLB
+Version: 0.1.0
+Author: L Laniewski <llaniewski@meil.pw.edu.pl>
+Maintainer: L Laniewski <llaniewski@meil.pw.edu.pl>
+Description: Various things in R that can be usefull for manipulating configuration and output for TCLB
+License: GPL
+LazyData: TRUE
