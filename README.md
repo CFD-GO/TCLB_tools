@@ -2,7 +2,7 @@
 Various tools for the TCLB project
 
 ## Structure
-All tools are divided by language: [R]{R/}
+All tools are divided by language: [R](R/)
 
 ## Installation
 ### R
