@@ -19,7 +19,7 @@ def geometryElement(func):
         for k in nargs:
             if not k == '_xml_node_name':
                 n.set(k, str(kwargs[k]))
-        return n                
+        return n
     return fin
 
 def BCElement(func):
@@ -36,7 +36,7 @@ def BCElement(func):
             if not k == '_xml_node_name':
                 n.set(k, str(kwargs[k]))
 
-        self.current_geometry = n  
+        self.current_geometry = n
         return self.current_geometry
     return fin
 
@@ -98,12 +98,13 @@ def addSimpleBCElements(nameList):
 @addSimpleBCElements([
     'MRT',
     'RightSymmetry',
-    'TopSymmetry',    
-    'BottomSymmetry',    
-    'None',    
+    'TopSymmetry',
+    'MovingWall',
+    'BottomSymmetry',
+    'None',
     'EPressure',
     'WPressure',
-    ])    
+    ])
 class CLBConfigWriter:
 
     def __init__(self, sign=''):
@@ -111,19 +112,19 @@ class CLBConfigWriter:
         if not sign == '':
             self.root.append(ET.Comment(sign))
         self.root.append(ET.Comment("Created using CLBConfigWriter"))
-        
+
         self.geometry = ET.SubElement(self.root,'Geometry')
         self.model = ET.SubElement(self.root, 'Model')
 
         self.root.set("version", "2.0")
         self.root.set("output", "output/")
         self.geometry.set("predef", "none")
-        self.geometry.set("model", "MRT")        
+        self.geometry.set("model", "MRT")
 
         self.current_geometry = self.geometry
-        
 
-    def dump(self):        
+
+    def dump(self):
         self.indent(self.root)
         ET.dump(self.root)
 
@@ -141,9 +142,9 @@ class CLBConfigWriter:
         else:
             if level and (not elem.tail or not elem.tail.strip()):
                 elem.tail = i
-            
-            
-    def write(self, filename):        
+
+
+    def write(self, filename):
         tree = ET.ElementTree(element=self.root)
         tree.write(filename)
 
@@ -152,14 +153,14 @@ class CLBConfigWriter:
         n.set(str(name), str(value))
 
     def addGeomParam(self, name, value):
-        self.geometry.set(str(name), str(value))  
-        
+        self.geometry.set(str(name), str(value))
+
     def setCG(self, cg):
         self.current_geometry = cg
-        
-    def addInit(self):      
+
+    def addInit(self):
         ET.SubElement(self.root, 'Init')
-        
+
     def addSolve(self, iterations=1, vtk=0, log=0):
         self.model = self.root
         n = ET.SubElement(self.root, 'Solve')
@@ -167,10 +168,10 @@ class CLBConfigWriter:
         if vtk > 0:
             n2 = ET.SubElement(n, 'VTK')
             n2.set('Iterations', str(vtk))
-            
+
         if log > 0:
             n3 = ET.SubElement(n, 'Log')
-            n3.set('Iterations', str(log))            
+            n3.set('Iterations', str(log))
 ##############
 # ELEMENT METHODE
 #############
@@ -190,7 +191,7 @@ class CLBConfigWriter:
     @geometryElement
     def addText(self, **kwargs):
         kwargs['_xml_node_name'] = 'Text'
-        return kwargs        
+        return kwargs
 
 ##############
 #  END ELEMENT FUNCTIONS, END CLASS
@@ -243,14 +244,14 @@ params = {
 'S5':"0",
 'S6':"0",
 'S7':"0.00",
-'S8':"0.00"             
+'S8':"0.00"
 }
 
 for n in params:
     CLBc.addModelParam(n, params[n])
-    
-CLBc.addSolve(iterations=1, vtk=1)     
-CLBc.addSolve(iterations=100, vtk=50) 
+
+CLBc.addSolve(iterations=1, vtk=1)
+CLBc.addSolve(iterations=100, vtk=50)
 
 CLBc.dump()
 CLBc.write('/home/michal/tach-17/mnt/fhgfs/users/mdzikowski/yang-laplace-sphere-matrix/test.xml')
