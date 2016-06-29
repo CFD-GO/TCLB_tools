@@ -87,6 +87,15 @@ def addSimpleBCElements(nameList):
         return cls
     return nif
 
+
+    
+def _set_by_kw(kw, name, default):
+    if kw.has_key(name):
+        return kw[name]
+    else:
+        return default
+        
+        
 @addSimpleGeomElements([
     'Box',
     'Sphere',
@@ -105,6 +114,7 @@ def addSimpleBCElements(nameList):
     'EPressure',
     'WPressure',
     ])
+       
 class CLBConfigWriter:
 
     def __init__(self, sign=''):
@@ -161,7 +171,15 @@ class CLBConfigWriter:
     def addInit(self):
         ET.SubElement(self.root, 'Init')
 
-    def addSolve(self, iterations=1, vtk=0, log=0):
+
+    def addSolve(self, **kwargs):
+        
+        iterations = _set_by_kw(kwargs, 'iterations', 1)
+        vtk = _set_by_kw(kwargs, 'vtk', 0)
+        log = _set_by_kw(kwargs, 'log', 0)
+        failcheck = _set_by_kw(kwargs, 'failcheck', 0)
+
+        
         self.model = self.root
         n = ET.SubElement(self.root, 'Solve')
         n.set('Iterations', str(iterations))
@@ -172,6 +190,10 @@ class CLBConfigWriter:
         if log > 0:
             n3 = ET.SubElement(n, 'Log')
             n3.set('Iterations', str(log))
+        if failcheck > 0:
+            n3 = ET.SubElement(n, 'Failcheck')
+            n3.set('Iterations', str(failcheck))
+            ET.SubElement(n3, 'VTK')                
 ##############
 # ELEMENT METHODE
 #############
