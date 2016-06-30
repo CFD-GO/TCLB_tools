@@ -171,6 +171,10 @@ class CLBConfigWriter:
     def addInit(self):
         ET.SubElement(self.root, 'Init')
 
+    def addSave(self,iterations, fname):
+        n = ET.SubElement(self.root, 'SaveBinary')
+        n.set('Iterations', str(iterations))
+        n.set('filename', str(fname))
 
     def addSolve(self, **kwargs):
         
@@ -178,6 +182,10 @@ class CLBConfigWriter:
         vtk = _set_by_kw(kwargs, 'vtk', 0)
         log = _set_by_kw(kwargs, 'log', 0)
         failcheck = _set_by_kw(kwargs, 'failcheck', 0)
+
+        failcheck_nx = _set_by_kw(kwargs, 'failcheck_nx', 1)
+        failcheck_ny = _set_by_kw(kwargs, 'failcheck_ny', 1)
+        failcheck_nz = _set_by_kw(kwargs, 'failcheck_nz', 1)
 
         
         self.model = self.root
@@ -193,6 +201,9 @@ class CLBConfigWriter:
         if failcheck > 0:
             n3 = ET.SubElement(n, 'Failcheck')
             n3.set('Iterations', str(failcheck))
+            n3.set('nx', str(failcheck_nx))
+            n3.set('ny', str(failcheck_ny))
+            n3.set('nz', str(failcheck_nz))
             ET.SubElement(n3, 'VTK')                
 ##############
 # ELEMENT METHODE
