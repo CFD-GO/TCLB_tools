@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import xml.etree.ElementTree as ET
-
-
+import lxml.etree as ET
 
 ## DECORATORS ##
 
@@ -21,6 +19,17 @@ def geometryElement(func):
                 n.set(k, str(kwargs[k]))
         return n
     return fin
+
+
+def addCDATA(name):
+    def nif(func):
+        def fin(self, *args, **kwargs):
+            n = func(self, *args, **kwargs)
+            n.text = ET.CDATA(kwargs['eval'])
+            #n.append(cdata)
+        return fin
+    return nif
+
 
 def BCElement(func):
     def fin(self, *args, **kwargs):
@@ -101,6 +110,7 @@ def _set_by_kw(kw, name, default):
     'Sphere',
     'HalfSphere',
     'OffgridSphere',
+    'OffgridPipe',
     'Outlet',
     'Inlet'
     ])
@@ -155,7 +165,7 @@ class CLBConfigWriter:
 
 
     def write(self, filename):
-        tree = ET.ElementTree(element=self.root)
+        tree = ET.ElementTree(element=self.root) 
         tree.write(filename)
 
     def addModelParam(self, name, value):
@@ -226,68 +236,78 @@ class CLBConfigWriter:
         kwargs['_xml_node_name'] = 'Text'
         return kwargs
 
+    @requireArg('eval')
+    @addCDATA('eval')
+    @geometryElement
+    def addPythonInline(self, **kwargs):
+        kwargs['_xml_node_name'] = 'PythonInline'
+        del kwargs['eval']
+        return kwargs
 ##############
 #  END ELEMENT FUNCTIONS, END CLASS
 #############
 
 
-'''
-CLBc = CLBConfigWriter()
-CLBc.addGeomParam('ny', 256)
-CLBc.addGeomParam('nx', 160)
-
-
-CLBc.addMRT()
-CLBc.addBox()
-
-CLBc.addZoneBlock(name='zwet')
-
-CLBc.addBox(dy=90, fy=-90)
-
-CLBc.addWall(name="zwall")
-#CLBc.addSphere(dy=">128", ny="256", dx=">-128", nx="256")
-CLBc.addSphere(dy="0", ny="256", dx=">-128", nx="256")
-CLBc.addBox(fy=-1, nx=50)
-
-CLBc.addRightSymmetry()
-CLBc.addBox(fy=-1, dx=-1)
-
-CLBc.addTopSymmetry()
-CLBc.addBox(fx=-1, dy=-1)
-
-params = {
-'InletVelocity': "0.0",
-'Density':"0.05",
-'Density-zwet':"3.117355002492964819",
-'Density-zwall':"2",
-'Density-zbc':"3.2625",
-'Temperature':"0.56",
-'FAcc':"1",
-'Magic':"0.008",
-'MagicA':"-0.152",
-'MagicF':"-0.6666666666666",
-'GravitationY':"-0.00000",
-'GravitationX':"-0.00000",
-'MovingWallVelocity':"0.000",
-'S0':"0",
-'S1':"0",
-'S2':"0",
-'S3':"-0.333333",
-'S4':"0",
-'S5':"0",
-'S6':"0",
-'S7':"0.00",
-'S8':"0.00"
-}
-
-for n in params:
-    CLBc.addModelParam(n, params[n])
-
-CLBc.addSolve(iterations=1, vtk=1)
-CLBc.addSolve(iterations=100, vtk=50)
-
-CLBc.dump()
-CLBc.write('/home/michal/tach-17/mnt/fhgfs/users/mdzikowski/yang-laplace-sphere-matrix/test.xml')
-#for l in file('/tmp/a.xml'):
-#    print l
-'''
+if __name__ == "__main__":
+    CLBc = CLBConfigWriter()
+    CLBc.addGeomParam('ny', 256)
+    CLBc.addGeomParam('nx', 160)
+    
+    
+    CLBc.addMRT()
+    CLBc.addBox()
+    
+    CLBc.addZoneBlock(name='zwet')
+    
+    CLBc.addBox(dy=90, fy=-90)
+    
+    CLBc.addWall(name="zwall")
+    #CLBc.addSphere(dy=">128", ny="256", dx=">-128", nx="256")
+    CLBc.addSphere(dy="0", ny="256", dx=">-128", nx="256")
+    CLBc.addBox(fy=-1, nx=50)
+    
+    CLBc.addRightSymmetry()
+    CLBc.addBox(fy=-1, dx=-1)
+  
+    CLBc.addPythonInline(nx=50, eval=""" 
+def test(*args, **kwargs):    
+    pass
+    """)
+  
+    CLBc.addTopSymmetry()
+    CLBc.addBox(fx=-1, dy=-1)
+    
+    params = {
+    'InletVelocity': "0.0",
+    'Density':"0.05",
+    'Density-zwet':"3.117355002492964819",
+    'Density-zwall':"2",
+    'Density-zbc':"3.2625",
+    'Temperature':"0.56",
+    'FAcc':"1",
+    'Magic':"0.008",
+    'MagicA':"-0.152",
+    'MagicF':"-0.6666666666666",
+    'GravitationY':"-0.00000",
+    'GravitationX':"-0.00000",
+    'MovingWallVelocity':"0.000",
+    'S0':"0",
+    'S1':"0",
+    'S2':"0",
+    'S3':"-0.333333",
+    'S4':"0",
+    'S5':"0",
+    'S6':"0",
+    'S7':"0.00",
+    'S8':"0.00"
+    }
+    
+    for n in params:
+        CLBc.addModelParam(n, params[n])
+    
+    CLBc.addSolve(iterations=1, vtk=1)
+    CLBc.addSolve(iterations=100, vtk=50)
+    
+    CLBc.dump()
+   # CLBc.write('/home/michal/tach-17/mnt/fhgfs/users/mdzikowski/yang-laplace-sphere-matrix/test.xml')
+   
