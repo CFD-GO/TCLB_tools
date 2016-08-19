@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<CLBConfig version="2.0">
+
+    <Geometry nx="129" ny="129">
+
+		<MRT><Box /></MRT>
+
+     	<None name="disc">
+            <!-- <Sphere nx="65"  dx="32" ny="65"  dy="32" />-->
+            <Box nx="65"  dx="32"  />
+            <!--     <Sphere   nx="50" ny="50"  />-->
+        </None>
+
+
+	</Geometry>
+    <Model>
+        <Params PhaseField="0.5"/>
+        <Params PhaseField-disc="-0.5"/>
+        <Params IntWidth="0.25" />
+        <Params RelaxationRate_ph="1" />
+        <Params Mobility="0.001"/> 
+        <Params Velocity="0."/>
+        <Params SurfaceTensionDecay="100" />
+        <Params GravitationX="0.000"/>
+    </Model>
+    <Params RelaxationRate="1" />
+    <Params RelaxationRate_l="1" />
+    <Params SurfaceTension
+Rate="0."/> 
+    
+    <Solve Iterations="2000" output="output/">
+       <VTK Iterations="1000"/> 
+        <CallPython Iterations="1000" module="CallPythonHandler" function="console" pass_component="h[0],h[1],h[2],h[3],h[4],h[5],h[6],h[7],h[8]"/> 
+        <CallPython Iterations="1000" module="CallPythonHandler" function="dump" pass_component="h[0],h[1],h[2],h[3],h[4],h[5],h[6],h[7],h[8]"/>
+    </Solve>
+
+
+</CLBConfig>
+
+
