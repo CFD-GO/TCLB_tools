@@ -116,10 +116,10 @@ def _set_by_kw(kw, name, default):
     ])
 @addSimpleBCElements([
     'MRT',
-    'RightSymmetry',
-    'TopSymmetry',
+    'ESymmetry',
+    'NSymmetry',
     'MovingWall',
-    'BottomSymmetry',
+    'SSymmetry',
     'None',
     'EPressure',
     'WPressure',
@@ -146,7 +146,7 @@ class CLBConfigWriter:
 
     def dump(self):
         self.indent(self.root)
-        ET.dump(self.root)
+        return ET.tostring(self.root)
 
     def indent(self, elem, level=0):
         i = "\n" + level*"  "
