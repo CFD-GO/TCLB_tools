@@ -117,9 +117,21 @@ def parseConfig(fconfig, **kwargs):
     else:
         time = 0
     parser.setContentHandler(CLBXMLHandler(CLBc, mp, time))
-    parser.parse(open(fconfig,"r"))
-
     
+    
+    try:
+        parser.parse(open(fconfig,"r"))
+    except xml.sax._exceptions.SAXParseException:
+        # this may be due <Run> element at the end
+        parser.reset()
+        f = file(fconfig,"r")
+        temp = list()
+        for l in f:
+            temp.append(str(l))  
+        t = '\n'.join(temp[:-3])
+        parser.feed(t)
+        
+        
     CLBcf = dict()
     CLBcg = dict()
     for c in  CLBc:
