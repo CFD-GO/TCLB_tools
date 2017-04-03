@@ -49,9 +49,13 @@ class VTIFile:
     def axisIterator(self,i=0,start=0, step=1, stop=-1):
         if stop == -1:
             stop = self.trim_1[i]-self.trim_0[i]
-        for j in range(start,  stop, step):
-            yield j
-            
+        else:
+            stop = np.min([ self.trim_1[i]-self.trim_0[i], stop ])
+           
+        for j in range(start, stop, step):
+             yield j
+
+
     def len(self,i=0):
         return self.trim_1[i] - self.trim_0[i]
 
