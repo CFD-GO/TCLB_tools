@@ -116,6 +116,7 @@ def _set_by_kw(kw, name, default):
     ])
 @addSimpleBCElements([
     'MRT',
+    'Cumulant',    
     'ESymmetry',
     'NSymmetry',
     'MovingWall',
@@ -123,6 +124,8 @@ def _set_by_kw(kw, name, default):
     'None',
     'EPressure',
     'WPressure',
+    'EVelocity',
+    'WVelocity',    
     ])
        
 class CLBConfigWriter:
@@ -171,7 +174,11 @@ class CLBConfigWriter:
     def addModelParam(self, name, value):
         n = ET.SubElement(self.model,'Params')
         n.set(str(name), str(value))
-
+    
+    def addParamRoot(self, name, value):
+        n = ET.SubElement(self.root,'Params')
+        n.set(str(name), str(value))
+        
     def addGeomParam(self, name, value):
         self.geometry.set(str(name), str(value))
 
@@ -181,6 +188,15 @@ class CLBConfigWriter:
     def addInit(self):
         ET.SubElement(self.root, 'Init')
 
+    def addSaveVTK(self,  **kwargs):
+        
+        vtk_what = _set_by_kw(kwargs, 'vtk_fields', 0)
+        
+        
+        n = ET.SubElement(self.root, 'VTK')
+        if vtk_what > 0:
+            n.set('what', str(vtk_what))       
+    
     def addSave(self,iterations, fname):
         n = ET.SubElement(self.root, 'SaveBinary')
         n.set('Iterations', str(iterations))
@@ -197,6 +213,10 @@ class CLBConfigWriter:
         failcheck_nx = _set_by_kw(kwargs, 'failcheck_nx', 1)
         failcheck_ny = _set_by_kw(kwargs, 'failcheck_ny', 1)
         failcheck_nz = _set_by_kw(kwargs, 'failcheck_nz', 1)
+
+        failcheck_dx = _set_by_kw(kwargs, 'failcheck_dx', 1)
+        failcheck_dy = _set_by_kw(kwargs, 'failcheck_dy', 1)
+        failcheck_dz = _set_by_kw(kwargs, 'failcheck_dz', 1)
 
         
         #self.model = self.root
@@ -217,6 +237,11 @@ class CLBConfigWriter:
             n4.set('nx', str(failcheck_nx))
             n4.set('ny', str(failcheck_ny))
             n4.set('nz', str(failcheck_nz))
+
+            n4.set('dx', str(failcheck_dx))
+            n4.set('dy', str(failcheck_dy))
+            n4.set('dz', str(failcheck_dz))
+
             ET.SubElement(n4, 'VTK')                
 ##############
 # ELEMENT METHODE

@@ -8,6 +8,13 @@ Created on Tue Apr 28 15:55:33 2015
 import xml.sax
 import re
 import numpy as np
+
+def toFloat(val):
+    try:
+        return float(val)
+    except ValueError:
+        return np.nan
+        
 class CLBXMLHandler(xml.sax.ContentHandler):
     
     def __init__(self, config_ref, mp, time):
@@ -29,8 +36,11 @@ class CLBXMLHandler(xml.sax.ContentHandler):
                 self.rewind = True
             for (k,v) in iters:
                 if k == 'Iterations':
-                    self.iterations = self.iterations + int(v)
-            
+                    try:
+                        self.iterations = self.iterations + int(v)
+                    except ValueError:
+                        self.iterations = self.iterations + 0
+            print self.iterations
                 
         if self.rewind:
                 return
@@ -41,29 +51,42 @@ class CLBXMLHandler(xml.sax.ContentHandler):
                 if k == 'gauge':
                     g = re.findall('[-,\.,e,0-9]+', v)
                     if len(g) == 1:
-                        a['gauge'] = float(g[0])
+                        a['gauge'] = toFloat(g[0])
+                    else:
+                        print "No gauge value: ", a, v
+                        a['float'] = np.nan                        
                 else:
                     a['name'] = k
                     a['value'] = v
                     g = re.findall('[-,\.,e,0-9]+', v)
                     if len(g) >= 1:
-                        a['float'] = float(g[0])                    
+                        a['float'] = toFloat(g[0])                    
                     else:
                         print "No value: ", k, v
                         a['float'] = np.nan
+            
+            ###catch overwrite
+            if self.config.has_key(a['name']) and self.config[a['name']].has_key('gauge') :
+                tmp = self.config[a['name']]
+                for k in a.keys():
+                    if not tmp.has_key(k):
+                        tmp[k] = a[k]                        
+                a = tmp
+                print "Safe-Overwriting ", a['name']
+                
             self.config[a['name']] = a
             self.config[a['name']]['time'] = self.iterations
         if name == "Geometry":
             
             for (k,v) in attrs.items():
                 
-                if k in ('nx', 'ny'):
+                if k in ('nx', 'ny', 'nz'):
                     a = dict()
                     a['name'] = k
                     a['value'] = v
                     g = re.findall('[-,\.,e,0-9]+', v)
                     if len(g) == 1:
-                        a['float'] = float(g[0])         
+                        a['float'] = toFloat(g[0])         
                     else:
                         a['float'] = np.nan                            
                     self.config[a['name']] = a
@@ -78,13 +101,16 @@ class CLBXMLHandler(xml.sax.ContentHandler):
                 if k == 'gauge':
                     g = re.findall('[-,\.,e,0-9]+', v)
                     if len(g) == 1:
-                        a['gauge'] = float(g[0])
+                        a['gauge'] = toFloat(g[0])
+                    else:
+                        print "No gauge value: ", k, v
+                        a['float'] = np.nan                              
                 else:
                     a['name'] = k
                     a['value'] = v
                     g = re.findall('[-,\.,e,0-9]+', v)
                     if len(g) >= 1:
-                        a['float'] = float(g[0])                    
+                        a['float'] = toFloat(g[0])                    
                     else:
                         print "No value: ", k, v
                         a['float'] = np.nan
@@ -99,10 +125,11 @@ class CLBXMLHandler(xml.sax.ContentHandler):
                     a['value'] = v
                     g = re.findall('[-,\.,e,0-9]+', v)
                     if len(g) == 1:
-                        a['float'] = float(g[0])         
+                        a['float'] = toFloat(g[0])         
                     else:
                         a['float'] = np.nan                            
                     self.config[a['name']] = a        
+
             
 def parseConfig(fconfig, **kwargs):
     CLBc = dict()
