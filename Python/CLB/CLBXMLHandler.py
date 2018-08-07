@@ -40,7 +40,7 @@ class CLBXMLHandler(xml.sax.ContentHandler):
                         self.iterations = self.iterations + int(v)
                     except ValueError:
                         self.iterations = self.iterations + 0
-            print self.iterations
+            #print self.iterations
                 
         if self.rewind:
                 return

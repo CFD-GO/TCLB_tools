@@ -20,6 +20,25 @@ def geometryElement(func):
         return n
     return fin
 
+def rootElement(func):
+    def fin(self, *args, **kwargs):
+        nargs = func(self, *args, **kwargs)
+
+        if len(nargs) < 1 or \
+        not nargs.has_key('_xml_node_name') \
+        :
+            raise BaseException("NOT ENOUGHT ARGS FOR ROOT ELEMENT")
+
+        if nargs.has_key('parent'):
+            n = ET.SubElement(nargs['parent'],nargs['_xml_node_name'])
+        else:
+            n = ET.SubElement(self.root,nargs['_xml_node_name'])
+        for k in nargs:
+            if not k in ('_xml_node_name', 'parent'):
+                n.set(k, str(kwargs[k]))
+        return n
+    return fin
+
 
 def addCDATA(name):
     def nif(func):
@@ -96,6 +115,18 @@ def addSimpleBCElements(nameList):
         return cls
     return nif
 
+def addRootElements(nameList):
+    def nif(cls):
+        def inf(name):
+            @rootElement
+            def fin(self, **kwargs):
+                kwargs['_xml_node_name'] = name
+                return kwargs
+            cls.__dict__["add"+name] = fin
+        for n in nameList:
+            inf(n)
+        return cls
+    return nif
 
     
 def _set_by_kw(kw, name, default):
@@ -126,8 +157,16 @@ def _set_by_kw(kw, name, default):
     'WPressure',
     'EVelocity',
     'WVelocity',    
+    'SVelocity',
+    'NVelocity',       
     ])
-       
+@addRootElements(
+[   
+ 'EvalIf',
+ 'CallPython',
+ 'VTK'
+ ]        
+)
 class CLBConfigWriter:
 
     def __init__(self, sign=''):
@@ -175,9 +214,20 @@ class CLBConfigWriter:
         n = ET.SubElement(self.model,'Params')
         n.set(str(name), str(value))
     
-    def addParamRoot(self, name, value):
+    def addModelParams(self, params_dict):
+        for n in params_dict:
+            self.addModelParam(n, params_dict[n])      
+
+    def addRootParams(self, params_dict):
+        for n in params_dict:
+            self.addParamRoot(n, params_dict[n])      
+
+    def addRootParam(self, name, value):
         n = ET.SubElement(self.root,'Params')
         n.set(str(name), str(value))
+        
+    def addParamRoot(self, name, value):
+        self.addRootParam(name,value)
         
     def addGeomParam(self, name, value):
         self.geometry.set(str(name), str(value))
@@ -188,14 +238,14 @@ class CLBConfigWriter:
     def addInit(self):
         ET.SubElement(self.root, 'Init')
 
-    def addSaveVTK(self,  **kwargs):
-        
-        vtk_what = _set_by_kw(kwargs, 'vtk_fields', 0)
-        
-        
-        n = ET.SubElement(self.root, 'VTK')
-        if vtk_what > 0:
-            n.set('what', str(vtk_what))       
+#    def addSaveVTK(self,  **kwargs):
+#        
+#        vtk_what = _set_by_kw(kwargs, 'vtk_fields', 0)
+#        
+#        
+#        n = ET.SubElement(self.root, 'VTK')
+#        if vtk_what > 0:
+#            n.set('what', str(vtk_what))       
     
     def addSave(self,iterations, fname):
         n = ET.SubElement(self.root, 'SaveBinary')
@@ -217,7 +267,7 @@ class CLBConfigWriter:
         failcheck_dx = _set_by_kw(kwargs, 'failcheck_dx', 1)
         failcheck_dy = _set_by_kw(kwargs, 'failcheck_dy', 1)
         failcheck_dz = _set_by_kw(kwargs, 'failcheck_dz', 1)
-
+        failcheck_fields = _set_by_kw(kwargs, 'failcheck_fields', "")
         
         #self.model = self.root
         n = ET.SubElement(self.root, 'Solve')
@@ -242,7 +292,11 @@ class CLBConfigWriter:
             n4.set('dy', str(failcheck_dy))
             n4.set('dz', str(failcheck_dz))
 
-            ET.SubElement(n4, 'VTK')                
+            n4.set('what', str(failcheck_fields))
+
+
+            ET.SubElement(n4, 'VTK')     
+        return n
 ##############
 # ELEMENT METHODE
 #############
