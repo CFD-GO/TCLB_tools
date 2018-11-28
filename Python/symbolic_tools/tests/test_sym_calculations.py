@@ -135,7 +135,7 @@ class TestSymbolicCalc(TestCase):
 
         assert out == expected_result
 
-    def test_get_F_cm_using_He_scheme_and_continuous_Maxwellian_DF(self):
+    def test_get_F_cm_using_He_scheme_and_continuous_rho_Maxwellian_DF(self):
         from SymbolicCollisions.core.hardcoded_results import hardcoded_F_cm_hydro_LB_density_based
 
         F_cm = get_mom_vector_from_continuous_def(get_continuous_force_He_MB, continuous_transformation=get_continuous_cm)
@@ -152,7 +152,7 @@ class TestSymbolicCalc(TestCase):
 
         assert expected_result == out
 
-    def test_get_F_cm_using_He_scheme_and_continuous_Maxwellian_DF(self):
+    def test_get_F_cm_using_He_scheme_and_continuous_p_Maxwellian_DF(self):
         F_cm = get_mom_vector_from_continuous_def(get_continuous_force_He_hydro_DF, continuous_transformation=get_continuous_cm)
 
         f = io.StringIO()
