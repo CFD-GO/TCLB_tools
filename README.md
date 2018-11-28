@@ -1,4 +1,9 @@
 # TCLB tools
+
+[![CircleCI](https://circleci.com/gh/ggruszczynski/TCLB_tools.svg?style=shield&circle-token=:circle-token)](https://circleci.com/gh/ggruszczynski/TCLB_tools)
+[![codecov](https://codecov.io/gh/ggruszczynski/TCLB_tools/badge.svg)](https://codecov.io/gh/ggruszczynski/TCLB_tools)
+
+
 Various tools for the [TCLB](/CFD-GO/TCLB/) project
 
 ## Structure
