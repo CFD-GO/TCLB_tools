@@ -4,6 +4,10 @@ import io
 from contextlib import redirect_stdout
 from sympy import Symbol
 
+import sys, os
+sys.path.append(os.path.join('Python','symbolic_tools'))  # allow CI bot to see the stuff from the main repo dir
+# from Python.symbolic_tools.SymbolicCollisions.core.cm_symbols import w  # alternatively change all import paths
+
 from SymbolicCollisions.core.cm_symbols import w
 
 from SymbolicCollisions.core.sym_col_fun import \
