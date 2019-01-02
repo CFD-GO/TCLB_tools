@@ -3,7 +3,7 @@ from SymbolicCollisions.core.sym_col_fun import *
 from SymbolicCollisions.core.cm_symbols import *
 from sympy.matrices import Matrix
 from sympy import pretty_print, exp
-from SymbolicCollisions.core.cm_symbols import ex, ey
+from SymbolicCollisions.core.cm_symbols import ex_D2Q9, ey_D2Q9
 from SymbolicCollisions.core.printers import print_as_vector
 import numpy as np
 from sympy.utilities.iterables import flatten
@@ -20,7 +20,7 @@ pretty_print(K_ortho_Geier.transpose()*K_ortho_Geier)
 
 
 print("\n\n=== from raw moments to ortho moments ===\n")
-T_raw_to_ortho = M_ortho_GS * Mraw.inv()
+T_raw_to_ortho = M_ortho_GS * Mraw_D2Q9.inv()
 pretty_print(T_raw_to_ortho)
 
 print("\n\n=== relax raw moments in ortho space and go back to raw moments ===\n")
@@ -39,7 +39,7 @@ print("\n\n=== CM ===\n")
 
 # N_ortho = T_raw_to_ortho*N
 # pretty_print(N_ortho)
-XXX_ortho = T_raw_to_ortho * Mraw
+XXX_ortho = T_raw_to_ortho * Mraw_D2Q9
 pretty_print(XXX_ortho * XXX_ortho.transpose())
 print_as_vector(XXX_ortho * XXX_ortho.transpose(), print_symbol='xxx', regex=True)
 
@@ -123,4 +123,4 @@ pretty_print(hmm.transpose()*hmm)
 #
 # pretty_print(mmm.transpose())
 print("\n=========================================")
-pretty_print(Nraw.transpose()*Nraw)
+pretty_print(NrawD2Q9.transpose() * NrawD2Q9)

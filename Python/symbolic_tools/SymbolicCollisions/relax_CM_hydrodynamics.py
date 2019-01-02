@@ -1,8 +1,8 @@
 
 from sympy.matrices import eye
-from SymbolicCollisions.core.cm_symbols import sv, sb, Mraw, Nraw, S_relax, rho
+from SymbolicCollisions.core.cm_symbols import sv, sb, Mraw_D2Q9, NrawD2Q9, S_relax_D2Q9, rho
 from SymbolicCollisions.core.sym_col_fun import get_DF, get_m00
-from SymbolicCollisions.core.sym_col_fun import get_mom_vector_from_discrete_def, get_discrete_force_Guo_second_order, \
+from SymbolicCollisions.core.sym_col_fun import get_mom_vector_from_discrete_def, get_discrete_force_Guo, \
       get_mom_vector_from_continuous_def, get_continuous_force_He_MB, get_discrete_EDF_hydro
 from SymbolicCollisions.core.printers import print_u2, print_as_vector, print_ccode
 from SymbolicCollisions.core.hardcoded_results import hardcoded_cm_hydro_eq, hardcoded_F_cm_He_hydro_LB_velocity_based
@@ -41,14 +41,14 @@ print("for (int i = 0; i < 9; i++) {\n\t"
 populations = get_DF(pop_in_str)
 temp_populations = get_DF(temp_pop_str)
 cm_eq = get_DF(cm_eq_pop_str)
-m = Mraw * temp_populations
+m = Mraw_D2Q9 * temp_populations
 
 print("\n//raw moments from density-probability functions")
 print("//[m00, m10, m01, m20, m02, m11, m21, m12, m22]")
 print_as_vector(m, print_symbol=pop_in_str)
 
 print("\n//central moments from raw moments")
-cm = Nraw * populations
+cm = NrawD2Q9 * populations
 print_as_vector(cm, print_symbol=temp_pop_str, regex=True)
 
 print("\n//collision in central moments space")
@@ -57,16 +57,16 @@ print("//calculate equilibrium distributions in cm space")
 print_as_vector(hardcoded_cm_hydro_eq, cm_eq_pop_str, regex=True)  # save time
 
 print("//collide eq: -S*(cm - cm_eq)")
-cm_after_collision = -S_relax * (temp_populations - cm_eq)
+cm_after_collision = -S_relax_D2Q9 * (temp_populations - cm_eq)
 # cm_after_collision = -S_relax * (temp_populations - hardcoded_cm_hydro_eq)
 print_as_vector(cm_after_collision, print_symbol=pop_in_str, regex=True)
 
 print("\n//back to raw moments")
-m = Nraw.inv() * populations
+m = NrawD2Q9.inv() * populations
 print_as_vector(m, print_symbol=temp_pop_str, regex=True)
 
 print("\n//back to density-probability functions")
-populations = Mraw.inv()*temp_populations
+populations = Mraw_D2Q9.inv() * temp_populations
 print_as_vector(populations, print_symbol=pop_in_str, regex=True)
 
 print("\n}\n")

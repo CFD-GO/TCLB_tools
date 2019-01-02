@@ -1,6 +1,6 @@
 from SymbolicCollisions.core.sym_col_fun import *
 from SymbolicCollisions.core.printers import print_as_vector, print_ccode
-from SymbolicCollisions.core.cm_symbols import Mraw, M_ortho_GS
+from SymbolicCollisions.core.cm_symbols import Mraw_D2Q9, M_ortho_GS
 import numpy as np
 import time
 from sympy.utilities.iterables import flatten
@@ -11,21 +11,21 @@ start = time.process_time()
 print('// === welcome to moments space! === \n ')
 print('// === discrete moments ===\n ')
 
-T_raw_to_ortho = M_ortho_GS * Mraw.inv()
+T_raw_to_ortho = M_ortho_GS * Mraw_D2Q9.inv()
 
 print('\n//F_m_Guo_extended')
-F_m_Guo_extended = get_mom_vector_from_discrete_def(get_discrete_force_Guo_second_order, discrete_transform=get_discrete_m)
+F_m_Guo_extended = get_mom_vector_from_discrete_def(get_discrete_force_Guo, discrete_transform=get_discrete_m)
 print_as_vector(F_m_Guo_extended, 'F_raw_m', regex=True)
 print_as_vector(T_raw_to_ortho*F_m_Guo_extended, 'F_GS_m', regex=True)
 
 print('\n//M*F_m_Guo_extended ')
-F_m_Guo_extended = get_mom_vector_from_shift_Mat(get_discrete_force_Guo_second_order, Mat=Mraw)
+F_m_Guo_extended = get_mom_vector_from_shift_Mat(get_discrete_force_Guo, Mat=Mraw_D2Q9)
 print_as_vector(F_m_Guo_extended, 'F_raw_m', regex=True)
 print_as_vector(T_raw_to_ortho*F_m_Guo_extended, 'F_GS_m', regex=True)
 
 
 print('\n//M_ortho_GS*F_m_Guo_extended ')
-F_m_Guo_extended = get_mom_vector_from_shift_Mat(get_discrete_force_Guo_second_order, Mat=M_ortho_GS)
+F_m_Guo_extended = get_mom_vector_from_shift_Mat(get_discrete_force_Guo, Mat=M_ortho_GS)
 print_as_vector(F_m_Guo_extended, 'F_GS_m', regex=True)
 
 

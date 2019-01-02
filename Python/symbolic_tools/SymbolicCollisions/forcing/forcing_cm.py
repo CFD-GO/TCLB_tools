@@ -12,12 +12,12 @@ print('// === discrete central moments ===\n ')
 
 
 print('\n//F_cm_Guo_extended from discrete def')
-F_cm_Guo_extended = get_mom_vector_from_discrete_def(get_discrete_force_Guo_second_order, discrete_transform=get_discrete_m)
+F_cm_Guo_extended = get_mom_vector_from_discrete_def(get_discrete_force_Guo, discrete_transform=get_discrete_m)
 print_as_vector(F_cm_Guo_extended, 'F_cm', regex=True)
 #
 #
 print('\n//M*F_cm_Guo_extended')
-F_cm_Guo_extended = get_mom_vector_from_shift_Mat(get_discrete_force_Guo_second_order, Mat=Nraw * Mraw)
+F_cm_Guo_extended = get_mom_vector_from_shift_Mat(get_discrete_force_Guo, Mat=NrawD2Q9 * Mraw_D2Q9)
 print_as_vector(F_cm_Guo_extended, 'F_cm', regex=True)
 
 print('\n\n// === continuous central moments === \n ')

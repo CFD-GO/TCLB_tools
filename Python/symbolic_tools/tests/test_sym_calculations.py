@@ -1,11 +1,18 @@
-from unittest import TestCase
+import unittest
 
 import io
 from contextlib import redirect_stdout
 from sympy import Symbol
 
-import sys, os
-sys.path.append(os.path.join('Python','symbolic_tools'))  # allow CI bot to see the stuff from the main repo dir
+
+import multiprocessing
+from concurrencytest import ConcurrentTestSuite, fork_for_tests
+
+
+import sys
+import os
+sys.path.append(os.path.join('Python', 'symbolic_tools'))  # allow CI bot to see the stuff from the main repo dir
+sys.path.append(os.path.join('.'))  # allow CI bot to see the stuff from the main repo dir
 # from Python.symbolic_tools.SymbolicCollisions.core.cm_symbols import w  # alternatively change all import paths
 
 from SymbolicCollisions.core.cm_symbols import w
@@ -16,11 +23,11 @@ from SymbolicCollisions.core.sym_col_fun import \
     get_continuous_force_He_MB, \
     get_discrete_EDF_hydro, \
     get_discrete_force_He, \
-    get_discrete_force_Guo_second_order, get_continuous_force_Guo, \
+    get_discrete_force_Guo, get_continuous_force_Guo, \
     get_gamma, get_continuous_hydro_DF, get_continuous_force_He_hydro_DF, \
     get_continuous_cm, get_discrete_cm
 
-from SymbolicCollisions.core.cm_symbols import Mraw, Nraw
+from SymbolicCollisions.core.cm_symbols import Mraw_D2Q9, NrawD2Q9
 
 from SymbolicCollisions.core.printers import print_as_vector
 
@@ -28,17 +35,16 @@ from SymbolicCollisions.core.hardcoded_results import \
     hardcoded_F_cm_Guo_hydro_LB_velocity_based, hardcoded_cm_pf_eq, hardcoded_cm_hydro_eq
 
 
-class TestSymbolicCalc(TestCase):
-
+class TestSymbolicCalc(unittest.TestCase):
     def test_get_raw_matrix_d2q9(self):
-        from SymbolicCollisions.core.MatrixGenerator import MatrixGenerator
-        from SymbolicCollisions.core.cm_symbols import ex, ey, Mraw
+        from SymbolicCollisions.core.MatrixGenerator import get_raw_moments_matrix
+        from SymbolicCollisions.core.cm_symbols import ex_D2Q9, ey_D2Q9, Mraw_D2Q9
 
-        M = MatrixGenerator().get_raw_moments_matrix(ex_=ex, ey_=ey)
+        M = get_raw_moments_matrix(ex_=ex_D2Q9, ey_=ey_D2Q9)
 
         f = io.StringIO()
         with redirect_stdout(f):
-            print_as_vector(Mraw, 's', regex=True)
+            print_as_vector(Mraw_D2Q9, 's', regex=True)
         out = f.getvalue()
 
         f2 = io.StringIO()
@@ -50,11 +56,11 @@ class TestSymbolicCalc(TestCase):
 
 
     def test_Shift_ortho_Straka_d2q5(self):
-        from SymbolicCollisions.core.MatrixGenerator import MatrixGenerator
+        from SymbolicCollisions.core.MatrixGenerator import get_shift_matrix
         from SymbolicCollisions.core.cm_symbols import Shift_ortho_Straka_d2q5, K_ortho_Straka_d2q5, ex_Straka_d2_q5, \
             ey_Straka_d2_q5
 
-        Smat = MatrixGenerator().get_shift_matrix(K_ortho_Straka_d2q5, ex_Straka_d2_q5, ey_Straka_d2_q5)
+        Smat = get_shift_matrix(K_ortho_Straka_d2q5, ex_Straka_d2_q5, ey_Straka_d2_q5)
 
         f = io.StringIO()
         with redirect_stdout(f):
@@ -69,10 +75,10 @@ class TestSymbolicCalc(TestCase):
         assert out == out2
 
     def test_Shift_ortho_Geier_d2q9(self):
-        from SymbolicCollisions.core.MatrixGenerator import MatrixGenerator
+        from SymbolicCollisions.core.MatrixGenerator import get_shift_matrix
         from SymbolicCollisions.core.cm_symbols import Shift_ortho_Geier, K_ortho_Geier, ex_Geier, ey_Geier
 
-        Smat = MatrixGenerator().get_shift_matrix(K_ortho_Geier, ex_Geier, ey_Geier)
+        Smat = get_shift_matrix(K_ortho_Geier, ex_Geier, ey_Geier)
 
         f = io.StringIO()
         with redirect_stdout(f):
@@ -87,11 +93,11 @@ class TestSymbolicCalc(TestCase):
         assert out == out2
 
     def test_shift_vs_def_cm(self):
-        functions = [lambda i: w[i], get_discrete_force_He, get_discrete_force_Guo_second_order]
+        functions = [lambda i: w[i], get_discrete_force_He, get_discrete_force_Guo]
 
         for fun in functions:
             F_in_cm = get_mom_vector_from_discrete_def(fun, discrete_transform=get_discrete_cm)  # calculate from definition of cm
-            NMF_cm = get_mom_vector_from_shift_Mat(fun, Mat=Nraw * Mraw)  # calculate using shift matrices
+            NMF_cm = get_mom_vector_from_shift_Mat(fun, Mat=NrawD2Q9 * Mraw_D2Q9)  # calculate using shift matrices
 
             f = io.StringIO()
             with redirect_stdout(f):
@@ -121,7 +127,7 @@ class TestSymbolicCalc(TestCase):
         assert expected_result == out
 
     def test_get_F_cm_Guo_continuous_and_discrete(self):
-        F_cm_Guo_disc = get_mom_vector_from_discrete_def(get_discrete_force_Guo_second_order, discrete_transform=get_discrete_cm)
+        F_cm_Guo_disc = get_mom_vector_from_discrete_def(get_discrete_force_Guo, discrete_transform=get_discrete_cm)
         F_cm_Guo_cont = get_mom_vector_from_continuous_def(get_continuous_force_Guo, continuous_transformation=get_continuous_cm)
 
         results = [F_cm_Guo_disc, F_cm_Guo_cont]
@@ -306,3 +312,18 @@ class TestSymbolicCalc(TestCase):
         assert 'cm_eq[8] = m00*(3.0*ux2*uy2 + 1./9.);\n' in out
 
         assert expected_result == out
+
+
+# Pycharm runs them sequentially
+# python -m unittest tests/test_example_unit_tests_parallel_run.py # sequential as well
+# python tests/test_example_unit_tests_parallel_run.py # concurrent run :)
+
+if __name__ == '__main__':
+    loader = unittest.TestLoader()
+    runner = unittest.TextTestRunner()
+    # Run same tests across 4 processes
+    cores = multiprocessing.cpu_count()
+    print(f'\nRunning tests on {cores} cores:')
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestSymbolicCalc)
+    concurrent_suite = ConcurrentTestSuite(suite, fork_for_tests(cores))
+    runner.run(concurrent_suite)

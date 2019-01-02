@@ -3,19 +3,72 @@ from sympy.interactive.printing import init_printing
 from sympy.matrices import Matrix, eye, zeros, ones, diag, GramSchmidt
 
 from sympy import simplify, Float, preorder_traversal
-
+import numpy as np
 
 init_printing(use_unicode=False, wrap_line=False, no_global=True)
 
 # SYMBOLS:
 ux = Symbol('u.x')
 uy = Symbol('u.y')
+uz = Symbol('u.z')
 
 sv = Symbol('s_v')  # s_v = 1 /(tau + 0.5)
 sb = Symbol('s_b')  # results in bulk viscosity = 1/6 since : zeta = (1/sb - 0.5)*cs^2*dt
 
-ex = Matrix([0, 1, 0, -1, 0, 1, -1, -1, 1])
-ey = Matrix([0, 0, 1, 0, -1, 1, 1, -1, -1])
+ex_D2Q9 = Matrix([0, 1, 0, -1, 0, 1, -1, -1, 1])
+ey_D2Q9 = Matrix([0, 0, 1, 0, -1, 1, 1, -1, -1])
+
+# ex_D2Q9 = np.array([0, 1, 0, -1, 0, 1, -1, -1, 1])
+# ey_D2Q9 = np.array([0, 0, 1, 0, -1, 1, 1, -1, -1])
+
+# D3Q7 notation from TCLB
+ex_D3Q7 = Matrix([0, 1, -1, 0, 0, 0, 0])
+ey_D3Q7 = Matrix([0, 0, 0, 1, -1, 0, 0])
+ez_D3Q7 = Matrix([0, 0, 0, 0, 0, 1, -1])
+
+
+# D3Q15 - notation from 'LBM Principles and Practise' Book p. 89
+ex_D3Q15 = Matrix([0, 1, -1, 0, 0, 0, 0, 1, -1, 1, -1, 1, -1, -1, 1])
+ey_D3Q15 = Matrix([0, 0, 0, 1, -1, 0, 0, 1, -1, 1, -1, -1, 1, 1, -1])
+ez_D3Q15 = Matrix([0, 0, 0, 0, 0, 1, -1, 1, -1, -1, 1, 1, -1, 1, -1])
+
+S_relax_ADE_D3Q15 = diag(1, sv, sv, sv, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+
+
+# D3Q19 -
+# as in TCLM or '3D CLBM: Improved implementation and consistent forcing scheme' by L. Fei and Q. li 2018
+# (differs from 'LBM Principles and Practise' Book)
+ex_D3Q19 = Matrix([0, 1, -1, 0, 0, 0, 0, 1, -1, 1, -1, 1, -1, 1, -1, 0, 0, 0, 0])
+ey_D3Q19 = Matrix([0, 0, 0, 1, -1, 0, 0, 1, 1, -1, -1, 0, 0, 0, 0, 1, -1, 1, -1])
+ez_D3Q19 = Matrix([0, 0, 0, 0, 0, 1, -1, 0, 0, 0, 0, 1, 1, -1, -1, 1, 1, -1, -1])
+
+# FROM TCLB
+# d3q19 = matrix(c(
+#          0,  1, -1,  0,  0,  0,  0,  1, -1,  1, -1,  1, -1,  1, -1,  0,  0,  0,  0,
+#          0,  0,  0,  1, -1,  0,  0,  1,  1, -1, -1,  0,  0,  0,  0,  1, -1,  1, -1,
+#          0,  0,  0,  0,  0,  1, -1,  0,  0,  0,  0,  1,  1, -1, -1,  1,  1, -1, -1), 19, 3);
+#
+# attr(d3q19,"MAT") = matrix(c(
+#          1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,
+#        -30,-11,-11,-11,-11,-11,-11,  8,  8,  8,  8,  8,  8,  8,  8,  8,  8,  8,  8,
+#         12, -4, -4, -4, -4, -4, -4,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,
+#          0,  1, -1,  0,  0,  0,  0,  1, -1,  1, -1,  1, -1,  1, -1,  0,  0,  0,  0,
+#          0, -4,  4,  0,  0,  0,  0,  1, -1,  1, -1,  1, -1,  1, -1,  0,  0,  0,  0,
+#          0,  0,  0,  1, -1,  0,  0,  1,  1, -1, -1,  0,  0,  0,  0,  1, -1,  1, -1,
+#          0,  0,  0, -4,  4,  0,  0,  1,  1, -1, -1,  0,  0,  0,  0,  1, -1,  1, -1,
+#          0,  0,  0,  0,  0,  1, -1,  0,  0,  0,  0,  1,  1, -1, -1,  1,  1, -1, -1,
+#          0,  0,  0,  0,  0, -4,  4,  0,  0,  0,  0,  1,  1, -1, -1,  1,  1, -1, -1,
+#          0,  2,  2, -1, -1, -1, -1,  1,  1,  1,  1,  1,  1,  1,  1, -2, -2, -2, -2,
+#          0, -4, -4,  2,  2,  2,  2,  1,  1,  1,  1,  1,  1,  1,  1, -2, -2, -2, -2,
+#          0,  0,  0,  1,  1, -1, -1,  1,  1,  1,  1, -1, -1, -1, -1,  0,  0,  0,  0,
+#          0,  0,  0, -2, -2,  2,  2,  1,  1,  1,  1, -1, -1, -1, -1,  0,  0,  0,  0,
+#          0,  0,  0,  0,  0,  0,  0,  1, -1, -1,  1,  0,  0,  0,  0,  0,  0,  0,  0,
+#          0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  1, -1, -1,  1,
+#          0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  1, -1, -1,  1,  0,  0,  0,  0,
+#          0,  0,  0,  0,  0,  0,  0,  1, -1,  1, -1, -1,  1, -1,  1,  0,  0,  0,  0,
+#          0,  0,  0,  0,  0,  0,  0, -1, -1,  1,  1,  0,  0,  0,  0,  1, -1,  1, -1,
+#          0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  1,  1, -1, -1, -1, -1,  1,  1), 19, 19);
+
 
 Fx = Symbol('Fhydro.x')
 Fy = Symbol('Fhydro.y')
@@ -41,13 +94,12 @@ uxuy3 = Symbol('uxuy3')
 
 dzeta_x = Symbol('dzeta_x')
 dzeta_y = Symbol('dzeta_y')
-
-
+dzeta_z = Symbol('dzeta_z')
 
 # this matrix will produce raw moments (m=M*f) in the following order:
 # [m00, m10, m01, m20, m02, m11, m21, m12, m22]
 # "Modelling incompressible thermal flows using a central-moments-based lattice Boltzmann method" L. Fei et al. 2017
-Mraw = Matrix([
+Mraw_D2Q9 = Matrix([
     [1, 1, 1,  1,  1, 1,  1,  1,  1],
     [0, 1, 0, -1,  0, 1, -1, -1,  1],
     [0, 0, 1,  0, -1, 1,  1, -1, -1],
@@ -58,7 +110,6 @@ Mraw = Matrix([
     [0, 0, 0,  0,  0, 1, -1, -1,  1],
     [0, 0, 0,  0,  0, 1,  1,  1,  1]
 ])
-
 
 # eq 10.30 from The Lattice Boltzmann Method: Principles and Practice
 # T. Krüger, H. Kusumaatmaja, A. Kuzmin, O. Shardt, G. Silva, E.M. Viggen
@@ -73,7 +124,6 @@ M_ortho_GS = Matrix([
     [ 0,  1, -1,  1, -1, 0,  0,  0,  0],
     [ 0,  0,  0,  0,  0, 1, -1,  1, -1]
 ])
-
 
 ex_Straka_d2_q5 = Matrix([0, -1, 0, 1, 0])
 ey_Straka_d2_q5 = Matrix([0, 0, -1, 0, 1])
@@ -129,8 +179,8 @@ Shift_ortho_Geier = Matrix([
 # real_t m22 =                                    f[5] + f[6] + f[7]  + f[8];  // m22 - m8
 
 # SHIFT MATRIX
-# "Modelling incompresiible thermal flows using a central-moments-based lattice Boltzmann method" L. Fei et al. 2017
-Nraw = Matrix([
+# "Modelling incompressible thermal flows using a central-moments-based lattice Boltzmann method" L. Fei et al. 2017
+NrawD2Q9 = Matrix([
     [                1,                 0,                 0,       0,       0,            0,       0,       0, 0],
     [              -ux,                 1,                 0,       0,       0,            0,       0,       0, 0],
     [              -uy,                 0,                 1,       0,       0,            0,       0,       0, 0],
@@ -146,12 +196,11 @@ Nraw = Matrix([
 s_plus = (sb + sv) / 2
 s_minus = (sb - sv) / 2
 
-S_relax = diag(1, 1, 1, s_plus, s_plus, sv, 1, 1, 1)
-S_relax[3, 4] = s_minus
-S_relax[4, 3] = s_minus
+S_relax_D2Q9 = diag(1, 1, 1, s_plus, s_plus, sv, 1, 1, 1)
+S_relax_D2Q9[3, 4] = s_minus
+S_relax_D2Q9[4, 3] = s_minus
 
-S_relax_phi = diag(1, sv, sv, 1, 1, 1, 1, 1, 1)
+S_relax_ADE_D2Q9 = diag(1, sv, sv, 1, 1, 1, 1, 1, 1)
 
-S_relax_MRT_GS = diag(1, 1, 1, 1, 1, 1, 1, sv, sv)   #
+S_relax_MRT_GS = diag(1, 1, 1, 1, 1, 1, 1, sv, sv)  #
 # S_relax_MRT_GS = diag(0, 0, 0, 0, 0, 0, 0, sv, sv)   #
-

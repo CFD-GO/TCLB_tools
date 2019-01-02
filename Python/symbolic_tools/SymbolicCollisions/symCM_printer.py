@@ -14,7 +14,7 @@ F_cm_He_original = get_mom_vector_from_discrete_def(get_discrete_force_He, discr
 print_as_vector(F_cm_He_original, 'F_cm', regex=True)
 
 print('\n//N*M*F_He')
-NMF_cm_He_original = get_mom_vector_from_shift_Mat(get_discrete_force_He, Mat=Nraw * Mraw)
+NMF_cm_He_original = get_mom_vector_from_shift_Mat(get_discrete_force_He, Mat=NrawD2Q9 * Mraw_D2Q9)
 print_as_vector(NMF_cm_He_original, 'F_cm', regex=True)
 
 print('\n//F_cm_He_hydro_eq_experimental')
@@ -27,15 +27,15 @@ F_cm_Guo_bez_U = get_mom_vector_from_discrete_def(get_discrete_force_Guo_without
 print_as_vector(F_cm_Guo_bez_U, 'F_cm', regex=True)
 
 print('\n//F_cm_Guo_first_order')
-F_cm_Guo = get_mom_vector_from_discrete_def(get_discrete_force_Guo_first_order, discrete_transform=get_discrete_cm)
+F_cm_Guo = get_mom_vector_from_discrete_def(get_discrete_force_Guo_experimental, discrete_transform=get_discrete_cm)
 print_as_vector(F_cm_Guo, 'F_cm', regex=True)
 
 print('\n//F_cm_Guo_second_order')
-F_cm_Guo_extended = get_mom_vector_from_discrete_def(get_discrete_force_Guo_second_order, discrete_transform=get_discrete_cm)
+F_cm_Guo_extended = get_mom_vector_from_discrete_def(get_discrete_force_Guo, discrete_transform=get_discrete_cm)
 print_as_vector(F_cm_Guo_extended, 'F_cm', regex=True)
 
 print('\n//N*M*F_cm_Guo_second_order ')
-NMF_cm_Guo_second_order = get_mom_vector_from_shift_Mat(get_discrete_force_Guo_second_order, Mat=Nraw * Mraw)
+NMF_cm_Guo_second_order = get_mom_vector_from_shift_Mat(get_discrete_force_Guo, Mat=NrawD2Q9 * Mraw_D2Q9)
 print_as_vector(NMF_cm_Guo_second_order, 'F_cm', regex=True)
 
 print('\n//F_phi_cm')
@@ -79,7 +79,7 @@ F_cm = get_mom_vector_from_continuous_def(get_continuous_force_Guo, continuous_t
 print_as_vector(F_cm, 'F_cm', regex=True)
 
 print('\n//N*M*F_He_continous ')
-NMF_cm_He_original = get_mom_vector_from_shift_Mat(get_continuous_force_He_MB, Mat=Nraw * Mraw)
+NMF_cm_He_original = get_mom_vector_from_shift_Mat(get_continuous_force_He_MB, Mat=NrawD2Q9 * Mraw_D2Q9)
 print_as_vector(NMF_cm_He_original, 'F_cm', regex=True)  # produces looong expressions
 
 
