@@ -4,7 +4,11 @@ from SymbolicCollisions.core.cm_symbols import sv, sb, Mraw_D2Q9, NrawD2Q9, S_re
 from SymbolicCollisions.core.sym_col_fun import get_DF, get_m00, \
     get_mom_vector_from_continuous_def, get_mom_vector_from_discrete_def, get_continuous_force_He_MB, get_discrete_force_Guo
 from SymbolicCollisions.core.printers import print_u2, print_as_vector, print_ccode
-from SymbolicCollisions.core.hardcoded_results import hardcoded_cm_pf_eq, hardcoded_F_cm_pf
+from SymbolicCollisions.core.hardcoded_results import hardcoded_cm_eq_compressible_D2Q9, hardcoded_F_cm_pf_D2Q9
+
+
+d = 2
+q = 9
 
 print("\n\n=== PRETTY CODE: relax and collide ===\n\n")
 
@@ -31,16 +35,16 @@ print("real_t %s = 1./tau;" % sv)
 print("real_t %s = omega_bulk;" % sb)  # s_b = 1./(3*bulk_visc + 0.5)
 print("")
 
-print_ccode(get_m00(pop_in_str), assign_to='real_t m00')
+print_ccode(get_m00(q, pop_in_str), assign_to='real_t m00')
 
 print("\nreal_t %s[9]; real_t %s[9]; real_t %s[9];\n" % (temp_pop_str, cm_eq_pop_str, F_cm_str))
 print("for (int i = 0; i < 9; i++) {\n\t"
       "%s[i] = %s[i];}" % (temp_pop_str, pop_in_str))
 
-populations = get_DF(pop_in_str)
-temp_populations = get_DF(temp_pop_str)
-cm_eq = get_DF(cm_eq_pop_str)
-F_cm = get_DF(F_cm_str)
+populations = get_DF(q, pop_in_str)
+temp_populations = get_DF(q, temp_pop_str)
+cm_eq = get_DF(q, cm_eq_pop_str)
+F_cm = get_DF(q, F_cm_str)
 m = Mraw_D2Q9 * temp_populations
 
 print("\n//raw moments from density-probability functions")
@@ -54,19 +58,19 @@ print_as_vector(cm, print_symbol=temp_pop_str, regex=True)
 print("\n//collision in central moments space")
 print("//calculate equilibrium distributions in cm space")
 # print_as_vector_re(get_cm_vector_from_discrete_def(lambda i: m00 * get_gamma(i)), cm_eq_pop_str)
-print_as_vector(hardcoded_cm_pf_eq, cm_eq_pop_str, regex=True)  # save time
+print_as_vector(hardcoded_cm_eq_compressible_D2Q9, cm_eq_pop_str, regex=True)  # save time
 
 print("//calculate forces in cm space")
 # print_as_vector(get_cm_vector_from_discrete_def(get_discrete_force_Guo_second_order), F_cm_str, regex=True)
 # print_as_vector(get_cm_vector_from_continuous_def(get_continuous_force_He_MB), F_cm_str, regex=True)
-print_as_vector(hardcoded_F_cm_pf, F_cm_str, regex=True)  # save time
+print_as_vector(hardcoded_F_cm_pf_D2Q9, F_cm_str, regex=True)  # save time
 print("//collide")
 # cm_after_collision = (eye(9) - S_relax) * temp_populations + S_relax * cm_eq + (eye(9) - S_relax / 2) * F_cm  # eq 8
 # Relax 2nd moments, FOI
 # cm_after_collision = (eye(9) - S_relax) * temp_populations + S_relax * hardcoded_cm_pf_eq +  hardcoded_F_cm_pf
 
 # Relax 2nd moments, SOI
-cm_after_collision = (eye(9) - S_relax_D2Q9) * temp_populations + S_relax_D2Q9 * hardcoded_cm_pf_eq + (eye(9) - S_relax_D2Q9 / 2) * hardcoded_F_cm_pf
+cm_after_collision = (eye(9) - S_relax_D2Q9) * temp_populations + S_relax_D2Q9 * hardcoded_cm_eq_compressible_D2Q9 + (eye(9) - S_relax_D2Q9 / 2) * hardcoded_F_cm_pf_D2Q9
 
 # Relax 1st moments, SOI
 #cm_after_collision = (eye(9) - S_relax_phi) * temp_populations + S_relax_phi * hardcoded_cm_pf_eq + (eye(9) - S_relax_phi / 2) * hardcoded_F_cm_pf  # eq 8

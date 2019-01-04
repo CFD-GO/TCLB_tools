@@ -88,7 +88,7 @@ def print_as_vector(some_matrix, print_symbol='default_symbol1', regex=False):
             row = re.sub(r"%s\*%s" % (ux, uz), '%s' % uxuz, row)
             row = re.sub(r"%s\*%s" % (uy, uz), '%s' % uyuz, row)
 
-            row = re.sub(r"1.0\*", "", row)
+            # row = re.sub(r"1.\*", "", row)
 
             result = re.findall(r"\d\.\d+", row)  # may return an empty list: []
             while result:
@@ -98,6 +98,7 @@ def print_as_vector(some_matrix, print_symbol='default_symbol1', regex=False):
                              str(Fraction(first_number).limit_denominator(max_denominator=1000)) + '.',
                              row, count=1)
 
+                row = re.sub(r"1\.\*", "", row)  # dont multiply by 1.*
                 result = re.findall(r"\d\.\d+", row)
 
         else:

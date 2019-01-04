@@ -82,13 +82,20 @@ S_relax_ADE_D3Q19 = diag(1, sv, sv, sv, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
 
 Fx = Symbol('Fhydro.x')
 Fy = Symbol('Fhydro.y')
+Fz = Symbol('Fhydro.z')
+
+F2D = (Fx, Fy)
+F3D = (Fx, Fy, Fz)
 
 F_phi_x = Symbol('F_phi.x')
 F_phi_y = Symbol('F_phi.y')
+F_phi_z = Symbol('F_phi.z')
 
-phi_norm_grad_x = Symbol('norm_grad_phi.x')  # normalized gradient of the phase field in the x direction
-phi_norm_grad_y = Symbol('norm_grad_phi.y')  # normalized gradient of the phase field in the y direction
-F_phi_coeff = Symbol('F_phi_coeff')  # F_phi_coeff=(1.0 - 4.0*(myPhaseF - pfavg)*(myPhaseF - pfavg))/inteface_width;
+# phi_norm_grad_x = Symbol('norm_grad_phi.x')  # normalized gradient of the phase field in the x direction
+# phi_norm_grad_y = Symbol('norm_grad_phi.y')  # normalized gradient of the phase field in the y direction
+# phi_norm_grad_z = Symbol('norm_grad_phi.z')  # normalized gradient of the phase field in the y direction
+#
+# F_phi_coeff = Symbol('F_phi_coeff')  # F_phi_coeff=(1.0 - 4.0*(myPhaseF - pfavg)*(myPhaseF - pfavg))/inteface_width;
 
 m00 = Symbol('m00')
 rho = Symbol('rho')

@@ -188,6 +188,7 @@ def get_mom_vector_from_shift_Mat(fun, Mat):
     return Matrix([cm_])
 
 
+
 def get_continuous_weight(dzeta=(dzeta_x, dzeta_y)):
 
     """
@@ -252,13 +253,13 @@ def get_continuous_force_He_hydro_DF(dzeta=(dzeta_x, dzeta_y)):
     cs2 = 1. / 3.
     eu = dzeta[0] * Fx + dzeta[1] * Fy
     dzeta_2 = dzeta[0]*dzeta[0] + dzeta[1] * dzeta[1]
-    DF_p = (m00-1) / (2 * pi * cs2)*exp(-dzeta_2 / (2 * cs2))
-    # DF_p = get_continuous_Maxwellian_DF(dzeta=dzeta, psi=(m00-1), u=(0, 0))
+    # DF_p = (m00-1) / (2 * pi * cs2)*exp(-dzeta_2 / (2 * cs2))
+    DF_p = get_continuous_Maxwellian_DF(dzeta=dzeta, psi=(m00-1), u=(0, 0))
 
     euF = (dzeta[0] - ux) * Fx + (dzeta[1] - uy) * Fy
     dzeta_u_2 = (dzeta[0] - ux) * (dzeta[0] - ux) + (dzeta[1] - uy) * (dzeta[1] - uy)
-    DF_gamma = 1 / (2 * pi * cs2)*exp(-dzeta_u_2 / (2 * cs2))
-    # DF_gamma = get_continuous_Maxwellian_DF(dzeta=dzeta, psi=1, u=(ux, uy))
+    # DF_gamma = 1 / (2 * pi * cs2)*exp(-dzeta_u_2 / (2 * cs2))
+    DF_gamma = get_continuous_Maxwellian_DF(dzeta=dzeta, psi=1, u=(ux, uy))
 
     R = -(eu * DF_p + euF * DF_gamma)/(rho * cs2)
     R = -R  # `-` sign is skipped to ease code copy-paste ;p

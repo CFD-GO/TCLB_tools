@@ -5,8 +5,8 @@ from SymbolicCollisions.core.sym_col_fun import get_DF, get_m00
 from SymbolicCollisions.core.sym_col_fun import get_mom_vector_from_discrete_def, get_discrete_force_Guo, \
     get_mom_vector_from_continuous_def, get_continuous_force_He_MB, get_discrete_EDF_hydro
 from SymbolicCollisions.core.printers import print_u2, print_ccode, print_as_vector
-from SymbolicCollisions.core.hardcoded_results import hardcoded_cm_hydro_eq, \
-      hardcoded_F_cm_He_hydro_LB_velocity_based, hardcoded_F_cm_Guo_hydro_LB_velocity_based
+from SymbolicCollisions.core.hardcoded_results import hardcoded_cm_eq_incompressible_D2Q9, \
+      hardcoded_F_cm_He_hydro_LB_velocity_based_D2Q9, hardcoded_F_cm_Guo_hydro_LB_velocity_based_D2Q9
 
 
 print("\n\n=== PRETTY CODE: relax and collide ===\n\n")
@@ -55,15 +55,15 @@ print_as_vector(cm, print_symbol=temp_pop_str, regex=True)
 print("\n//collision in central moments space")
 print("//calculate equilibrium distributions in cm space")
 # print_as_vector_re(get_cm_vector_from_discrete_def(get_pop_eq_hydro), cm_eq_pop_str)
-print_as_vector(hardcoded_cm_hydro_eq, cm_eq_pop_str, regex=True)  # save time
+print_as_vector(hardcoded_cm_eq_incompressible_D2Q9, cm_eq_pop_str, regex=True)  # save time
 print("//calculate forces in cm space")
 # print_as_vector(get_cm_vector_from_discrete_def(get_force_Guo_second_order), F_cm_str, regex=True)
 # print_as_vector(get_cm_vector_from_continuous_def(get_continuous_force_He_MB), F_cm_str, regex=True)
-print_as_vector(hardcoded_F_cm_He_hydro_LB_velocity_based, F_cm_str, regex=True)  # save time
+print_as_vector(hardcoded_F_cm_He_hydro_LB_velocity_based_D2Q9, F_cm_str, regex=True)  # save time
 
 print("//collide eq: (eye(9)-S)*cm + S*cm_eq + (eye(9)-S/2.)*force_in_cm_space")
 # cm_after_collision = (eye(9) - S_relax) * temp_populations + S_relax * cm_eq + (eye(9) - S_relax / 2) * F_cm
-cm_after_collision = (eye(9) - S_relax_D2Q9) * temp_populations + S_relax_D2Q9 * cm_eq + (eye(9) - S_relax_D2Q9 / 2) * hardcoded_F_cm_He_hydro_LB_velocity_based  # FOI - use `hardcoded` to skip zero terms
+cm_after_collision = (eye(9) - S_relax_D2Q9) * temp_populations + S_relax_D2Q9 * cm_eq + (eye(9) - S_relax_D2Q9 / 2) * hardcoded_F_cm_He_hydro_LB_velocity_based_D2Q9  # FOI - use `hardcoded` to skip zero terms
 print_as_vector(cm_after_collision, print_symbol=pop_in_str, regex=True)
 
 print("\n//back to raw moments")

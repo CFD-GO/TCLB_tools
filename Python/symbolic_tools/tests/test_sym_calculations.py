@@ -32,7 +32,7 @@ from SymbolicCollisions.core.cm_symbols import Mraw_D2Q9, NrawD2Q9
 from SymbolicCollisions.core.printers import print_as_vector
 
 from SymbolicCollisions.core.hardcoded_results import \
-    hardcoded_F_cm_Guo_hydro_LB_velocity_based, hardcoded_cm_pf_eq, hardcoded_cm_hydro_eq
+    hardcoded_F_cm_Guo_hydro_LB_velocity_based_D2Q9, hardcoded_cm_eq_compressible_D2Q9, hardcoded_cm_eq_incompressible_D2Q9
 
 
 class TestSymbolicCalc(unittest.TestCase):
@@ -121,7 +121,7 @@ class TestSymbolicCalc(unittest.TestCase):
 
         f2= io.StringIO()
         with redirect_stdout(f2):
-            print_as_vector(hardcoded_cm_pf_eq, 'cm_eq', regex=True)
+            print_as_vector(hardcoded_cm_eq_compressible_D2Q9, 'cm_eq', regex=True)
         expected_result = f2.getvalue()
 
         assert expected_result == out
@@ -134,7 +134,7 @@ class TestSymbolicCalc(unittest.TestCase):
 
         f = io.StringIO()
         with redirect_stdout(f):
-            print_as_vector(hardcoded_F_cm_Guo_hydro_LB_velocity_based, 'F_cm', regex=True)
+            print_as_vector(hardcoded_F_cm_Guo_hydro_LB_velocity_based_D2Q9, 'F_cm', regex=True)
         expected_result = f.getvalue()
 
         for result in results:
@@ -146,7 +146,7 @@ class TestSymbolicCalc(unittest.TestCase):
         assert out == expected_result
 
     def test_get_F_cm_using_He_scheme_and_continuous_rho_Maxwellian_DF(self):
-        from SymbolicCollisions.core.hardcoded_results import hardcoded_F_cm_hydro_LB_density_based
+        from SymbolicCollisions.core.hardcoded_results import hardcoded_F_cm_hydro_density_based_D2Q9
 
         F_cm = get_mom_vector_from_continuous_def(get_continuous_force_He_MB, continuous_transformation=get_continuous_cm)
 
@@ -157,7 +157,7 @@ class TestSymbolicCalc(unittest.TestCase):
 
         f2 = io.StringIO()
         with redirect_stdout(f2):
-            print_as_vector(hardcoded_F_cm_hydro_LB_density_based, 'F_cm', regex=True)
+            print_as_vector(hardcoded_F_cm_hydro_density_based_D2Q9, 'F_cm', regex=True)
             expected_result = f2.getvalue()
 
         assert expected_result == out

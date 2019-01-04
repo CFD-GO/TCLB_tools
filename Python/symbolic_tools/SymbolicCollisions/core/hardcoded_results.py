@@ -1,12 +1,12 @@
 
 from sympy.matrices import Matrix
 from SymbolicCollisions.core.cm_symbols import m00, rho, \
-    Fx, Fy, F_phi_x, F_phi_y, \
+    Fx, Fy, Fz, F_phi_x, F_phi_y, F_phi_z, \
     ux, uy, ux2, uy2, uxuy
 
 
 # save time and hardcode some of the results
-hardcoded_F_cm_hydro_LB_density_based = Matrix([
+hardcoded_F_cm_hydro_density_based_D2Q9 = Matrix([
     0,
     Fx * m00 / rho,
     Fy * m00 / rho,
@@ -18,7 +18,52 @@ hardcoded_F_cm_hydro_LB_density_based = Matrix([
     0,
 ])
 
-hardcoded_F_cm_He_hydro_LB_velocity_based = Matrix([
+hardcoded_F_cm_hydro_density_based_D3Q19 = Matrix([
+    0,
+    Fx*m00/rho,
+    Fy*m00/rho,
+    Fz*m00/rho,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1/3.*Fx*m00/rho,
+    1/3.*Fx*m00/rho,
+    1/3.*Fy*m00/rho,
+    1/3.*Fz*m00/rho,
+    1/3.*Fy*m00/rho,
+    1/3.*Fz*m00/rho,
+    0,
+    0,
+    0,
+])
+
+hardcoded_F_cm_pf_D3Q19 = Matrix([
+    0,
+    F_phi_x,
+    F_phi_y,
+    F_phi_z,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1/3.*F_phi_x,
+    1/3.*F_phi_x,
+    1/3.*F_phi_y,
+    1/3.*F_phi_z,
+    1/3.*F_phi_y,
+    1/3.*F_phi_z,
+    0,
+    0,
+    0,
+])
+
+
+hardcoded_F_cm_He_hydro_LB_velocity_based_D2Q9 = Matrix([
     0,
     Fx / rho,
     Fy / rho,
@@ -30,7 +75,7 @@ hardcoded_F_cm_He_hydro_LB_velocity_based = Matrix([
     0,
 ])
 
-hardcoded_F_cm_Guo_hydro_LB_velocity_based = Matrix([
+hardcoded_F_cm_Guo_hydro_LB_velocity_based_D2Q9 = Matrix([
     0,
     Fx / rho,
     Fy / rho,
@@ -42,7 +87,7 @@ hardcoded_F_cm_Guo_hydro_LB_velocity_based = Matrix([
     4.0 * uxuy * (Fx * uy + Fy * ux) / rho,
 ])
 
-hardcoded_F_cm_pf = Matrix([
+hardcoded_F_cm_pf_D2Q9 = Matrix([
     0,
     F_phi_x,
     F_phi_y,
@@ -56,20 +101,46 @@ hardcoded_F_cm_pf = Matrix([
 
 
 
-hardcoded_cm_pf_eq = Matrix([m00,
-                             0,
-                             0,
-                             1./3. * m00,
-                             1./3. * m00,
-                             0,
-                             0,
-                             0,
-                             1./9. * m00,
-                             ])
+hardcoded_cm_eq_compressible_D2Q9 = Matrix([
+    m00,
+    0,
+    0,
+    1 / 3. * m00,
+    1 / 3. * m00,
+    0,
+    0,
+    0,
+    1. / 9. * m00,
+    ])
 
 
+# order of 3D (central) moments as in
+# `Three-dimensional cascaded lattice Boltzmann method:
+# Improved implementation and consistent forcing scheme`
+# by Linlin Fei, Kai H.  Luo,  Qing Li. 2018
+hardcoded_cm_eq_compressible_D3Q19 = Matrix([
+    m00,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1 / 3. * m00,
+    1 / 3. * m00,
+    1 / 3. * m00,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1 / 9. * m00,
+    1 / 9. * m00,
+    1 / 9. * m00,
+])
 
-hardcoded_cm_hydro_eq = Matrix([
+hardcoded_cm_eq_incompressible_D2Q9 = Matrix([
     m00,
     ux * (-m00 + 1),
     uy * (-m00 + 1),

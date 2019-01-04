@@ -5,7 +5,7 @@ from SymbolicCollisions.core.sym_col_fun import get_DF, get_m00
 from SymbolicCollisions.core.sym_col_fun import get_mom_vector_from_discrete_def, get_discrete_force_Guo, \
       get_mom_vector_from_continuous_def, get_continuous_force_He_MB, get_discrete_EDF_hydro
 from SymbolicCollisions.core.printers import print_u2, print_as_vector, print_ccode
-from SymbolicCollisions.core.hardcoded_results import hardcoded_cm_hydro_eq, hardcoded_F_cm_He_hydro_LB_velocity_based
+from SymbolicCollisions.core.hardcoded_results import hardcoded_cm_eq_incompressible_D2Q9, hardcoded_F_cm_He_hydro_LB_velocity_based_D2Q9
 
 print("\n\n=== PRETTY CODE relax eq ===\n\n")
 
@@ -54,7 +54,7 @@ print_as_vector(cm, print_symbol=temp_pop_str, regex=True)
 print("\n//collision in central moments space")
 print("//calculate equilibrium distributions in cm space")
 # print_as_vector(get_cm_vector_from_discrete_def(get_pop_eq_hydro), cm_eq_pop_str, regex=True)
-print_as_vector(hardcoded_cm_hydro_eq, cm_eq_pop_str, regex=True)  # save time
+print_as_vector(hardcoded_cm_eq_incompressible_D2Q9, cm_eq_pop_str, regex=True)  # save time
 
 print("//collide eq: -S*(cm - cm_eq)")
 cm_after_collision = -S_relax_D2Q9 * (temp_populations - cm_eq)
