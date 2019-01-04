@@ -240,8 +240,8 @@ def get_continuous_Maxwellian_DF(dzeta=(dzeta_x, dzeta_y), psi=m00, u=(ux, uy)):
 
 def get_continuous_hydro_DF(dzeta=(dzeta_x, dzeta_y)):
 
-    DF_p = get_continuous_Maxwellian_DF(dzeta=(dzeta_x, dzeta_y),psi=(m00-1), u=(0, 0))
-    DF_gamma = get_continuous_Maxwellian_DF(dzeta=(dzeta_x, dzeta_y),psi=(1), u=(ux, uy))
+    DF_p = get_continuous_Maxwellian_DF(dzeta=(dzeta_x, dzeta_y), psi=(m00-1), u=(0, 0))
+    DF_gamma = get_continuous_Maxwellian_DF(dzeta=(dzeta_x, dzeta_y), psi=1, u=(ux, uy))
     return DF_p + DF_gamma
 
 
@@ -278,7 +278,7 @@ def get_continuous_force_He_MB(dzeta=(dzeta_x, dzeta_y)):
 
 
 def get_continuous_m(m, n, DF):
-    fun = DF((dzeta_x, dzeta_y)) * pow((dzeta_x), m) * pow((dzeta_y), n)
+    fun = DF((dzeta_x, dzeta_y)) * pow(dzeta_x, m) * pow(dzeta_y, n)
 
     result = integrate(fun, (dzeta_x, -oo, oo), (dzeta_y, -oo, oo))
     return round_and_simplify(result)
@@ -305,4 +305,3 @@ def get_mom_vector_from_continuous_def(fun, continuous_transformation):
           continuous_transformation(2, 2, fun)
           ]
     return Matrix([m_])
-

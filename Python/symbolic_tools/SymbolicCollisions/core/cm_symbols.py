@@ -11,6 +11,14 @@ init_printing(use_unicode=False, wrap_line=False, no_global=True)
 ux = Symbol('u.x')
 uy = Symbol('u.y')
 uz = Symbol('u.z')
+u2D = (ux, uy)
+u3D = (ux, uy, uz)
+
+dzeta_x = Symbol('dzeta_x')
+dzeta_y = Symbol('dzeta_y')
+dzeta_z = Symbol('dzeta_z')
+dzeta2D = (dzeta_x, dzeta_y)
+dzeta3D = (dzeta_x, dzeta_y, dzeta_z)
 
 sv = Symbol('s_v')  # s_v = 1 /(tau + 0.5)
 sb = Symbol('s_b')  # results in bulk viscosity = 1/6 since : zeta = (1/sb - 0.5)*cs^2*dt
@@ -41,6 +49,8 @@ S_relax_ADE_D3Q15 = diag(1, sv, sv, sv, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
 ex_D3Q19 = Matrix([0, 1, -1, 0, 0, 0, 0, 1, -1, 1, -1, 1, -1, 1, -1, 0, 0, 0, 0])
 ey_D3Q19 = Matrix([0, 0, 0, 1, -1, 0, 0, 1, 1, -1, -1, 0, 0, 0, 0, 1, -1, 1, -1])
 ez_D3Q19 = Matrix([0, 0, 0, 0, 0, 1, -1, 0, 0, 0, 0, 1, 1, -1, -1, 1, 1, -1, -1])
+
+S_relax_ADE_D3Q19 = diag(1, sv, sv, sv, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
 
 # FROM TCLB
 # d3q19 = matrix(c(
@@ -84,17 +94,20 @@ m00 = Symbol('m00')
 rho = Symbol('rho')
 w = Matrix([4. / 9, 1. / 9, 1. / 9, 1. / 9, 1. / 9, 1. / 36, 1. / 36, 1. / 36, 1. / 36])
 
-uxuy = Symbol('uxuy')
+
 ux2 = Symbol('ux2')
 uy2 = Symbol('uy2')
+uz2 = Symbol('uz2')
 
 ux3 = Symbol('ux3')
 uy3 = Symbol('uy3')
+uz3 = Symbol('uy3')
+
 uxuy3 = Symbol('uxuy3')
 
-dzeta_x = Symbol('dzeta_x')
-dzeta_y = Symbol('dzeta_y')
-dzeta_z = Symbol('dzeta_z')
+uxuy = Symbol('uxuy')
+uxuz = Symbol('uxuz')
+uyuz = Symbol('uyuz')
 
 # this matrix will produce raw moments (m=M*f) in the following order:
 # [m00, m10, m01, m20, m02, m11, m21, m12, m22]
@@ -204,3 +217,104 @@ S_relax_ADE_D2Q9 = diag(1, sv, sv, 1, 1, 1, 1, 1, 1)
 
 S_relax_MRT_GS = diag(1, 1, 1, 1, 1, 1, 1, sv, sv)  #
 # S_relax_MRT_GS = diag(0, 0, 0, 0, 0, 0, 0, sv, sv)   #
+
+
+moments_dict = {
+    # order of 2D (central) moments as in
+    # `Modeling incompressible thermal flows using a central-moments-based lattice Boltzmann method`
+    # by Linlin Fei, Kai Hong Luo Chuandong Lin , Qing Li. 2017
+    'D2Q5': [(0, 0, 0),
+             (1, 0, 0),
+             (0, 1, 0),
+             (2, 0, 0),
+             (0, 2, 0)],
+
+    'D2Q9': [(0, 0, 0),
+             (1, 0, 0),
+             (0, 1, 0),
+             (2, 0, 0),
+             (0, 2, 0),
+             (1, 1, 0),
+             (2, 1, 0),
+             (1, 2, 0),
+             (2, 2, 0)],
+
+    # order of 3D (central) moments as in
+    # `Three-dimensional cascaded lattice Boltzmann method:
+    # Improved implementation and consistent forcing scheme`
+    # by Linlin Fei, Kai H.  Luo,  Qing Li. 2018
+    'D3Q7': [(0, 0, 0),
+             (1, 0, 0),
+             (0, 1, 0),
+             (0, 0, 1),
+             (2, 0, 0),
+             (0, 2, 0),
+             (0, 0, 2)],
+
+    'D3Q15': [(0, 0, 0),
+              (1, 0, 0),
+              (0, 1, 0),
+              (0, 0, 1),
+              (2, 0, 0),
+              (0, 2, 0),
+              (0, 0, 2),
+              (1, 1, 1),  # skipped in      D3Q19, D3Q7
+              (2, 1, 1),  # skipped in      D3Q19, D3Q7
+              (1, 2, 1),  # skipped in      D3Q19, D3Q7
+              (1, 1, 2),  # skipped in      D3Q19, D3Q7
+              (1, 2, 2),  # skipped in      D3Q19, D3Q7
+              (2, 1, 2),  # skipped in      D3Q19, D3Q7
+              (2, 2, 1),  # skipped in      D3Q19, D3Q7
+              (2, 2, 2),  # skipped in      D3Q19, D3Q7
+              ],
+
+    'D3Q19': [(0, 0, 0),
+              (1, 0, 0),
+              (0, 1, 0),
+              (0, 0, 1),
+              (1, 1, 0),  # skipped in D3Q15, D3Q7
+              (1, 0, 1),  # skipped in D3Q15, D3Q7
+              (0, 1, 1),  # skipped in D3Q15, D3Q7
+              (2, 0, 0),
+              (0, 2, 0),
+              (0, 0, 2),
+              (1, 2, 0),  # skipped in D3Q15, D3Q7
+              (1, 0, 2),  # skipped in D3Q15, D3Q7
+              (2, 1, 0),  # skipped in D3Q15, D3Q7
+              (2, 0, 1),  # skipped in D3Q15, D3Q7
+              (0, 1, 2),  # skipped in D3Q15, D3Q7
+              (0, 2, 1),  # skipped in D3Q15, D3Q7
+              (2, 2, 0),  # skipped in D3Q15, D3Q7
+              (2, 0, 2),  # skipped in D3Q15, D3Q7
+              (0, 2, 2),  # skipped in D3Q15, D3Q7
+              ],
+
+    'D3Q27': [(0, 0, 0),
+              (1, 0, 0),
+              (0, 1, 0),
+              (0, 0, 1),
+              (1, 1, 0),  # skipped in D3Q15, D3Q7
+              (1, 0, 1),  # skipped in D3Q15, D3Q7
+              (0, 1, 1),  # skipped in D3Q15, D3Q7
+              (2, 0, 0),
+              (0, 2, 0),
+              (0, 0, 2),
+              (1, 2, 0),  # skipped in D3Q15, D3Q7
+              (1, 0, 2),  # skipped in D3Q15, D3Q7
+              (2, 1, 0),  # skipped in D3Q15, D3Q7
+              (2, 0, 1),  # skipped in D3Q15, D3Q7
+              (0, 1, 2),  # skipped in D3Q15, D3Q7
+              (0, 2, 1),  # skipped in D3Q15, D3Q7
+              (1, 1, 1),  # skipped in      D3Q19, D3Q7
+              (2, 2, 0),  # skipped in D3Q15, D3Q7
+              (2, 0, 2),  # skipped in D3Q15, D3Q7
+              (0, 2, 2),  # skipped in D3Q15, D3Q7
+              (2, 1, 1),  # skipped in      D3Q19, D3Q7
+              (1, 2, 1),  # skipped in      D3Q19, D3Q7
+              (1, 1, 2),  # skipped in      D3Q19, D3Q7
+              (1, 2, 2),  # skipped in      D3Q19, D3Q7
+              (2, 1, 2),  # skipped in      D3Q19, D3Q7
+              (2, 2, 1),  # skipped in      D3Q19, D3Q7
+              (2, 2, 2),  # skipped in      D3Q19, D3Q7
+              ],
+}

@@ -6,3 +6,5 @@ codecov
 pytest
 concurrencytest
 pyglet
+
+joblib  # experimental

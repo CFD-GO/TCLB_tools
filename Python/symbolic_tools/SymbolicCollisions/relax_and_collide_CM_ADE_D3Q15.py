@@ -3,11 +3,26 @@ from sympy.matrices import eye
 from SymbolicCollisions.core.cm_symbols import sv, sb, Mraw_D2Q9, NrawD2Q9, S_relax_D2Q9, S_relax_ADE_D2Q9
 from SymbolicCollisions.core.sym_col_fun import get_DF, get_m00, \
     get_mom_vector_from_continuous_def, get_mom_vector_from_discrete_def, get_continuous_force_He_MB, get_discrete_force_Guo
-from SymbolicCollisions.core.printers import print_u2, print_as_vector, print_ccode
+from SymbolicCollisions.core.printers import print_u2, print_as_vector, print_ccode, print_as_vector_old
 from SymbolicCollisions.core.hardcoded_results import hardcoded_cm_pf_eq, hardcoded_F_cm_pf
 
+from SymbolicCollisions.core.MatrixGenerator import get_raw_moments_matrix, get_shift_matrix
+from sympy import pprint
+
 d = 3
-q = 15
+q = 19
+
+from SymbolicCollisions.core.cm_symbols import \
+    ex_D3Q19 as ex, \
+    ey_D3Q19 as ey, \
+    ez_D3Q19 as ez, \
+      S_relax_ADE_D3Q15 as S_relax
+
+Mraw = get_raw_moments_matrix(ex, ey, ez)
+Nraw = get_shift_matrix(Mraw.inv(), ex, ey, ez)
+
+# pprint(Mraw)
+# pprint(Nraw)
 
 print("\n\n=== PRETTY CODE: relax and collide ===\n\n")
 
@@ -44,15 +59,23 @@ populations = get_DF(q, pop_in_str)
 temp_populations = get_DF(q, temp_pop_str)
 cm_eq = get_DF(q, cm_eq_pop_str)
 F_cm = get_DF(q, F_cm_str)
-m = Mraw_D2Q9 * temp_populations
+m = Mraw * temp_populations
 
 print("\n//raw moments from density-probability functions")
 print("//[m00, m10, m01, m20, m02, m11, m21, m12, m22]")
 print_as_vector(m, print_symbol=pop_in_str)
 
+print("\n----------------raw printer-------------------------")
+print_as_vector(m, print_symbol=temp_pop_str, regex=False)
+print("\n-----------------------------------------")
+
 print("\n//central moments from raw moments")
-cm = NrawD2Q9 * populations
+cm = Nraw * populations
 print_as_vector(cm, print_symbol=temp_pop_str, regex=True)
+
+print("\n----------------raw printer-------------------------")
+print_as_vector_old(cm, print_symbol=temp_pop_str, regex=False)
+print("\n-----------------------------------------")
 
 print("\n//collision in central moments space")
 print("//calculate equilibrium distributions in cm space")
