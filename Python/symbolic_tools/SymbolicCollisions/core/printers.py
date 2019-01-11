@@ -90,6 +90,10 @@ def print_as_vector(some_matrix, print_symbol='default_symbol1', regex=False):
 
             # row = re.sub(r"1.\*", "", row)
 
+            row = re.sub(r"_{", "", row)  # skip curly brackets from latex
+            row = re.sub(r"}", "", row)  #
+
+            # get algebraic fractions from decimal ones
             result = re.findall(r"\d\.\d+", row)  # may return an empty list: []
             while result:
                 first_number = result[0]

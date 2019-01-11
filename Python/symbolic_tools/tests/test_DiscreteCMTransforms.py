@@ -16,15 +16,12 @@ sys.path.append(os.path.join('.'))  # allow CI bot to see the stuff from the mai
 
 from SymbolicCollisions.core.cm_symbols import w
 
-from SymbolicCollisions.core.sym_col_fun import \
+from SymbolicCollisions.core.DiscreteCMTransforms import \
     get_mom_vector_from_discrete_def, get_mom_vector_from_shift_Mat, \
-    get_mom_vector_from_continuous_def, get_continuous_Maxwellian_DF, \
-    get_continuous_force_He_MB, \
     get_discrete_EDF_hydro, \
     get_discrete_force_He, \
-    get_discrete_force_Guo, get_continuous_force_Guo, \
-    get_gamma, get_continuous_hydro_DF, get_continuous_force_He_hydro_DF, \
-    get_continuous_cm, get_discrete_cm
+    get_discrete_force_Guo,\
+    get_gamma, get_discrete_cm
 
 from SymbolicCollisions.core.cm_symbols import Mraw_D2Q9, NrawD2Q9
 
@@ -54,24 +51,11 @@ class TestSymbolicCalc(unittest.TestCase):
 
             assert out == out2
 
-    # DONE - ported
-    def test_get_cm_eq_from_continuous_Maxwellian_DF(self):
-        cm_eq = get_mom_vector_from_continuous_def(get_continuous_Maxwellian_DF, continuous_transformation=get_continuous_cm)
-
-        f = io.StringIO()
-        with redirect_stdout(f):
-            print_as_vector(cm_eq, 'cm_eq', regex=True)
-        out = f.getvalue()
-
-        f2= io.StringIO()
-        with redirect_stdout(f2):
-            print_as_vector(hardcoded_cm_eq_compressible_D2Q9, 'cm_eq', regex=True)
-        expected_result = f2.getvalue()
-
-        assert expected_result == out
 
     def test_get_F_cm_Guo_continuous_and_discrete(self):
         F_cm_Guo_disc = get_mom_vector_from_discrete_def(get_discrete_force_Guo, discrete_transform=get_discrete_cm)
+
+        from SymbolicCollisions.core.sym_col_fun import get_mom_vector_from_continuous_def, get_continuous_force_Guo
         F_cm_Guo_cont = get_mom_vector_from_continuous_def(get_continuous_force_Guo, continuous_transformation=get_continuous_cm)
 
         print_as_vector(F_cm_Guo_cont, 'F_cm', regex=True)
@@ -90,49 +74,6 @@ class TestSymbolicCalc(unittest.TestCase):
             out = f.getvalue()
 
         assert out == expected_result
-
-    # DONE - ported
-    def test_get_F_cm_using_He_scheme_and_continuous_rho_Maxwellian_DF(self):
-        from SymbolicCollisions.core.hardcoded_results import hardcoded_F_cm_hydro_density_based_D2Q9
-
-        F_cm = get_mom_vector_from_continuous_def(get_continuous_force_He_MB, continuous_transformation=get_continuous_cm)
-
-        print_as_vector(F_cm, 'F_cm', regex=True)
-        print_as_vector(hardcoded_F_cm_hydro_density_based_D2Q9, 'F_cm_expected', regex=True)
-
-        f = io.StringIO()
-        with redirect_stdout(f):
-            print_as_vector(F_cm, 'F_cm', regex=True)
-        out = f.getvalue()
-
-        f2 = io.StringIO()
-        with redirect_stdout(f2):
-            print_as_vector(hardcoded_F_cm_hydro_density_based_D2Q9, 'F_cm', regex=True)
-            expected_result = f2.getvalue()
-
-        assert expected_result == out
-
-    # DONE - ported
-    def test_get_F_cm_using_He_scheme_and_continuous_Maxwellian_DF(self):
-        F_cm = get_mom_vector_from_continuous_def(get_continuous_force_He_hydro_DF, continuous_transformation=get_continuous_cm)
-
-        f = io.StringIO()
-        with redirect_stdout(f):
-            print_as_vector(F_cm, 'F_cm', regex=True)
-        out = f.getvalue()
-
-        expected_result = \
-            'F_cm[0] = 0;\n' \
-            'F_cm[1] = Fhydro.x*m00/rho;\n' \
-            'F_cm[2] = Fhydro.y*m00/rho;\n' \
-            'F_cm[3] = -2.*Fhydro.x*u.x*(m00 - 1.)/rho;\n' \
-            'F_cm[4] = -2.*Fhydro.y*u.y*(m00 - 1.)/rho;\n' \
-            'F_cm[5] = (-Fhydro.x*m00*u.y + Fhydro.x*u.y - Fhydro.y*m00*u.x + Fhydro.y*u.x)/rho;\n' \
-            'F_cm[6] = (2.*Fhydro.x*m00*uxuy - 2.*Fhydro.x*uxuy + Fhydro.y*m00*ux2 + 1/3.*Fhydro.y*m00 - Fhydro.y*ux2)/rho;\n' \
-            'F_cm[7] = (Fhydro.x*m00*uy2 + 1/3.*Fhydro.x*m00 - Fhydro.x*uy2 + 2.*Fhydro.y*m00*uxuy - 2.*Fhydro.y*uxuy)/rho;\n' \
-            'F_cm[8] = (-2.*Fhydro.x*m00*u.x*uy2 - 2/3.*Fhydro.x*m00*u.x + 2.*Fhydro.x*u.x*uy2 + 2/3.*Fhydro.x*u.x - 2.*Fhydro.y*m00*ux2*u.y - 2/3.*Fhydro.y*m00*u.y + 2.*Fhydro.y*ux2*u.y + 2/3.*Fhydro.y*u.y)/rho;\n'
-
-        assert expected_result == out
 
     def test_get_force_He_discrete(self):
         F_in_cm = get_mom_vector_from_discrete_def(get_discrete_force_He, discrete_transform=get_discrete_cm)
@@ -194,40 +135,6 @@ class TestSymbolicCalc(unittest.TestCase):
 
         assert expected_result == out
 
-    # DONE - ported
-    def test_get_cm_eq_incompressible_continuous(self):
-        # population_eq -> cm_eq - from continous definition: '
-        # k_mn = integrate(fun, (x, -oo, oo), (y, -oo, oo)) '
-        # where fun = fM(rho,u,x,y) *(x-ux)^m (y-uy)^n')
-
-        cm_eq = get_mom_vector_from_continuous_def(get_continuous_hydro_DF, continuous_transformation=get_continuous_cm)
-
-        f = io.StringIO()
-        with redirect_stdout(f):
-            print_as_vector(cm_eq, 'cm_eq', regex=True)
-        out = f.getvalue()
-
-        expected_result = 'cm_eq[0] = m00;\n' \
-                          'cm_eq[1] = u.x*(-m00 + 1);\n' \
-                          'cm_eq[2] = u.y*(-m00 + 1);\n' \
-                          'cm_eq[3] = m00*ux2 + 1/3.*m00 - ux2;\n' \
-                          'cm_eq[4] = m00*uy2 + 1/3.*m00 - uy2;\n' \
-                          'cm_eq[5] = uxuy*(m00 - 1.);\n' \
-                          'cm_eq[6] = u.y*(-m00*ux2 - 1/3.*m00 + ux2 + 1/3.);\n' \
-                          'cm_eq[7] = u.x*(-m00*uy2 - 1/3.*m00 + uy2 + 1/3.);\n' \
-                          'cm_eq[8] = m00*ux2*uy2 + 1/3.*m00*ux2 + 1/3.*m00*uy2 + 1/9.*m00 - ux2*uy2 - 1/3.*ux2 - 1/3.*uy2;\n'  # noqa
-
-        assert 'cm_eq[0] = m00;' in out
-        assert 'cm_eq[1] = u.x*(-m00 + 1)' in out
-        assert 'cm_eq[2] = u.y*(-m00 + 1);' in out
-        assert 'cm_eq[3] = m00*ux2 + 1/3.*m00 - ux2;\n' in out
-        assert 'cm_eq[4] = m00*uy2 + 1/3.*m00 - uy2;\n' in out
-        assert 'cm_eq[5] = uxuy*(m00 - 1.);\n' in out
-        assert 'cm_eq[6] = u.y*(-m00*ux2 - 1/3.*m00 + ux2 + 1/3.);\n' in out
-        assert 'cm_eq[7] = u.x*(-m00*uy2 - 1/3.*m00 + uy2 + 1/3.);\n' in out
-        assert 'cm_eq[8] = m00*ux2*uy2 + 1/3.*m00*ux2 + 1/3.*m00*uy2 + 1/9.*m00 - ux2*uy2 - 1/3.*ux2 - 1/3.*uy2;\n' in out  # noqa
-
-        assert expected_result == out
 
     def test_cm_eq_compressible_discrete(self):
         """

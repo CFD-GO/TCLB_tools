@@ -100,7 +100,6 @@ hardcoded_F_cm_pf_D2Q9 = Matrix([
 ])
 
 
-
 hardcoded_cm_eq_compressible_D2Q9 = Matrix([
     m00,
     0,
@@ -142,14 +141,14 @@ hardcoded_cm_eq_compressible_D3Q19 = Matrix([
 
 hardcoded_cm_eq_incompressible_D2Q9 = Matrix([
     m00,
-    ux * (-m00 + 1),
-    uy * (-m00 + 1),
-    m00 * ux2 + 1. / 3. * m00 - ux2,
-    m00 * uy2 + 1. / 3. * m00 - uy2,
-    uxuy * (m00 - 1.0),
-    uy * (-m00 * ux2 - 1. / 3. * m00 + ux2 + 1. / 3.),
-    ux * (-m00 * uy2 - 1. / 3. * m00 + uy2 + 1. / 3.),
-    m00 * ux2 * uy2 + 1. / 3. * m00 * ux2 + 1. / 3. * m00 * uy2 + 1. / 9. * m00 - ux2 * uy2 - 1. / 3. * ux2 - 1. / 3. * uy2,
+    -ux*(m00 - 1),
+    uy*(-m00 + 1),
+    m00*ux2 + 1/3.*m00 - ux2,
+    m00*uy2 + 1/3.*m00 - uy2,
+    uxuy*(m00 - 1.0),
+    uy*(-m00 * ux2 - 1/3.*m00 + ux2 + 1/3.),
+    ux*(-m00 * uy2 - 1/3.*m00 + uy2 + 1/3.),
+    m00*ux2*uy2 + 1/3.*m00*ux2 + 1/3.*m00*uy2 + 1/9.*m00 - ux2*uy2 - 1/3.*ux2 - 1/3.*uy2,
     ])
 
 # cm_eq[0] = m00;

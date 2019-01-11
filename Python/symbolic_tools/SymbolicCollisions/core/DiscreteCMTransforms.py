@@ -13,10 +13,12 @@ from sympy import exp, pi, integrate, oo
 from sympy import Symbol
 from sympy.matrices import Matrix
 from sympy.interactive.printing import init_printing
-from SymbolicCollisions.core.cm_symbols import ex_D2Q9, ey_D2Q9, ux, uy, w, m00, \
+from SymbolicCollisions.core.cm_symbols import ux, uy, w, m00, \
     Fx, Fy, F_phi_x, F_phi_y, rho, dzeta_x, dzeta_y, \
     NrawD2Q9, Mraw_D2Q9, M_ortho_GS, \
-    F2D, F3D, dzeta2D, dzeta3D, u2D, u3D
+    F2D, F3D, dzeta2D, dzeta3D, u2D, u3D, \
+    ex_D2Q9 as ex, \
+    ey_D2Q9 as ey
 
 
 from SymbolicCollisions.core.printers import round_and_simplify
@@ -39,14 +41,14 @@ def get_m00(q, print_symbol='default_symbol3'):
 
 
 def get_e():
-    symbols_ = [Matrix([ex_D2Q9[i], ey_D2Q9[i]]) for i in range(9)]
+    symbols_ = [Matrix([ex[i], ey[i]]) for i in range(9)]
     return Matrix([symbols_])
 
 
 def get_gamma(i):
     cs2 = 1. / 3.
     # cs2 = Symbol('cs2')
-    eu = ex_D2Q9[i] * ux + ey_D2Q9[i] * uy
+    eu = ex[i] * ux + ey[i] * uy
     u2 = ux * ux + uy * uy
     gamma = w[i] * (1 + eu / cs2 + eu * eu / (2 * cs2 * cs2) - u2 / (2 * cs2))
     return gamma
@@ -64,7 +66,7 @@ def get_discrete_force_He(i):
     """
     cs2 = 1. / 3.
     # cs2 = Symbol('cs2')
-    euF = (ex_D2Q9[i] - ux) * Fx + (ey_D2Q9[i] - uy) * Fy
+    euF = (ex[i] - ux) * Fx + (ey[i] - uy) * Fy
     pop_eq = m00 * get_gamma(i)
     R = pop_eq * euF / (rho * cs2)
     return R
@@ -77,7 +79,7 @@ def get_discrete_force_He_hydro_eq_experimental(i):
     """
     cs2 = 1. / 3.
     # cs2 = Symbol('cs2')
-    euF = (ex_D2Q9[i] - ux) * Fx + (ey_D2Q9[i] - uy) * Fy
+    euF = (ex[i] - ux) * Fx + (ey[i] - uy) * Fy
     pop_eq = get_discrete_EDF_hydro(i)
     # R = pop_eq*euF/(p_star*cs2)
     R = pop_eq * euF / (rho * cs2)
@@ -93,7 +95,7 @@ def get_discrete_force_Guo_without_U_experimental(i):
     cs2 = 1. / 3.
     # # cs2 = Symbol('cs2')
     # eF = (ex[i] - ux) * Fx + (ey[i] - uy) * Fy  # TODO why (ey[i] - uy)
-    eF = ex_D2Q9[i] * Fx + ey_D2Q9[i] * Fy
+    eF = ex[i] * Fx + ey[i] * Fy
     R = w[i] * eF / (rho * cs2)
     return R
 
@@ -106,7 +108,7 @@ def get_discrete_force_Guo_experimental(i):
     # first order terms only
     cs2 = 1. / 3.
     # # cs2 = Symbol('cs2')
-    eF = (ex_D2Q9[i] - ux) * Fx + (ey_D2Q9[i] - uy) * Fy  # TODO why (ey[i] - uy)
+    eF = (ex[i] - ux) * Fx + (ey[i] - uy) * Fy  # TODO why (ey[i] - uy)
     # eF = ex[i]*Fx + ey[i]*Fy
     R = w[i] * eF / (rho * cs2)
     return R
@@ -119,8 +121,8 @@ def get_discrete_force_Guo(i):
     """
     # extended version with second order terms
     cs2 = 1. / 3.
-    temp_x = ex_D2Q9[i] - ux + (ex_D2Q9[i] * ux + ey_D2Q9[i] * uy) * ex_D2Q9[i] / cs2
-    temp_y = ey_D2Q9[i] - uy + (ex_D2Q9[i] * ux + ey_D2Q9[i] * uy) * ey_D2Q9[i] / cs2
+    temp_x = ex[i] - ux + (ex[i] * ux + ey[i] * uy) * ex[i] / cs2
+    temp_y = ey[i] - uy + (ex[i] * ux + ey[i] * uy) * ey[i] / cs2
     R = w[i] * (temp_x * Fx + temp_y * Fy) / (rho * cs2)
     return R
 
@@ -135,8 +137,8 @@ def get_discrete_force_interface_tracking(i):
     # try Guo:
     # extended version with second order terms
     cs2 = 1. / 3.
-    temp_x = ex_D2Q9[i] - ux + (ex_D2Q9[i] * ux + ey_D2Q9[i] * uy) * ex_D2Q9[i] / cs2
-    temp_y = ey_D2Q9[i] - uy + (ex_D2Q9[i] * ux + ey_D2Q9[i] * uy) * ey_D2Q9[i] / cs2
+    temp_x = ex[i] - ux + (ex[i] * ux + ey[i] * uy) * ex[i] / cs2
+    temp_y = ey[i] - uy + (ex[i] * ux + ey[i] * uy) * ey[i] / cs2
     R = w[i] * (temp_x * F_phi_x + temp_y * F_phi_y) / cs2
     return R
 
@@ -148,7 +150,7 @@ def get_discrete_m(m, n, fun):
         # pop = p_star * get_gamma(i)
         # pop = Symbol('f[%d]' % i)
         pop = fun(i)
-        k += pow(ex_D2Q9[i], m) * pow(ey_D2Q9[i], n) * pop
+        k += pow(ex[i], m) * pow(ey[i], n) * pop
 
     return round_and_simplify(k)
 
@@ -160,7 +162,7 @@ def get_discrete_cm(m, n, fun):
         # pop = p_star * get_gamma(i)
         # pop = Symbol('f[%d]' % i)
         pop = fun(i)
-        k += pow((ex_D2Q9[i] - ux), m) * pow((ey_D2Q9[i] - uy), n) * pop
+        k += pow((ex[i] - ux), m) * pow((ey[i] - uy), n) * pop
 
     return round_and_simplify(k)
 
@@ -189,119 +191,3 @@ def get_mom_vector_from_shift_Mat(fun, Mat):
     return Matrix([cm_])
 
 
-
-def get_continuous_weight(dzeta=(dzeta_x, dzeta_y)):
-
-    """
-    PhD Thesis: `The lattice Boltzmann method: Fundamentals and acoustics`
-    by Erlend Magnus Viggen
-    4.1  The discrete-velocity Boltzmann equation, pp75
-    :param i: i-th lattice direction
-    :return: returns weight in i-th lattice direction
-    """
-    e2 = dzeta[0] * dzeta[0] + dzeta[1] * dzeta[1]
-
-    cs2 = 1. / 3.
-    dim = 2  # dimension of the space
-    w_ = 1. / pow((2 * pi * cs2), dim / 2.)
-    w_ *= exp(-e2 / (2 * cs2))
-    return w_
-
-
-def get_continuous_force_Guo(dzeta=(dzeta_x, dzeta_y)):
-    cs2 = 1. / 3.
-    # cs2 = Symbol('cs2')
-    # extended version with second order terms
-    temp_x = dzeta[0] - ux + (dzeta[0] * ux + dzeta[1] * uy) * dzeta[0] / cs2
-    temp_y = dzeta[1] - uy + (dzeta[0] * ux + dzeta[1] * uy) * dzeta[1] / cs2
-
-    result = get_continuous_weight(dzeta) * (temp_x * Fx + temp_y * Fy) / (rho * cs2)
-    return result
-
-
-def get_continuous_Maxwellian_DF(dzeta=(dzeta_x, dzeta_y), psi=m00, u=(ux, uy)):
-    """
-    :param dzeta: direction (x,y)
-    :param u: velocity (x,y)
-    :param psi: quantity of interest aka scaling function like density
-    :return: continuous, local Maxwell-Boltzmann distribution
-    'Incorporating forcing terms in cascaded lattice Boltzmann approach by method of central moments'
-    Kannan N. Premnath, Sanjoy Banerjee, 2009
-    eq 22
-    """
-
-    cs2 = 1. / 3.
-    dzeta_u2 = 0
-    for dzeta_i, u_i in zip(dzeta, u):
-        dzeta_u2 += (dzeta_i-u_i)*(dzeta_i-u_i)
-
-    DF = psi / (2 * pi * cs2)
-    DF *= exp(-dzeta_u2 / (2 * cs2))
-
-    return DF
-
-def get_continuous_hydro_DF(dzeta=(dzeta_x, dzeta_y)):
-
-    DF_p = get_continuous_Maxwellian_DF(dzeta=(dzeta_x, dzeta_y), psi=(m00-1), u=(0, 0))
-    DF_gamma = get_continuous_Maxwellian_DF(dzeta=(dzeta_x, dzeta_y), psi=1, u=(ux, uy))
-    return DF_p + DF_gamma
-
-
-def get_continuous_force_He_hydro_DF(dzeta=(dzeta_x, dzeta_y)):
-    """
-    'Discrete Boltzmann equation model for the incompressible Navier-Stokes equation', He et al., 1998
-    """
-    cs2 = 1. / 3.
-    # eu = dzeta2D.dot(F2D)
-    eu = dzeta[0] * Fx + dzeta[1] * Fy
-    DF_p = get_continuous_Maxwellian_DF(dzeta=dzeta2D, psi=(m00-1), u=(0, 0))
-
-    euF = (dzeta[0] - ux) * Fx + (dzeta[1] - uy) * Fy
-    # euF = (dzeta2D - u2D).dot(F2D)
-    DF_gamma = get_continuous_Maxwellian_DF(dzeta=dzeta2D, psi=1, u=(ux, uy))
-
-    R = -(eu * DF_p + euF * DF_gamma)/(rho * cs2)
-    R = -R  # `-` sign is skipped to ease code copy-paste ;p
-    return R
-
-
-def get_continuous_force_He_MB(dzeta=(dzeta_x, dzeta_y)):
-    """
-    'Discrete Boltzmann equation model for the incompressible Navier-Stokes equation', He et al., 1998
-    Use Maxwellian to calculate equilibria
-    """
-    cs2 = 1. / 3.
-    # cs2 = Symbol('cs2')
-    euF = (dzeta[0] - ux) * Fx + (dzeta[1] - uy) * Fy
-    R = get_continuous_Maxwellian_DF(dzeta) * euF / (rho * cs2)
-    return R
-
-
-def get_continuous_m(m, n, DF):
-    fun = DF((dzeta_x, dzeta_y)) * pow(dzeta_x, m) * pow(dzeta_y, n)
-
-    result = integrate(fun, (dzeta_x, -oo, oo), (dzeta_y, -oo, oo))
-    return round_and_simplify(result)
-
-
-def get_continuous_cm(m, n, DF):
-    fun = DF((dzeta_x, dzeta_y)) * pow((dzeta_x - ux), m) * pow((dzeta_y - uy), n)
-
-    result = integrate(fun, (dzeta_x, -oo, oo), (dzeta_y, -oo, oo))
-    return round_and_simplify(result)
-
-
-def get_mom_vector_from_continuous_def(fun, continuous_transformation):
-    # for example: continous_transformation=get_continuous_cm
-
-    m_ = [continuous_transformation(0, 0, fun),
-          continuous_transformation(1, 0, fun),
-          continuous_transformation(0, 1, fun),
-          continuous_transformation(2, 0, fun),
-          continuous_transformation(0, 2, fun),
-          continuous_transformation(1, 1, fun),
-          continuous_transformation(2, 1, fun),
-          continuous_transformation(1, 2, fun),
-          continuous_transformation(2, 2, fun)
-          ]
-    return Matrix([m_])

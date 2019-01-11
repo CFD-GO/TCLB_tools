@@ -40,13 +40,13 @@ F_cm_str = 'F_phi_cm'
 # "Modelling incompressible thermal flows using a central-moments-based lattice Boltzmann method" L. Fei et al. 2017
 # eq8 : (eye(q)-S)*cm + S*cm_eq + (eye(q)-S/2.)*force_in_cm_space
 
-print("CudaDeviceFunction void relax_and_collide_CM_phase_field("
-      "real_t %s[9], "
+print("CudaDeviceFunction void relax_and_collide_ADE_with_F("
+      f"real_t {pop_in_str}[9], "
       "real_t tau, "
       "vector_t u, "
-      "vector_t F_phi"
+      f"vector_t {F_cm_str}"
       ") \n{"
-      % pop_in_str)
+      )
 
 print_u2()
 print("real_t %s = 1./tau;" % sv)

@@ -11,14 +11,28 @@ init_printing(use_unicode=False, wrap_line=False, no_global=True)
 ux = Symbol('u.x')
 uy = Symbol('u.y')
 uz = Symbol('u.z')
-u2D = (ux, uy)
-u3D = (ux, uy, uz)
+u2D = Matrix([ux, uy])
+u3D = Matrix([ux, uy, uz])
 
 dzeta_x = Symbol('dzeta_x')
 dzeta_y = Symbol('dzeta_y')
 dzeta_z = Symbol('dzeta_z')
-dzeta2D = (dzeta_x, dzeta_y)
-dzeta3D = (dzeta_x, dzeta_y, dzeta_z)
+
+dzeta2D = Matrix([dzeta_x, dzeta_y])
+dzeta3D = Matrix([dzeta_x, dzeta_y, dzeta_z])
+
+
+Fx = Symbol('Fhydro.x')
+Fy = Symbol('Fhydro.y')
+Fz = Symbol('Fhydro.z')
+
+F2D = Matrix([Fx, Fy])
+F3D = Matrix([Fx, Fy, Fz])
+
+F_phi_x = Symbol('F_phi.x')
+F_phi_y = Symbol('F_phi.y')
+F_phi_z = Symbol('F_phi.z')
+
 
 sv = Symbol('s_v')  # s_v = 1 /(tau + 0.5)
 sb = Symbol('s_b')  # results in bulk viscosity = 1/6 since : zeta = (1/sb - 0.5)*cs^2*dt
@@ -80,16 +94,7 @@ S_relax_ADE_D3Q19 = diag(1, sv, sv, sv, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
 #          0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  1,  1, -1, -1, -1, -1,  1,  1), 19, 19);
 
 
-Fx = Symbol('Fhydro.x')
-Fy = Symbol('Fhydro.y')
-Fz = Symbol('Fhydro.z')
 
-F2D = (Fx, Fy)
-F3D = (Fx, Fy, Fz)
-
-F_phi_x = Symbol('F_phi.x')
-F_phi_y = Symbol('F_phi.y')
-F_phi_z = Symbol('F_phi.z')
 
 # phi_norm_grad_x = Symbol('norm_grad_phi.x')  # normalized gradient of the phase field in the x direction
 # phi_norm_grad_y = Symbol('norm_grad_phi.y')  # normalized gradient of the phase field in the y direction
@@ -244,7 +249,8 @@ moments_dict = {
              (1, 1, 0),
              (2, 1, 0),
              (1, 2, 0),
-             (2, 2, 0)],
+             (2, 2, 0)
+             ],
 
     # order of 3D (central) moments as in
     # `Three-dimensional cascaded lattice Boltzmann method:

@@ -1,6 +1,5 @@
 
-
-from SymbolicCollisions.core.sym_col_fun import *
+from SymbolicCollisions.core.DiscreteCMTransforms import *
 from SymbolicCollisions.core.printers import print_as_vector, print_ccode
 
 import time
@@ -58,31 +57,5 @@ print_as_vector(cm_eq_pf, 'cm_eq_pf', regex=True)
 
 
 print('\n\n// === continous cm === \n ')
-
-print('\n//population_eq -> cm_eq - from continous definition: \n'
-      'k_mn = integrate(fun, (x, -oo, oo), (y, -oo, oo)) \n'
-      'where fun = fM(rho,u,x,y) *(x-ux)^m (y-uy)^n')
-cm_eq = get_mom_vector_from_continuous_def(get_continuous_Maxwellian_DF, continuous_transformation=get_continuous_cm)
-# cm_eq = get_mom_vector_from_continuous_def(get_continuous_hydro_DF, continuous_transformation=get_continuous_cm)
-print_as_vector(cm_eq, 'cm_eq', regex=True)
-
-print('\n//Force -> Force_cm - from continous definition: \n'
-      'k_mn = integrate(fun, (x, -oo, oo), (y, -oo, oo)) \n'
-      'where fun = forceM(rho,u,x,y) *(x-ux)^m (y-uy)^n ')
-F_cm = get_mom_vector_from_continuous_def(get_continuous_force_He_MB, continuous_transformation=get_continuous_cm)
-print_as_vector(F_cm, 'F_cm', regex=True)
-
-print('\n//Force -> Force_cm - from continous definition: \n'
-      'k_mn = integrate(fun, (x, -oo, oo), (y, -oo, oo)) \n'
-      'where fun = forceM(rho,u,x,y) *(x-ux)^m (y-uy)^n ')
-F_cm = get_mom_vector_from_continuous_def(get_continuous_force_Guo, continuous_transformation=get_continuous_cm)
-print_as_vector(F_cm, 'F_cm', regex=True)
-
-print('\n//Force -> Force_cm - from continous definition: \n'
-      'k_mn = integrate(fun, (x, -oo, oo), (y, -oo, oo)) \n'
-      'where fun = forceM(rho,u,x,y) *(x-ux)^m (y-uy)^n ')
-F_cm = get_mom_vector_from_continuous_def(get_continuous_force_He_hydro_DF, continuous_transformation=get_continuous_cm)
-print_as_vector(F_cm, 'F_cm', regex=True)
-
 print('\n\n Done in %s [s].'
       % str(time.process_time() - start))
