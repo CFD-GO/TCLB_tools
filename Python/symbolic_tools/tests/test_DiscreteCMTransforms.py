@@ -55,7 +55,7 @@ class TestSymbolicCalc(unittest.TestCase):
     def test_get_F_cm_Guo_continuous_and_discrete(self):
         F_cm_Guo_disc = get_mom_vector_from_discrete_def(get_discrete_force_Guo, discrete_transform=get_discrete_cm)
 
-        from SymbolicCollisions.core.sym_col_fun import get_mom_vector_from_continuous_def, get_continuous_force_Guo
+        from SymbolicCollisions.core.sym_col_fun import get_mom_vector_from_continuous_def, get_continuous_force_Guo, get_continuous_cm
         F_cm_Guo_cont = get_mom_vector_from_continuous_def(get_continuous_force_Guo, continuous_transformation=get_continuous_cm)
 
         print_as_vector(F_cm_Guo_cont, 'F_cm', regex=True)
