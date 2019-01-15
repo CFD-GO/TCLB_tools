@@ -9,6 +9,7 @@ from concurrencytest import ConcurrentTestSuite, fork_for_tests
 
 import sys
 import os
+
 sys.path.append(os.path.join('Python', 'symbolic_tools'))  # allow CI bot to see the stuff from the main repo dir
 sys.path.append(os.path.join('.'))  # allow CI bot to see the stuff from the main repo dir
 
@@ -29,7 +30,7 @@ from SymbolicCollisions.core.hardcoded_results import \
     hardcoded_F_cm_Guo_hydro_LB_velocity_based_D2Q9, hardcoded_cm_eq_compressible_D2Q9
 
 
-class TestSymbolicCalc(unittest.TestCase):
+class TestDiscreteCMTransforms(unittest.TestCase):
     def test_shift_vs_def_cm(self):
         dcmt = DiscreteCMTransforms(e_D2Q9, u2D, F2D, rho)
 
@@ -39,7 +40,8 @@ class TestSymbolicCalc(unittest.TestCase):
         for fun in functions:
             F_in_cm = get_mom_vector_from_discrete_def(fun,
                                                        discrete_transform=dcmt.get_cm,
-                                                       moments_order=moments_dict['D2Q9']) # calculate from definition of cm
+                                                       moments_order=moments_dict['D2Q9'],
+                                                       serial_run=True)  # calculate from definition of cm
             NMF_cm = get_mom_vector_from_shift_mat(fun, mat=NrawD2Q9 * Mraw_D2Q9)  # calculate using shift matrices
 
             f = io.StringIO()
@@ -58,7 +60,8 @@ class TestSymbolicCalc(unittest.TestCase):
         dcmt = DiscreteCMTransforms(e_D2Q9, u2D, F2D, rho)
         F_cm_Guo_disc = get_mom_vector_from_discrete_def(dcmt.get_force_Guo,
                                                          discrete_transform=dcmt.get_cm,
-                                                         moments_order=moments_dict['D2Q9'])
+                                                         moments_order=moments_dict['D2Q9'],
+                                                         serial_run=True)
 
         from SymbolicCollisions.core.ContinousCMTransforms import \
             ContinousCMTransforms, get_mom_vector_from_continuous_def
@@ -69,11 +72,10 @@ class TestSymbolicCalc(unittest.TestCase):
         ccmt = ContinousCMTransforms(dzeta3D, u3D, F3D, rho)
         F_cm_Guo_cont = get_mom_vector_from_continuous_def(ccmt.get_force_Guo,
                                                            continuous_transformation=ccmt.get_cm,
-                                                           moments_order=moments_dict['D2Q9'])
-
+                                                           moments_order=moments_dict['D2Q9'],
+                                                           serial_run=True)
 
         # print_as_vector(F_cm_Guo_cont, 'F_cm')
-
         results = [F_cm_Guo_disc, F_cm_Guo_cont]
 
         f = io.StringIO()
@@ -92,8 +94,9 @@ class TestSymbolicCalc(unittest.TestCase):
     def test_get_force_He_discrete(self):
         dcmt = DiscreteCMTransforms(e_D2Q9, u2D, F2D, rho)
         F_in_cm = get_mom_vector_from_discrete_def(dcmt.get_force_He,
-                                                            discrete_transform=dcmt.get_cm,
-                                                            moments_order=moments_dict['D2Q9'])
+                                                   discrete_transform=dcmt.get_cm,
+                                                   moments_order=moments_dict['D2Q9'],
+                                                   serial_run=True)
         f = io.StringIO()
         with redirect_stdout(f):
             print_as_vector(F_in_cm, 'F_in_cm')
@@ -124,8 +127,9 @@ class TestSymbolicCalc(unittest.TestCase):
     def test_get_cm_eq_hydro_discrete(self):
         dcmt = DiscreteCMTransforms(e_D2Q9, u2D, F2D, rho)
         cm_eq = get_mom_vector_from_discrete_def(dcmt.get_EDF_hydro,
-                                                  discrete_transform=dcmt.get_cm,
-                                                  moments_order=moments_dict['D2Q9'])
+                                                 discrete_transform=dcmt.get_cm,
+                                                 moments_order=moments_dict['D2Q9'],
+                                                 serial_run=True)
         f = io.StringIO()
         with redirect_stdout(f):
             print_as_vector(cm_eq, 'cm_eq')
@@ -162,8 +166,9 @@ class TestSymbolicCalc(unittest.TestCase):
         """
         dcmt = DiscreteCMTransforms(e_D2Q9, u2D, F2D, rho)
         cm_eq = get_mom_vector_from_discrete_def(lambda i: Symbol('m00') * dcmt.get_gamma(i),
-                                                  discrete_transform=dcmt.get_cm,
-                                                  moments_order=moments_dict['D2Q9'])
+                                                 discrete_transform=dcmt.get_cm,
+                                                 moments_order=moments_dict['D2Q9'],
+                                                 serial_run=True)
 
         f = io.StringIO()
         with redirect_stdout(f):
@@ -203,6 +208,6 @@ if __name__ == '__main__':
     # Run same tests across 4 processes
     cores = multiprocessing.cpu_count()
     print(f'\nRunning tests on {cores} cores:')
-    suite = unittest.TestLoader().loadTestsFromTestCase(TestSymbolicCalc)
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestDiscreteCMTransforms)
     concurrent_suite = ConcurrentTestSuite(suite, fork_for_tests(cores))
     runner.run(concurrent_suite)

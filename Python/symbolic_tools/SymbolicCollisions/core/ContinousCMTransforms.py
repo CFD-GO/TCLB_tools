@@ -129,13 +129,16 @@ class ContinousCMTransforms:
         return round_and_simplify(result)
 
 
-def get_mom_vector_from_continuous_def(fun, continuous_transformation, moments_order):
+def get_mom_vector_from_continuous_def(fun, continuous_transformation, moments_order, serial_run=False):
     """
     # obviously 2D is faster
     # However 3D works for 2D as well
     :param fun:
     :param continuous_transformation:
     :param moments_order:
+    :param serial_run:
+    python debugger may crash in parallel mode.
+    Moreover code coverage doesn't work multiprocessing, since the processes are independent beings,
     :return:
     """
     # for example: continuous_transformation=get_continuous_cm
@@ -143,17 +146,16 @@ def get_mom_vector_from_continuous_def(fun, continuous_transformation, moments_o
     # row = moments_order[0]
     # result = continuous_transformation(row, fun)
 
-    # serial run
-    # result = [continuous_transformation(row, fun) for row in moments_order]  # dziala
+    if serial_run:
+        result = [continuous_transformation(row, fun) for row in moments_order]  # serial run
+    else:  # run in parallel
+        # if you experience debugger crashing then run a serial version
+        # /pycharm-2018.3.1/helpers/pydev/pydevd.py", line 1487, in dispatch
+        #     host = setup['client']
+        # TypeError: 'NoneType' object is not subscriptable
 
-    # if you experience debugger crashing then run a serial version
-
-    # /pycharm-2018.3.1/helpers/pydev/pydevd.py", line 1487, in dispatch
-    #     host = setup['client']
-    # TypeError: 'NoneType' object is not subscriptable
-    # run in parallel:
-    num_cores = multiprocessing.cpu_count()
-    result = Parallel(n_jobs=num_cores)(delayed(continuous_transformation)(row, fun) for row in moments_order)
+        num_cores = multiprocessing.cpu_count()
+        result = Parallel(n_jobs=num_cores)(delayed(continuous_transformation)(row, fun) for row in moments_order)
 
     return Matrix([result])
 

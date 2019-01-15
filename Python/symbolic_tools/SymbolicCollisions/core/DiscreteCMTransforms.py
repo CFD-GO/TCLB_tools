@@ -108,13 +108,16 @@ class DiscreteCMTransforms:
         return result
 
 
-def get_mom_vector_from_discrete_def(fun, discrete_transform, moments_order):
+def get_mom_vector_from_discrete_def(fun, discrete_transform, moments_order, serial_run=False):
     """
     # obviously 2D is faster
     # However 3D works for 2D as well
     :param fun:
     :param discrete_transform:
     :param moments_order:
+    :param serial_run:
+    python debugger may crash in parallel mode.
+    Moreover code coverage doesn't work multiprocessing, since the processes are independent beings,
     :return:
     """
     # for example: discrete_transform=get_discrete_cm
@@ -122,17 +125,16 @@ def get_mom_vector_from_discrete_def(fun, discrete_transform, moments_order):
 
     # row = moments_order[3]
     # result = discrete_transform(row, fun, q)
-
-    # serial run
-    # result = [discrete_transform(row, fun, q) for row in moments_order]  # dziala
-
-    # if you experience debugger crashing then run a serial version
-    # /pycharm-2018.3.1/helpers/pydev/pydevd.py", line 1487, in dispatch
-    #     host = setup['client']
-    # TypeError: 'NoneType' object is not subscriptable
-    # run in parallel:
-    num_cores = multiprocessing.cpu_count()
-    result = Parallel(n_jobs=num_cores)(delayed(discrete_transform)(row, fun, q) for row in moments_order)
+    if serial_run:
+        result = [discrete_transform(row, fun, q) for row in moments_order]  # serial run
+    else:  # run in parallel
+        # if you experience debugger crashing then run a serial version
+        # /pycharm-2018.3.1/helpers/pydev/pydevd.py", line 1487, in dispatch
+        #     host = setup['client']
+        # TypeError: 'NoneType' object is not subscriptable
+        # run in parallel:
+        num_cores = multiprocessing.cpu_count()
+        result = Parallel(n_jobs=num_cores)(delayed(discrete_transform)(row, fun, q) for row in moments_order)
 
     return Matrix([result])
 

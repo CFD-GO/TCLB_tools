@@ -4,10 +4,8 @@ import io
 from contextlib import redirect_stdout
 from sympy import Symbol
 
-
 import multiprocessing
 from concurrencytest import ConcurrentTestSuite, fork_for_tests
-
 
 import sys
 import os
@@ -26,13 +24,12 @@ from SymbolicCollisions.core.hardcoded_results import hardcoded_F_cm_hydro_densi
 from SymbolicCollisions.core.ContinousCMTransforms import ContinousCMTransforms, get_mom_vector_from_continuous_def
 from SymbolicCollisions.core.cm_symbols import \
     F3D, dzeta3D, u3D, \
-    F2D, dzeta2D, u2D, \
-    rho, w_D2Q9, m00
+    rho
 
 from SymbolicCollisions.core.cm_symbols import moments_dict
 
 
-class TestSymbolicCalc(unittest.TestCase):
+class TestContinousCMTransforms(unittest.TestCase):
     def test_cm_vector_from_continuous_def(self):
         ccmt = ContinousCMTransforms(dzeta3D, u3D, F3D, rho)
 
@@ -63,7 +60,9 @@ class TestSymbolicCalc(unittest.TestCase):
         for fun, lattice, expected_result in zip(functions, lattices, expected_results):
             cm_eq = get_mom_vector_from_continuous_def(fun,
                                                        continuous_transformation=ccmt.get_cm,
-                                                       moments_order=moments_dict[lattice])
+                                                       moments_order=moments_dict[lattice],
+                                                       serial_run=True
+                                                       )
             # print("------------\n\n")
             # print_as_vector(cm_eq, 'CM')
             # print_as_vector(expected_result, 'CM_expected')
@@ -89,7 +88,8 @@ class TestSymbolicCalc(unittest.TestCase):
         cm_i = ContinousCMTransforms(dzeta3D, u3D, F3D, rho)
         cm_eq = get_mom_vector_from_continuous_def(cm_i.get_hydro_DF,
                                                    continuous_transformation=cm_i.get_cm,
-                                                   moments_order=moments_dict['D2Q9'])
+                                                   moments_order=moments_dict['D2Q9'],
+                                                   serial_run=True)
 
         f = io.StringIO()
         with redirect_stdout(f):
@@ -126,7 +126,8 @@ class TestSymbolicCalc(unittest.TestCase):
         cm_i = ContinousCMTransforms(dzeta3D, u3D, F3D, rho)
         F_cm = get_mom_vector_from_continuous_def(cm_i.get_force_He_hydro_DF,
                                                   continuous_transformation=cm_i.get_cm,
-                                                  moments_order=moments_dict['D2Q9'])
+                                                  moments_order=moments_dict['D2Q9'],
+                                                  serial_run=True)
 
         f = io.StringIO()
         with redirect_stdout(f):
@@ -149,3 +150,18 @@ class TestSymbolicCalc(unittest.TestCase):
             'F_cm[8] = (-2.*Fhydro.x*m00*u.x*uy2 - 2/3.*Fhydro.x*m00*u.x + 2.*Fhydro.x*u.x*uy2 + 2/3.*Fhydro.x*u.x - 2.*Fhydro.y*m00*ux2*u.y - 2/3.*Fhydro.y*m00*u.y + 2.*Fhydro.y*ux2*u.y + 2/3.*Fhydro.y*u.y)/rho;\n'
 
         assert expected_result == out
+
+
+# Pycharm runs them sequentially
+# python -m unittest tests/test_example_unit_tests_parallel_run.py # sequential as well
+# python tests/test_example_unit_tests_parallel_run.py # concurrent run :)
+
+if __name__ == '__main__':
+    loader = unittest.TestLoader()
+    runner = unittest.TextTestRunner()
+    # Run same tests across 4 processes
+    cores = multiprocessing.cpu_count()
+    print(f'\nRunning tests on {cores} cores:')
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestContinousCMTransforms)
+    concurrent_suite = ConcurrentTestSuite(suite, fork_for_tests(cores))
+    runner.run(concurrent_suite)
