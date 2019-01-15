@@ -39,9 +39,7 @@ sb = Symbol('s_b')  # results in bulk viscosity = 1/6 since : zeta = (1/sb - 0.5
 
 ex_D2Q9 = Matrix([0, 1, 0, -1, 0, 1, -1, -1, 1])
 ey_D2Q9 = Matrix([0, 0, 1, 0, -1, 1, 1, -1, -1])
-
-# ex_D2Q9 = np.array([0, 1, 0, -1, 0, 1, -1, -1, 1])
-# ey_D2Q9 = np.array([0, 0, 1, 0, -1, 1, 1, -1, -1])
+e_D2Q9 = ex_D2Q9.col_insert(1, ey_D2Q9)
 
 # D3Q7 notation from TCLB
 ex_D3Q7 = Matrix([0, 1, -1, 0, 0, 0, 0])
@@ -104,7 +102,7 @@ S_relax_ADE_D3Q19 = diag(1, sv, sv, sv, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
 
 m00 = Symbol('m00')
 rho = Symbol('rho')
-w = Matrix([4. / 9, 1. / 9, 1. / 9, 1. / 9, 1. / 9, 1. / 36, 1. / 36, 1. / 36, 1. / 36])
+w_D2Q9 = Matrix([4. / 9, 1. / 9, 1. / 9, 1. / 9, 1. / 9, 1. / 36, 1. / 36, 1. / 36, 1. / 36])
 
 
 ux2 = Symbol('ux2')

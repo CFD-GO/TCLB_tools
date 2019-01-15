@@ -1,5 +1,4 @@
 
-from SymbolicCollisions.core.sym_col_fun import *
 from SymbolicCollisions.core.cm_symbols import *
 from SymbolicCollisions.core.printers import print_as_vector
 
@@ -15,15 +14,6 @@ pretty_print(S_relax2)
 
 print("\n\n deja-vu! \n")
 pretty_print(S_relax_D2Q9)
-
-
-
-
-
-
-
-
-
 
 
 print("\n\n=== PRETTY CODE: relax relax_MRT_relax_raw_mom_into_ortho ===\n\n")

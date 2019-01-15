@@ -23,18 +23,18 @@ from SymbolicCollisions.core.hardcoded_results import hardcoded_F_cm_hydro_densi
     hardcoded_cm_eq_compressible_D2Q9,    hardcoded_cm_eq_compressible_D3Q19, \
     hardcoded_cm_eq_incompressible_D2Q9
 
-from SymbolicCollisions.core.ContinousCMTransforms import ContinousCMTransforms, get_mom_vector_from_continuous_def_new
+from SymbolicCollisions.core.ContinousCMTransforms import ContinousCMTransforms, get_mom_vector_from_continuous_def
 from SymbolicCollisions.core.cm_symbols import \
     F3D, dzeta3D, u3D, \
     F2D, dzeta2D, u2D, \
-    rho, w, m00
+    rho, w_D2Q9, m00
 
 from SymbolicCollisions.core.cm_symbols import moments_dict
 
 
 class TestSymbolicCalc(unittest.TestCase):
     def test_cm_vector_from_continuous_def(self):
-        cm_i = ContinousCMTransforms(dzeta3D, u3D, F3D, rho)
+        ccmt = ContinousCMTransforms(dzeta3D, u3D, F3D, rho)
 
         lattices = [
             'D2Q9',
@@ -45,11 +45,11 @@ class TestSymbolicCalc(unittest.TestCase):
             ]
 
         functions = [
-            cm_i.get_Maxwellian_DF,
-            cm_i.get_Maxwellian_DF,
-            cm_i.get_force_Guo,
-            cm_i.get_force_He_MB,
-            cm_i.get_force_He_MB,
+            ccmt.get_Maxwellian_DF,
+            ccmt.get_Maxwellian_DF,
+            ccmt.get_force_Guo,
+            ccmt.get_force_He_MB,
+            ccmt.get_force_He_MB,
         ]
 
         expected_results = [
@@ -61,22 +61,22 @@ class TestSymbolicCalc(unittest.TestCase):
         ]
 
         for fun, lattice, expected_result in zip(functions, lattices, expected_results):
-            cm_eq = get_mom_vector_from_continuous_def_new(fun,
-                                                           continuous_transformation=cm_i.get_cm,
-                                                           moments_order=moments_dict[lattice])
+            cm_eq = get_mom_vector_from_continuous_def(fun,
+                                                       continuous_transformation=ccmt.get_cm,
+                                                       moments_order=moments_dict[lattice])
             # print("------------\n\n")
-            # print_as_vector(cm_eq, 'CM', regex=True)
-            # print_as_vector(expected_result, 'CM_expected', regex=True)
+            # print_as_vector(cm_eq, 'CM')
+            # print_as_vector(expected_result, 'CM_expected')
             # print("------------\n\n")
 
             f = io.StringIO()
             with redirect_stdout(f):
-                print_as_vector(cm_eq, 'cm_eq', regex=True)
+                print_as_vector(cm_eq, 'cm_eq')
             out = f.getvalue()
 
             f2 = io.StringIO()
             with redirect_stdout(f2):
-                print_as_vector(expected_result, 'cm_eq', regex=True)
+                print_as_vector(expected_result, 'cm_eq')
             ccode_expected_result = f2.getvalue()
 
             assert ccode_expected_result == out
@@ -87,13 +87,13 @@ class TestSymbolicCalc(unittest.TestCase):
         # where fun = fM(rho,u,x,y) *(x-ux)^m *(y-uy)^n * (z-uz)^o ')
 
         cm_i = ContinousCMTransforms(dzeta3D, u3D, F3D, rho)
-        cm_eq = get_mom_vector_from_continuous_def_new(cm_i.get_hydro_DF,
-                                                       continuous_transformation=cm_i.get_cm,
-                                                       moments_order=moments_dict['D2Q9'])
+        cm_eq = get_mom_vector_from_continuous_def(cm_i.get_hydro_DF,
+                                                   continuous_transformation=cm_i.get_cm,
+                                                   moments_order=moments_dict['D2Q9'])
 
         f = io.StringIO()
         with redirect_stdout(f):
-            print_as_vector(cm_eq, 'cm_eq', regex=True)
+            print_as_vector(cm_eq, 'cm_eq')
         out = f.getvalue()
 
         # TODO: can't use hardcoded_cm_eq_incompressible_D2Q9,
@@ -124,13 +124,13 @@ class TestSymbolicCalc(unittest.TestCase):
 
     def test_get_F_cm_using_He_scheme_and_continuous_Maxwellian_DF(self):
         cm_i = ContinousCMTransforms(dzeta3D, u3D, F3D, rho)
-        F_cm = get_mom_vector_from_continuous_def_new(cm_i.get_force_He_hydro_DF,
-                                                      continuous_transformation=cm_i.get_cm,
-                                                      moments_order=moments_dict['D2Q9'])
+        F_cm = get_mom_vector_from_continuous_def(cm_i.get_force_He_hydro_DF,
+                                                  continuous_transformation=cm_i.get_cm,
+                                                  moments_order=moments_dict['D2Q9'])
 
         f = io.StringIO()
         with redirect_stdout(f):
-            print_as_vector(F_cm, 'F_cm', regex=True)
+            print_as_vector(F_cm, 'F_cm')
         out = f.getvalue()
 
         # TODO: can't use hardcoded_cm_eq_incompressible_D2Q9,

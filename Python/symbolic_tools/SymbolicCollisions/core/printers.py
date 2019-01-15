@@ -40,39 +40,15 @@ def round_and_simplify(stuff):
     return rounded_and_simplified_stuff
 
 
-def print_as_vector_old(some_matrix, print_symbol='default_symbol1', regex=False):
+def print_as_vector(some_matrix, print_symbol='default_symbol1', raw_output=False):
     rows = some_matrix._mat
 
     for i in range(len(rows)):
         row = rows[i]  # evaluate symbolic constants, like pi
 
-        if regex:
-            row = symbol_to_number(row)  # evaluate symbolic constants, like pi
-            row = str(round_and_simplify(row))
-            row = re.sub(r"%s\*\*2" % ux, '%s' % ux2, row)
-            row = re.sub(r"%s\*\*2" % uy, '%s' % uy2, row)
-            row = re.sub(r"%s\*%s" % (ux, uy), '%s' % uxuy, row)
-
-            row = re.sub(r"0.33333[1-9]{0,10}", "1./3.", row)
-            row = re.sub(r"0.11111[1-9]{0,10}", "1./9.", row)
-            row = re.sub(r"0.22222[1-9]{0,10}", "2./9.", row)
-            row = re.sub(r"0.16666[1-9]{0,10}", "1./6.", row)
-            row = re.sub(r"0.66666[1-9]{0,10}", "2./3.", row)
-            row = re.sub(r"3.99999[1-9]{0,10}", "4.0", row)
-            row = re.sub(r"1.0\*", "", row)
-        else:
+        if raw_output:
             row = str(row)
-
-        print(f"{print_symbol}[{i}] = {row};")
-
-
-def print_as_vector(some_matrix, print_symbol='default_symbol1', regex=False):
-    rows = some_matrix._mat
-
-    for i in range(len(rows)):
-        row = rows[i]  # evaluate symbolic constants, like pi
-
-        if regex:
+        else:
             row = symbol_to_number(row)  # evaluate symbolic constants, like pi
             row = str(round_and_simplify(row))
             row = re.sub(r"%s\*\*2" % ux, '%s' % ux2, row)
@@ -82,7 +58,6 @@ def print_as_vector(some_matrix, print_symbol='default_symbol1', regex=False):
             row = re.sub(r"%s\*\*3" % ux, '%s' % ux3, row)
             row = re.sub(r"%s\*\*3" % uy, '%s' % uy3, row)
             row = re.sub(r"%s\*\*3" % uz, '%s' % uz3, row)
-
 
             row = re.sub(r"%s\*%s" % (ux, uy), '%s' % uxuy, row)
             row = re.sub(r"%s\*%s" % (ux, uz), '%s' % uxuz, row)
@@ -104,9 +79,6 @@ def print_as_vector(some_matrix, print_symbol='default_symbol1', regex=False):
 
                 row = re.sub(r"1\.\*", "", row)  # dont multiply by 1.*
                 result = re.findall(r"\d\.\d+", row)
-
-        else:
-            row = str(row)
 
         print(f"{print_symbol}[{i}] = {row};")
 

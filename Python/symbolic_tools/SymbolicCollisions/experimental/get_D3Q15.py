@@ -32,10 +32,10 @@ sys.path.append(os.path.join('Python', 'symbolic_tools'))  # allow CI bot to see
 
 # M = MatrixGenerator().get_raw_moments_matrix(ex_=ex, ey_=ey, ez_=ez)
 M = get_raw_moments_matrix(ex_=ex, ey_=ey, ez_=ez)
-# print_as_vector(Mraw, 's', regex=True)
+# print_as_vector(Mraw, 's')
 pprint(M)
 
 Smat = get_shift_matrix(M.inv(), ex, ey, ez_=ez)
 pprint(Smat)
-print_as_vector(Smat, 'N', regex=True)
+print_as_vector(Smat, 'N')
 

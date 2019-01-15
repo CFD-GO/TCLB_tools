@@ -14,5 +14,6 @@ pprint(cumulant)
 # preview(trunc_cumulant, output='dvi')  # open preview in new window
 #
 
+
 mc = Matrix([cumulant])
-print_as_vector(mc, 'c', regex=True)
+print_as_vector(mc, 'c')

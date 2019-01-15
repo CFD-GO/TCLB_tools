@@ -40,7 +40,7 @@ class TestCumulants(TestCase):
             f = io.StringIO()
             with redirect_stdout(f):
                 mc = Matrix([cumulant])  # printer works using Matrix format
-                print_as_vector(mc, 'c', regex=True)
+                print_as_vector(mc, 'c')
             out = f.getvalue()
 
             assert r in out

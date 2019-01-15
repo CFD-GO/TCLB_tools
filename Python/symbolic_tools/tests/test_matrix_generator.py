@@ -26,12 +26,12 @@ class TestMatrixGenerator(TestCase):
 
         f = io.StringIO()
         with redirect_stdout(f):
-            print_as_vector(Mraw_D2Q9, 's', regex=True)
+            print_as_vector(Mraw_D2Q9, 's')
         out = f.getvalue()
 
         f2 = io.StringIO()
         with redirect_stdout(f2):
-            print_as_vector(M, 's', regex=True)
+            print_as_vector(M, 's')
         out2 = f2.getvalue()
 
         assert out == out2
@@ -45,12 +45,12 @@ class TestMatrixGenerator(TestCase):
 
         f = io.StringIO()
         with redirect_stdout(f):
-            print_as_vector(Shift_ortho_Straka_d2q5, 's', regex=True)
+            print_as_vector(Shift_ortho_Straka_d2q5, 's')
         out = f.getvalue()
 
         f2 = io.StringIO()
         with redirect_stdout(f2):
-            print_as_vector(Smat[1:, 1:], 's', regex=True)
+            print_as_vector(Smat[1:, 1:], 's')
         out2 = f2.getvalue()
 
         assert out == out2
@@ -63,12 +63,12 @@ class TestMatrixGenerator(TestCase):
 
         f = io.StringIO()
         with redirect_stdout(f):
-            print_as_vector(Shift_ortho_Geier, 's', regex=True)
+            print_as_vector(Shift_ortho_Geier, 's')
         out = f.getvalue()
 
         f2 = io.StringIO()
         with redirect_stdout(f2):
-            print_as_vector(Smat[3:, 3:], 's', regex=True)
+            print_as_vector(Smat[3:, 3:], 's')
         out2 = f2.getvalue()
 
         assert out == out2

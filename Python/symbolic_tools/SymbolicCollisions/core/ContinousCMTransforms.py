@@ -1,18 +1,11 @@
 
-from SymbolicCollisions.core.cm_symbols import moments_dict
 from sympy import exp, pi, integrate, oo
 import sympy as sp
 import numpy as np
-from sympy import diff, ln, sin, pprint
-from sympy import Symbol
-from sympy.matrices import Matrix
-#
-# from sympy.interactive.printing import init_printing
 
-from SymbolicCollisions.core.cm_symbols import \
-    F3D, dzeta3D, u3D, \
-    F2D, dzeta2D, u2D, \
-    rho, w, m00
+from sympy.matrices import Matrix
+
+from SymbolicCollisions.core.cm_symbols import m00
 
 from SymbolicCollisions.core.printers import round_and_simplify
 
@@ -42,7 +35,6 @@ class ContinousCMTransforms:
         Kannan N. Premnath, Sanjoy Banerjee, 2009
         eq 22
         """
-
         u = None
         if _u:
             u = _u
@@ -57,15 +49,14 @@ class ContinousCMTransforms:
         dzeta_minus_u = self.dzeta - u
         dzeta_u2 = dzeta_minus_u.dot(dzeta_minus_u)
 
-        DF = psi / pow(2 * PI * cs2, dim/2)
-        DF *= exp(-dzeta_u2 / (2 * cs2))
-
-        return DF
+        df = psi / pow(2 * PI * cs2, dim/2)
+        df *= exp(-dzeta_u2 / (2 * cs2))
+        return df
 
     def get_hydro_DF(self):
-        DF_p = self.get_Maxwellian_DF(psi=(m00 - 1), _u=Matrix([0, 0, 0]))
-        DF_gamma = self.get_Maxwellian_DF(psi=1, _u=self.u,)
-        return DF_p + DF_gamma
+        df_p = self.get_Maxwellian_DF(psi=(m00 - 1), _u=Matrix([0, 0, 0]))
+        df_gamma = self.get_Maxwellian_DF(psi=1, _u=self.u,)
+        return df_p + df_gamma
 
     def get_force_He_hydro_DF(self):
         """
@@ -73,12 +64,12 @@ class ContinousCMTransforms:
         """
         cs2 = 1./3.
         eu = self.dzeta.dot(self.F)
-        DF_p = self.get_Maxwellian_DF(psi=(m00 - 1), _u=Matrix([0, 0, 0]))
+        df_p = self.get_Maxwellian_DF(psi=(m00 - 1), _u=Matrix([0, 0, 0]))
 
-        euF = (self.dzeta - self.u).dot(self.F)
-        DF_gamma = self.get_Maxwellian_DF(psi=1, _u=self.u)
+        euf = (self.dzeta - self.u).dot(self.F)
+        df_gamma = self.get_Maxwellian_DF(psi=1, _u=self.u)
 
-        R = -(eu * DF_p + euF * DF_gamma) / (self.rho * cs2)
+        R = -(eu * df_p + euf * df_gamma) / (self.rho * cs2)
         R = -R  # `-` sign is skipped to ease code copy-paste ;p
         return R
 
@@ -138,7 +129,7 @@ class ContinousCMTransforms:
         return round_and_simplify(result)
 
 
-def get_mom_vector_from_continuous_def_new(fun, continuous_transformation, moments_order):
+def get_mom_vector_from_continuous_def(fun, continuous_transformation, moments_order):
     """
     # obviously 2D is faster
     # However 3D works for 2D as well
@@ -167,12 +158,3 @@ def get_mom_vector_from_continuous_def_new(fun, continuous_transformation, momen
     return Matrix([result])
 
     #Parallel(n_jobs=2)(delayed(sqrt)(i ** 2) for i in range(10))
-
-
-def get_mom_vector_from_shift_Mat(fun, Mat):
-    pop = Matrix([fun() for i in range(9)])
-    # pop = Matrix(9, 1, lambda i,j: i+j)  # column vect
-    cm_ = Mat * pop  #for example: Mat=Nraw * Mraw)
-    cm_ = round_and_simplify(cm_)
-    return Matrix([cm_])
-

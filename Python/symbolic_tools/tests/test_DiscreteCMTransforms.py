@@ -4,7 +4,6 @@ import io
 from contextlib import redirect_stdout
 from sympy import Symbol
 
-
 import multiprocessing
 from concurrencytest import ConcurrentTestSuite, fork_for_tests
 
@@ -12,18 +11,17 @@ import sys
 import os
 sys.path.append(os.path.join('Python', 'symbolic_tools'))  # allow CI bot to see the stuff from the main repo dir
 sys.path.append(os.path.join('.'))  # allow CI bot to see the stuff from the main repo dir
-# from Python.symbolic_tools.SymbolicCollisions.core.cm_symbols import w  # alternatively change all import paths
-
-from SymbolicCollisions.core.cm_symbols import w
 
 from SymbolicCollisions.core.DiscreteCMTransforms import \
-    get_mom_vector_from_discrete_def, get_mom_vector_from_shift_Mat, \
-    get_discrete_EDF_hydro, \
-    get_discrete_force_He, \
-    get_discrete_force_Guo,\
-    get_gamma, get_discrete_cm
+    DiscreteCMTransforms, \
+    get_mom_vector_from_shift_mat, \
+    get_mom_vector_from_discrete_def
 
-from SymbolicCollisions.core.cm_symbols import Mraw_D2Q9, NrawD2Q9
+from SymbolicCollisions.core.cm_symbols import \
+    F3D, dzeta3D, u3D, \
+    F2D, dzeta2D, u2D, \
+    rho, w_D2Q9, m00, e_D2Q9, \
+    moments_dict
 
 from SymbolicCollisions.core.printers import print_as_vector
 
@@ -33,54 +31,72 @@ from SymbolicCollisions.core.hardcoded_results import \
 
 class TestSymbolicCalc(unittest.TestCase):
     def test_shift_vs_def_cm(self):
-        functions = [lambda i: w[i], get_discrete_force_He, get_discrete_force_Guo]
+        dcmt = DiscreteCMTransforms(e_D2Q9, u2D, F2D, rho)
+
+        functions = [lambda i: w_D2Q9[i], dcmt.get_force_He, dcmt.get_force_Guo]
+        from SymbolicCollisions.core.cm_symbols import Mraw_D2Q9, NrawD2Q9
 
         for fun in functions:
-            F_in_cm = get_mom_vector_from_discrete_def(fun, discrete_transform=get_discrete_cm)  # calculate from definition of cm
-            NMF_cm = get_mom_vector_from_shift_Mat(fun, Mat=NrawD2Q9 * Mraw_D2Q9)  # calculate using shift matrices
+            F_in_cm = get_mom_vector_from_discrete_def(fun,
+                                                       discrete_transform=dcmt.get_cm,
+                                                       moments_order=moments_dict['D2Q9']) # calculate from definition of cm
+            NMF_cm = get_mom_vector_from_shift_mat(fun, mat=NrawD2Q9 * Mraw_D2Q9)  # calculate using shift matrices
 
             f = io.StringIO()
             with redirect_stdout(f):
-                print_as_vector(F_in_cm, 'F_in_cm', regex=True)
+                print_as_vector(F_in_cm, 'F_in_cm')
             out = f.getvalue()
 
             f2 = io.StringIO()
             with redirect_stdout(f2):
-                print_as_vector(NMF_cm, 'F_in_cm', regex=True)
+                print_as_vector(NMF_cm, 'F_in_cm')
             out2 = f2.getvalue()
 
             assert out == out2
 
-
     def test_get_F_cm_Guo_continuous_and_discrete(self):
-        F_cm_Guo_disc = get_mom_vector_from_discrete_def(get_discrete_force_Guo, discrete_transform=get_discrete_cm)
+        dcmt = DiscreteCMTransforms(e_D2Q9, u2D, F2D, rho)
+        F_cm_Guo_disc = get_mom_vector_from_discrete_def(dcmt.get_force_Guo,
+                                                         discrete_transform=dcmt.get_cm,
+                                                         moments_order=moments_dict['D2Q9'])
 
-        from SymbolicCollisions.core.sym_col_fun import get_mom_vector_from_continuous_def, get_continuous_force_Guo, get_continuous_cm
-        F_cm_Guo_cont = get_mom_vector_from_continuous_def(get_continuous_force_Guo, continuous_transformation=get_continuous_cm)
+        from SymbolicCollisions.core.ContinousCMTransforms import \
+            ContinousCMTransforms, get_mom_vector_from_continuous_def
 
-        print_as_vector(F_cm_Guo_cont, 'F_cm', regex=True)
+        from SymbolicCollisions.core.cm_symbols import \
+            F3D, dzeta3D, u3D
+
+        ccmt = ContinousCMTransforms(dzeta3D, u3D, F3D, rho)
+        F_cm_Guo_cont = get_mom_vector_from_continuous_def(ccmt.get_force_Guo,
+                                                           continuous_transformation=ccmt.get_cm,
+                                                           moments_order=moments_dict['D2Q9'])
+
+
+        # print_as_vector(F_cm_Guo_cont, 'F_cm')
 
         results = [F_cm_Guo_disc, F_cm_Guo_cont]
 
         f = io.StringIO()
         with redirect_stdout(f):
-            print_as_vector(hardcoded_F_cm_Guo_hydro_LB_velocity_based_D2Q9, 'F_cm', regex=True)
+            print_as_vector(hardcoded_F_cm_Guo_hydro_LB_velocity_based_D2Q9, 'F_cm')
         expected_result = f.getvalue()
 
         for result in results:
             f = io.StringIO()
             with redirect_stdout(f):
-                print_as_vector(result, 'F_cm', regex=True)
+                print_as_vector(result, 'F_cm')
             out = f.getvalue()
 
-        assert out == expected_result
+            assert out == expected_result
 
     def test_get_force_He_discrete(self):
-        F_in_cm = get_mom_vector_from_discrete_def(get_discrete_force_He, discrete_transform=get_discrete_cm)
-
+        dcmt = DiscreteCMTransforms(e_D2Q9, u2D, F2D, rho)
+        F_in_cm = get_mom_vector_from_discrete_def(dcmt.get_force_He,
+                                                            discrete_transform=dcmt.get_cm,
+                                                            moments_order=moments_dict['D2Q9'])
         f = io.StringIO()
         with redirect_stdout(f):
-            print_as_vector(F_in_cm, 'F_in_cm', regex=True)
+            print_as_vector(F_in_cm, 'F_in_cm')
         out = f.getvalue()
 
         expected_result = 'F_in_cm[0] = 0;\n' \
@@ -106,11 +122,13 @@ class TestSymbolicCalc(unittest.TestCase):
         assert expected_result == out
 
     def test_get_cm_eq_hydro_discrete(self):
-        cm_eq = get_mom_vector_from_discrete_def(get_discrete_EDF_hydro, discrete_transform=get_discrete_cm)
-
+        dcmt = DiscreteCMTransforms(e_D2Q9, u2D, F2D, rho)
+        cm_eq = get_mom_vector_from_discrete_def(dcmt.get_EDF_hydro,
+                                                  discrete_transform=dcmt.get_cm,
+                                                  moments_order=moments_dict['D2Q9'])
         f = io.StringIO()
         with redirect_stdout(f):
-            print_as_vector(cm_eq, 'cm_eq', regex=True)
+            print_as_vector(cm_eq, 'cm_eq')
         out = f.getvalue()
 
         expected_result = 'cm_eq[0] = m00;\n' \
@@ -135,7 +153,6 @@ class TestSymbolicCalc(unittest.TestCase):
 
         assert expected_result == out
 
-
     def test_cm_eq_compressible_discrete(self):
         """
         test eq 10 from
@@ -143,12 +160,14 @@ class TestSymbolicCalc(unittest.TestCase):
         Linlin Fei, Kai Hong Luo, Chuandong Lin, Qing Li
         2017
         """
-
-        cm_eq = get_mom_vector_from_discrete_def(lambda i: Symbol('m00') * get_gamma(i), discrete_transform=get_discrete_cm)
+        dcmt = DiscreteCMTransforms(e_D2Q9, u2D, F2D, rho)
+        cm_eq = get_mom_vector_from_discrete_def(lambda i: Symbol('m00') * dcmt.get_gamma(i),
+                                                  discrete_transform=dcmt.get_cm,
+                                                  moments_order=moments_dict['D2Q9'])
 
         f = io.StringIO()
         with redirect_stdout(f):
-            print_as_vector(cm_eq, 'cm_eq', regex=True)
+            print_as_vector(cm_eq, 'cm_eq')
         out = f.getvalue()
 
         expected_result = 'cm_eq[0] = m00;\n' \

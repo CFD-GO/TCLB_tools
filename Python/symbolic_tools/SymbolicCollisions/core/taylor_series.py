@@ -6,7 +6,6 @@ from sympy import pretty_print
 
 plt.style.use("ggplot")
 
-
 # Factorial function
 def factorial(n):
     if n <= 0:

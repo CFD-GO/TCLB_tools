@@ -1,6 +1,6 @@
 
-from SymbolicCollisions.core.sym_col_fun import *
-from SymbolicCollisions.core.cm_symbols import w
+
+from SymbolicCollisions.core.cm_symbols import w_D2Q9
 from sympy.matrices import Matrix
 from sympy import pretty_print, exp
 from SymbolicCollisions.core.cm_symbols import ex_D2Q9, ey_D2Q9
@@ -55,6 +55,6 @@ def check_lattice_isotropy(weigths):
 w_test = [get_w_i(i) for i in range(9)]
 print(w_test)
 
-check_lattice_isotropy(w)
+check_lattice_isotropy(w_D2Q9)
 check_lattice_isotropy(w_test)
 

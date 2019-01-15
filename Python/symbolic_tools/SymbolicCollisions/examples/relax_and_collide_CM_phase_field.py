@@ -1,8 +1,7 @@
 from sympy.matrices import eye
 
 from SymbolicCollisions.core.cm_symbols import sv, sb, Mraw_D2Q9, NrawD2Q9, S_relax_D2Q9, S_relax_ADE_D2Q9
-from SymbolicCollisions.core.sym_col_fun import get_DF, get_m00, \
-    get_mom_vector_from_continuous_def, get_mom_vector_from_discrete_def, get_continuous_force_He_MB, get_discrete_force_Guo
+from SymbolicCollisions.core.DiscreteCMTransforms import get_DF, get_m00
 from SymbolicCollisions.core.printers import print_u2, print_as_vector, print_ccode
 from SymbolicCollisions.core.hardcoded_results import hardcoded_cm_eq_compressible_D2Q9, hardcoded_F_cm_pf_D2Q9
 
@@ -53,17 +52,17 @@ print_as_vector(m, print_symbol=pop_in_str)
 
 print("\n//central moments from raw moments")
 cm = NrawD2Q9 * populations
-print_as_vector(cm, print_symbol=temp_pop_str, regex=True)
+print_as_vector(cm, print_symbol=temp_pop_str)
 
 print("\n//collision in central moments space")
 print("//calculate equilibrium distributions in cm space")
 # print_as_vector_re(get_cm_vector_from_discrete_def(lambda i: m00 * get_gamma(i)), cm_eq_pop_str)
-print_as_vector(hardcoded_cm_eq_compressible_D2Q9, cm_eq_pop_str, regex=True)  # save time
+print_as_vector(hardcoded_cm_eq_compressible_D2Q9, cm_eq_pop_str)  # save time
 
 print("//calculate forces in cm space")
-# print_as_vector(get_cm_vector_from_discrete_def(get_discrete_force_Guo_second_order), F_cm_str, regex=True)
-# print_as_vector(get_cm_vector_from_continuous_def(get_continuous_force_He_MB), F_cm_str, regex=True)
-print_as_vector(hardcoded_F_cm_pf_D2Q9, F_cm_str, regex=True)  # save time
+# print_as_vector(get_cm_vector_from_discrete_def(get_discrete_force_Guo_second_order), F_cm_str)
+# print_as_vector(get_cm_vector_from_continuous_def(get_continuous_force_He_MB), F_cm_str)
+print_as_vector(hardcoded_F_cm_pf_D2Q9, F_cm_str)  # save time
 print("//collide")
 # cm_after_collision = (eye(9) - S_relax) * temp_populations + S_relax * cm_eq + (eye(9) - S_relax / 2) * F_cm  # eq 8
 # Relax 2nd moments, FOI
@@ -75,14 +74,14 @@ cm_after_collision = (eye(9) - S_relax_D2Q9) * temp_populations + S_relax_D2Q9 *
 # Relax 1st moments, SOI
 #cm_after_collision = (eye(9) - S_relax_phi) * temp_populations + S_relax_phi * hardcoded_cm_pf_eq + (eye(9) - S_relax_phi / 2) * hardcoded_F_cm_pf  # eq 8
 
-print_as_vector(cm_after_collision, print_symbol=pop_in_str, regex=True)
+print_as_vector(cm_after_collision, print_symbol=pop_in_str)
 
 print("\n//back to raw moments")
 m = NrawD2Q9.inv() * populations
-print_as_vector(m, print_symbol=temp_pop_str, regex=True)
+print_as_vector(m, print_symbol=temp_pop_str)
 
 print("\n//back to density-probability functions")
 populations = Mraw_D2Q9.inv() * temp_populations
-print_as_vector(populations, print_symbol=pop_in_str, regex=True)
+print_as_vector(populations, print_symbol=pop_in_str)
 
 print("\n}\n")

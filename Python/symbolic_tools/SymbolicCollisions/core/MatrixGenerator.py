@@ -1,5 +1,5 @@
 from SymbolicCollisions.core.cm_symbols import ux, uy, uz, moments_dict
-from SymbolicCollisions.core.sym_col_fun import round_and_simplify
+from SymbolicCollisions.core.printers import round_and_simplify
 from sympy.matrices import Matrix, diag
 
 

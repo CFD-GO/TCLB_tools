@@ -1,5 +1,5 @@
 
-from SymbolicCollisions.core.sym_col_fun import *
+from SymbolicCollisions.core.DiscreteCMTransforms import get_DF
 from SymbolicCollisions.core.cm_symbols import *
 from sympy.matrices import Matrix
 from sympy import pretty_print, exp
@@ -41,7 +41,7 @@ print("\n\n=== CM ===\n")
 # pretty_print(N_ortho)
 XXX_ortho = T_raw_to_ortho * Mraw_D2Q9
 pretty_print(XXX_ortho * XXX_ortho.transpose())
-print_as_vector(XXX_ortho * XXX_ortho.transpose(), print_symbol='xxx', regex=True)
+print_as_vector(XXX_ortho * XXX_ortho.transpose(), print_symbol='xxx')
 
 
 
