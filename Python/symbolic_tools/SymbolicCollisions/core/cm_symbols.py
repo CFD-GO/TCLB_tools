@@ -34,8 +34,8 @@ F_phi_y = Symbol('F_phi.y')
 F_phi_z = Symbol('F_phi.z')
 
 
-sv = Symbol('s_v')  # s_v = 1 /(tau + 0.5)
-sb = Symbol('s_b')  # results in bulk viscosity = 1/6 since : zeta = (1/sb - 0.5)*cs^2*dt
+omega_v = Symbol('omega_v')  # omega_v = s_v = 1 /(tau + 0.5)
+omega_b = Symbol('omega_b')  # results in bulk viscosity = 1/6 since : zeta = (1/sb - 0.5)*cs^2*dt
 
 ex_D2Q9 = Matrix([0, 1, 0, -1, 0, 1, -1, -1, 1])
 ey_D2Q9 = Matrix([0, 0, 1, 0, -1, 1, 1, -1, -1])
@@ -52,17 +52,17 @@ ex_D3Q15 = Matrix([0, 1, -1, 0, 0, 0, 0, 1, -1, 1, -1, 1, -1, -1, 1])
 ey_D3Q15 = Matrix([0, 0, 0, 1, -1, 0, 0, 1, -1, 1, -1, -1, 1, 1, -1])
 ez_D3Q15 = Matrix([0, 0, 0, 0, 0, 1, -1, 1, -1, -1, 1, 1, -1, 1, -1])
 
-S_relax_ADE_D3Q15 = diag(1, sv, sv, sv, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+S_relax_ADE_D3Q15 = diag(1, omega_v, omega_v, omega_v, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
 
 
 # D3Q19 -
-# as in TCLM or '3D CLBM: Improved implementation and consistent forcing scheme' by L. Fei and Q. li 2018
+# as in TCLB or '3D CLBM: Improved implementation and consistent forcing scheme' by L. Fei and Q. li 2018
 # (differs from 'LBM Principles and Practise' Book)
 ex_D3Q19 = Matrix([0, 1, -1, 0, 0, 0, 0, 1, -1, 1, -1, 1, -1, 1, -1, 0, 0, 0, 0])
 ey_D3Q19 = Matrix([0, 0, 0, 1, -1, 0, 0, 1, 1, -1, -1, 0, 0, 0, 0, 1, -1, 1, -1])
 ez_D3Q19 = Matrix([0, 0, 0, 0, 0, 1, -1, 0, 0, 0, 0, 1, 1, -1, -1, 1, 1, -1, -1])
 
-S_relax_ADE_D3Q19 = diag(1, sv, sv, sv, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+S_relax_ADE_D3Q19 = diag(1, omega_v, omega_v, omega_v, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
 
 # FROM TCLB
 # d3q19 = matrix(c(
@@ -216,16 +216,16 @@ NrawD2Q9 = Matrix([
 ])
 
 # RELAXATION MATRIX
-s_plus = (sb + sv) / 2
-s_minus = (sb - sv) / 2
+s_plus = (omega_b + omega_v) / 2
+s_minus = (omega_b - omega_v) / 2
 
-S_relax_D2Q9 = diag(1, 1, 1, s_plus, s_plus, sv, 1, 1, 1)
+S_relax_D2Q9 = diag(1, 1, 1, s_plus, s_plus, omega_v, 1, 1, 1)
 S_relax_D2Q9[3, 4] = s_minus
 S_relax_D2Q9[4, 3] = s_minus
 
-S_relax_ADE_D2Q9 = diag(1, sv, sv, 1, 1, 1, 1, 1, 1)
+S_relax_ADE_D2Q9 = diag(1, omega_v, omega_v, 1, 1, 1, 1, 1, 1)
 
-S_relax_MRT_GS = diag(1, 1, 1, 1, 1, 1, 1, sv, sv)  #
+S_relax_MRT_GS = diag(1, 1, 1, 1, 1, 1, 1, omega_v, omega_v)  #
 # S_relax_MRT_GS = diag(0, 0, 0, 0, 0, 0, 0, sv, sv)   #
 
 

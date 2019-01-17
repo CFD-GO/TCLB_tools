@@ -1,6 +1,6 @@
 
 from sympy.matrices import eye
-from SymbolicCollisions.core.cm_symbols import sv, sb, Mraw_D2Q9, NrawD2Q9, S_relax_D2Q9, rho
+from SymbolicCollisions.core.cm_symbols import omega_v, omega_b, Mraw_D2Q9, NrawD2Q9, S_relax_D2Q9, rho
 from SymbolicCollisions.core.DiscreteCMTransforms import get_DF, get_m00
 from SymbolicCollisions.core.printers import print_u2, print_ccode, print_as_vector
 from SymbolicCollisions.core.hardcoded_results import hardcoded_cm_eq_incompressible_D2Q9, \
@@ -26,10 +26,10 @@ print("CudaDeviceFunction void relax_and_collide_CM_hydro("
       "\n {")
 
 print_u2()
-print("real_t %s = 1./tau;" % sv)
+print("real_t %s = 1./tau;" % omega_v)
 # print("real_t bulk_visc = 1./6. ;")
 # print("real_t %s = 1./(3*bulk_visc + 0.5);" % sb) 
-print("real_t %s = omega_bulk;" % sb)  # s_b = 1./(3*bulk_visc + 0.5)
+print("real_t %s = omega_bulk;" % omega_b)  # s_b = 1./(3*bulk_visc + 0.5)
 print("")
 
 print_ccode(get_m00(q, pop_in_str), assign_to='real_t m00')

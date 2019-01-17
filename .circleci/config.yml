@@ -43,7 +43,7 @@ jobs:
       # https://pytest.org
       - run:
           name: run tests
-          no_output_timeout: 30m
+          no_output_timeout: 45m
           command: |
             . venv/bin/activate
             coverage run -m unittest discover -s ./Python/symbolic_tools/tests/

@@ -29,7 +29,7 @@ print("CudaDeviceFunction void relax_MRT_relax_raw_mom_into_ortho("
       % DF_in_str)
 
 
-print("\nreal_t %s = 1./tau;" % sv)
+print("\nreal_t %s = 1./tau;" % omega_v)
 print("\nreal_t %s[9]; real_t %s[9]; \n" % (mom_DF_str, mom_relaxed_DF_str))
 
 populations = get_DF(DF_in_str)

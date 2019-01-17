@@ -1,6 +1,6 @@
 
 from sympy.matrices import eye
-from SymbolicCollisions.core.cm_symbols import sv, S_relax_MRT_GS, M_ortho_GS
+from SymbolicCollisions.core.cm_symbols import omega_v, S_relax_MRT_GS, M_ortho_GS
 from SymbolicCollisions.core.DiscreteCMTransforms import get_DF, get_m00
 from SymbolicCollisions.core.printers import print_u2, print_as_vector
 
@@ -18,7 +18,7 @@ print("CudaDeviceFunction void relax_MRT_orthoGS("
       % DF_in_str)
 
 
-print("real_t %s = 1./tau;" % sv)
+print("real_t %s = 1./tau;" % omega_v)
 print("\nreal_t %s[9]; \n" % mom_DF_str)
 
 DF = get_DF(print_symbol=DF_in_str)
