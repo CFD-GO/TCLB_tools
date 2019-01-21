@@ -2,31 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c086ab28-e36f-4e1a-a78c-398d43bd4b4e" name="Default Changelist" comment="Extended Matrix Generator to DdQq">
-      <change afterPath="$PROJECT_DIR$/SymbolicCollisions/experimental/cumulants.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SymbolicCollisions/experimental/experiments_derivatives.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SymbolicCollisions/experimental/get_D3Q15.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SymbolicCollisions/relax_and_collide_CM_ADE_D3Q15.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tests/test_matrix_generator.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/symbolic_python_tools.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/symbolic_python_tools.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SymbolicCollisions/core/MatrixGenerator.py" beforeDir="false" afterPath="$PROJECT_DIR$/SymbolicCollisions/core/MatrixGenerator.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SymbolicCollisions/core/cm_symbols.py" beforeDir="false" afterPath="$PROJECT_DIR$/SymbolicCollisions/core/cm_symbols.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SymbolicCollisions/core/sym_col_fun.py" beforeDir="false" afterPath="$PROJECT_DIR$/SymbolicCollisions/core/sym_col_fun.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SymbolicCollisions/experimental/probki_GS.py" beforeDir="false" afterPath="$PROJECT_DIR$/SymbolicCollisions/experimental/probki_GS.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SymbolicCollisions/experimental/probki_shift.py" beforeDir="false" afterPath="$PROJECT_DIR$/SymbolicCollisions/experimental/probki_shift.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SymbolicCollisions/experimental/weights.py" beforeDir="false" afterPath="$PROJECT_DIR$/SymbolicCollisions/experimental/weights.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SymbolicCollisions/forcing/forcing_cm.py" beforeDir="false" afterPath="$PROJECT_DIR$/SymbolicCollisions/forcing/forcing_cm.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SymbolicCollisions/forcing/forcing_m.py" beforeDir="false" afterPath="$PROJECT_DIR$/SymbolicCollisions/forcing/forcing_m.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SymbolicCollisions/raw_moments_to_ortho_moments.py" beforeDir="false" afterPath="$PROJECT_DIR$/SymbolicCollisions/raw_moments_to_ortho_moments.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SymbolicCollisions/raw_to_ortho_relax.py" beforeDir="false" afterPath="$PROJECT_DIR$/SymbolicCollisions/raw_to_ortho_relax.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SymbolicCollisions/relax_CM_hydrodynamics.py" beforeDir="false" afterPath="$PROJECT_DIR$/SymbolicCollisions/relax_CM_hydrodynamics.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SymbolicCollisions/relax_and_collide_CM_hydrodynamics.py" beforeDir="false" afterPath="$PROJECT_DIR$/SymbolicCollisions/relax_and_collide_CM_hydrodynamics.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SymbolicCollisions/relax_and_collide_CM_phase_field.py" beforeDir="false" afterPath="$PROJECT_DIR$/SymbolicCollisions/relax_and_collide_CM_phase_field.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SymbolicCollisions/relaxed_CM_to_orthoM_d2q5.py" beforeDir="false" afterPath="$PROJECT_DIR$/SymbolicCollisions/relaxed_CM_to_orthoM_d2q5.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SymbolicCollisions/symCM_printer.py" beforeDir="false" afterPath="$PROJECT_DIR$/SymbolicCollisions/symCM_printer.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/test_sym_calculations.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_sym_calculations.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SymbolicCollisions/core/DiscreteCMTransforms.py" beforeDir="false" afterPath="$PROJECT_DIR$/SymbolicCollisions/core/DiscreteCMTransforms.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SymbolicCollisions/examples/equilibria/eq_cm.py" beforeDir="false" afterPath="$PROJECT_DIR$/SymbolicCollisions/examples/equilibria/eq_cm.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SymbolicCollisions/examples/equilibria/eq_m.py" beforeDir="false" afterPath="$PROJECT_DIR$/SymbolicCollisions/examples/equilibria/eq_m.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -35,29 +16,31 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="CoverageDataManager">
-    <SUITE FILE_PATH="coverage/symbolic_python_tools$Unittests_for_test_sym_calculations_TestSymbolicCalc_test_get_F_cm_using_He_scheme_and_continuous_Maxwellian_DF.coverage" NAME="Unittests for test_sym_calculations.TestSymbolicCalc.test_get_F_cm_using_He_scheme_and_continuous_Maxwellian_DF Coverage Results" MODIFIED="1541674887523" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests" />
-    <SUITE FILE_PATH="coverage/symbolic_python_tools$Unittests_for_test_sym_calculations_TestSymbolicCalc_test_Shift_ortho_Straka_d2q5.coverage" NAME="Unittests for test_sym_calculations.TestSymbolicCalc.test_Shift_ortho_Straka_d2q5 Coverage Results" MODIFIED="1541674366303" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests" />
     <SUITE FILE_PATH="coverage/symbolic_tools$Unittests_in_parallel_tests_py.coverage" NAME="Unittests in parallel_tests.py Coverage Results" MODIFIED="1546448703774" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests" />
-    <SUITE FILE_PATH="coverage/symbolic_python_tools$relax_and_collide_CM_phase_field.coverage" NAME="relax_and_collide_CM_phase_field Coverage Results" MODIFIED="1541515869320" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/SymbolicCollisions" />
-    <SUITE FILE_PATH="coverage/symbolic_python_tools$mraw_matrix_gen.coverage" NAME="mraw_matrix_gen Coverage Results" MODIFIED="1541674249704" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/SymbolicCollisions/experimental" />
-    <SUITE FILE_PATH="coverage/symbolic_tools$relax_and_collide_CM_ADE_D3Q15.coverage" NAME="relax_and_collide_CM_ADE_D3Q15 Coverage Results" MODIFIED="1546455431462" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/SymbolicCollisions" />
-    <SUITE FILE_PATH="coverage/symbolic_python_tools$Unittests_for_test_sym_calculations_TestSymbolicCalc_test_Shift_ortho_Geier_d2q9.coverage" NAME="Unittests for test_sym_calculations.TestSymbolicCalc.test_Shift_ortho_Geier_d2q9 Coverage Results" MODIFIED="1541674407000" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests" />
-    <SUITE FILE_PATH="coverage/symbolic_tools$cum_experiments.coverage" NAME="cum_experiments Coverage Results" MODIFIED="1546010757945" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/SymbolicCollisions/experimental" />
-    <SUITE FILE_PATH="coverage/symbolic_tools$symCM_printer.coverage" NAME="symCM_printer Coverage Results" MODIFIED="1546442168266" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/SymbolicCollisions" />
-    <SUITE FILE_PATH="coverage/symbolic_tools$Unittests_in_test_sym_calculations_py.coverage" NAME="Unittests in test_sym_calculations.py Coverage Results" MODIFIED="1546455522216" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests" />
     <SUITE FILE_PATH="coverage/symbolic_python_tools$experiments.coverage" NAME="experiments Coverage Results" MODIFIED="1542889655040" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/SymbolicCollisions/experimental" />
-    <SUITE FILE_PATH="coverage/symbolic_tools$raw_moments_to_ortho_moments.coverage" NAME="raw_moments_to_ortho_moments Coverage Results" MODIFIED="1546454509912" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/SymbolicCollisions" />
-    <SUITE FILE_PATH="coverage/symbolic_python_tools$relax_and_collide_CM_hydrodynamics.coverage" NAME="relax_and_collide_CM_hydrodynamics Coverage Results" MODIFIED="1540919171253" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/SymbolicCollisions" />
-    <SUITE FILE_PATH="coverage/symbolic_tools$get_D3Q15.coverage" NAME="get_D3Q15 Coverage Results" MODIFIED="1546454427957" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/SymbolicCollisions/experimental" />
-    <SUITE FILE_PATH="coverage/symbolic_python_tools$relax_CM_hydrodynamics.coverage" NAME="relax_CM_hydrodynamics Coverage Results" MODIFIED="1540920544741" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/SymbolicCollisions" />
-    <SUITE FILE_PATH="coverage/symbolic_python_tools$weights.coverage" NAME="weights Coverage Results" MODIFIED="1538137604313" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/SymbolicCollisions/experimental" />
-    <SUITE FILE_PATH="coverage/symbolic_tools$Unittests_in_test_matrix_generator_py.coverage" NAME="Unittests in test_matrix_generator.py Coverage Results" MODIFIED="1546455517681" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests" />
-    <SUITE FILE_PATH="coverage/symbolic_tools$relax_CM_hydrodynamics.coverage" NAME="relax_CM_hydrodynamics Coverage Results" MODIFIED="1546454525822" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/SymbolicCollisions" />
+    <SUITE FILE_PATH="coverage/symbolic_python_tools$relax_and_collide_CM_phase_field.coverage" NAME="relax_and_collide_CM_phase_field Coverage Results" MODIFIED="1541515869320" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/SymbolicCollisions" />
+    <SUITE FILE_PATH="coverage/symbolic_python_tools$Unittests_for_test_sym_calculations_TestSymbolicCalc_test_Shift_ortho_Geier_d2q9.coverage" NAME="Unittests for test_sym_calculations.TestSymbolicCalc.test_Shift_ortho_Geier_d2q9 Coverage Results" MODIFIED="1541674407000" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests" />
     <SUITE FILE_PATH="coverage/symbolic_python_tools$forcing_m.coverage" NAME="forcing_m Coverage Results" MODIFIED="1541001961603" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/SymbolicCollisions/forcing" />
-    <SUITE FILE_PATH="coverage/symbolic_python_tools$Unittests_in_test_sym_calculations_py.coverage" NAME="Unittests in test_sym_calculations.py Coverage Results" MODIFIED="1541676244262" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests" />
+    <SUITE FILE_PATH="coverage/symbolic_tools$eq_cm.coverage" NAME="eq_cm Coverage Results" MODIFIED="1548101345248" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/SymbolicCollisions/examples/equilibria" />
     <SUITE FILE_PATH="coverage/symbolic_python_tools$Unittests_for_test_sym_calculations_TestSymbolicCalc_test_get_raw_matrix_d2q9.coverage" NAME="Unittests for test_sym_calculations.TestSymbolicCalc.test_get_raw_matrix_d2q9 Coverage Results" MODIFIED="1541674533304" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests" />
+    <SUITE FILE_PATH="coverage/symbolic_python_tools$relax_and_collide_CM_hydrodynamics.coverage" NAME="relax_and_collide_CM_hydrodynamics Coverage Results" MODIFIED="1540919171253" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/SymbolicCollisions" />
+    <SUITE FILE_PATH="coverage/symbolic_tools$cum_experiments.coverage" NAME="cum_experiments Coverage Results" MODIFIED="1546010757945" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/SymbolicCollisions/experimental" />
+    <SUITE FILE_PATH="coverage/symbolic_tools$Unittests_in_test_sym_calculations_py.coverage" NAME="Unittests in test_sym_calculations.py Coverage Results" MODIFIED="1546455522216" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests" />
+    <SUITE FILE_PATH="coverage/symbolic_tools$eq_m.coverage" NAME="eq_m Coverage Results" MODIFIED="1548102298993" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/SymbolicCollisions/examples/equilibria" />
+    <SUITE FILE_PATH="coverage/symbolic_tools$relax_and_collide_CM_ADE_D3Q15.coverage" NAME="relax_and_collide_CM_ADE_D3Q15 Coverage Results" MODIFIED="1546455431462" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/SymbolicCollisions" />
+    <SUITE FILE_PATH="coverage/symbolic_python_tools$relax_CM_hydrodynamics.coverage" NAME="relax_CM_hydrodynamics Coverage Results" MODIFIED="1540920544741" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/SymbolicCollisions" />
+    <SUITE FILE_PATH="coverage/symbolic_python_tools$Unittests_for_test_sym_calculations_TestSymbolicCalc_test_Shift_ortho_Straka_d2q5.coverage" NAME="Unittests for test_sym_calculations.TestSymbolicCalc.test_Shift_ortho_Straka_d2q5 Coverage Results" MODIFIED="1541674366303" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests" />
+    <SUITE FILE_PATH="coverage/symbolic_tools$get_D3Q15.coverage" NAME="get_D3Q15 Coverage Results" MODIFIED="1546454427957" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/SymbolicCollisions/experimental" />
     <SUITE FILE_PATH="coverage/symbolic_python_tools$probki_forcing.coverage" NAME="probki_forcing Coverage Results" MODIFIED="1538141742530" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/SymbolicCollisions/experimental" />
+    <SUITE FILE_PATH="coverage/symbolic_tools$raw_moments_to_ortho_moments.coverage" NAME="raw_moments_to_ortho_moments Coverage Results" MODIFIED="1546454509912" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/SymbolicCollisions" />
+    <SUITE FILE_PATH="coverage/symbolic_python_tools$weights.coverage" NAME="weights Coverage Results" MODIFIED="1538137604313" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/SymbolicCollisions/experimental" />
+    <SUITE FILE_PATH="coverage/symbolic_python_tools$Unittests_in_test_sym_calculations_py.coverage" NAME="Unittests in test_sym_calculations.py Coverage Results" MODIFIED="1541676244262" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests" />
+    <SUITE FILE_PATH="coverage/symbolic_tools$Unittests_in_test_matrix_generator_py.coverage" NAME="Unittests in test_matrix_generator.py Coverage Results" MODIFIED="1546455517681" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests" />
+    <SUITE FILE_PATH="coverage/symbolic_python_tools$mraw_matrix_gen.coverage" NAME="mraw_matrix_gen Coverage Results" MODIFIED="1541674249704" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/SymbolicCollisions/experimental" />
+    <SUITE FILE_PATH="coverage/symbolic_tools$symCM_printer.coverage" NAME="symCM_printer Coverage Results" MODIFIED="1546442168266" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/SymbolicCollisions" />
     <SUITE FILE_PATH="coverage/symbolic_python_tools$Unittests_for_test_sym_calculations_TestSymbolicCalc_test_get_cm_eq_hydro_cont.coverage" NAME="Unittests for test_sym_calculations.TestSymbolicCalc.test_get_cm_eq_hydro_cont Coverage Results" MODIFIED="1541675734149" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests" />
+    <SUITE FILE_PATH="coverage/symbolic_python_tools$Unittests_for_test_sym_calculations_TestSymbolicCalc_test_get_F_cm_using_He_scheme_and_continuous_Maxwellian_DF.coverage" NAME="Unittests for test_sym_calculations.TestSymbolicCalc.test_get_F_cm_using_He_scheme_and_continuous_Maxwellian_DF Coverage Results" MODIFIED="1541674887523" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests" />
+    <SUITE FILE_PATH="coverage/symbolic_tools$relax_CM_hydrodynamics.coverage" NAME="relax_CM_hydrodynamics Coverage Results" MODIFIED="1546454525822" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/SymbolicCollisions" />
   </component>
   <component name="DatabaseView">
     <option name="SHOW_INTERMEDIATE" value="true" />
@@ -78,8 +61,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/SymbolicCollisions/core/cm_symbols.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-1179">
-              <caret line="18" selection-start-line="18" selection-end-line="18" />
+            <state relative-caret-position="578">
+              <caret line="34" selection-start-line="34" selection-end-line="34" />
               <folding>
                 <element signature="e#0#24#0" expanded="true" />
               </folding>
@@ -88,39 +71,40 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/SymbolicCollisions/core/sym_col_fun.py">
+        <entry file="file://$PROJECT_DIR$/requirements.txt">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="315">
-              <caret line="39" column="6" selection-start-line="39" selection-start-column="6" selection-end-line="39" selection-end-column="6" />
-              <folding>
-                <element signature="e#280#320#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="102">
+              <caret line="6" column="15" selection-start-line="6" selection-start-column="15" selection-end-line="6" selection-end-column="15" />
             </state>
           </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/SymbolicCollisions/symCM_printer.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="105">
-              <caret line="7" lean-forward="true" selection-start-line="7" selection-end-line="7" />
-              <folding>
-                <element signature="e#2#51#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/SymbolicCollisions/relaxed_CM_to_orthoM_d2q5.py">
-          <provider selected="true" editor-type-id="text-editor" />
         </entry>
       </file>
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/SymbolicCollisions/relax_CM_hydrodynamics.py">
+        <entry file="file://$PROJECT_DIR$/SymbolicCollisions/examples/equilibria/eq_m.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="30">
-              <caret line="2" column="93" selection-start-line="2" selection-start-column="93" selection-end-line="2" selection-end-column="93" />
+            <state relative-caret-position="107">
+              <caret line="26" lean-forward="true" selection-start-line="26" selection-end-line="26" />
+              <folding>
+                <element signature="e#0#148#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/SymbolicCollisions/examples/equilibria/eq_cm.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-646">
+              <caret line="4" selection-start-line="4" selection-end-line="5" selection-end-column="26" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/SymbolicCollisions/core/DiscreteCMTransforms.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-264">
+              <caret line="35" column="8" selection-start-line="35" selection-start-column="8" selection-end-line="35" selection-end-column="8" />
             </state>
           </provider>
         </entry>
@@ -128,8 +112,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/SymbolicCollisions/core/hardcoded_results.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1065">
-              <caret line="71" column="21" selection-start-line="71" selection-end-line="71" selection-end-column="21" />
+            <state relative-caret-position="1156">
+              <caret line="71" column="6" selection-start-line="71" selection-end-line="71" selection-end-column="6" />
               <folding>
                 <element signature="e#1#34#0" expanded="true" />
               </folding>
@@ -138,43 +122,10 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/SymbolicCollisions/relax_and_collide_CM_ADE_D3Q15.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="600">
-              <caret line="46" column="12" selection-start-line="46" selection-start-column="12" selection-end-line="46" selection-end-column="12" />
-              <folding>
-                <element signature="e#0#30#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/SymbolicCollisions/raw_moments_to_ortho_moments.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="752">
-              <caret line="62" lean-forward="true" selection-start-line="62" selection-end-line="62" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/SymbolicCollisions/core/MatrixGenerator.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="75">
+            <state relative-caret-position="51">
               <caret line="5" column="45" selection-start-line="5" selection-start-column="45" selection-end-line="5" selection-end-column="45" />
-              <folding>
-                <element signature="e#0#53#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/tests/test_sym_calculations.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="360">
-              <caret line="36" selection-start-line="36" selection-end-line="36" />
             </state>
           </provider>
         </entry>
@@ -227,14 +178,17 @@
         <option value="$PROJECT_DIR$/SymbolicCollisions/relax_and_collide_CM_ADE_D3Q15.py" />
         <option value="$PROJECT_DIR$/SymbolicCollisions/core/MatrixGenerator.py" />
         <option value="$PROJECT_DIR$/SymbolicCollisions/relax_CM_hydrodynamics.py" />
+        <option value="$PROJECT_DIR$/SymbolicCollisions/core/DiscreteCMTransforms.py" />
+        <option value="$PROJECT_DIR$/SymbolicCollisions/examples/equilibria/eq_cm.py" />
+        <option value="$PROJECT_DIR$/SymbolicCollisions/examples/equilibria/eq_m.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="67" />
-    <option name="y" value="25" />
-    <option name="width" value="927" />
-    <option name="height" value="1175" />
+    <option name="x" value="1920" />
+    <option name="y" value="-2" />
+    <option name="width" value="1920" />
+    <option name="height" value="1202" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
@@ -242,7 +196,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -264,17 +217,31 @@
             <path>
               <item name="symbolic_tools" type="b2602c69:ProjectViewProjectNode" />
               <item name="symbolic_tools" type="462c0819:PsiDirectoryNode" />
+              <item name="SymbolicCollisions" type="462c0819:PsiDirectoryNode" />
+              <item name="examples" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="symbolic_tools" type="b2602c69:ProjectViewProjectNode" />
+              <item name="symbolic_tools" type="462c0819:PsiDirectoryNode" />
+              <item name="SymbolicCollisions" type="462c0819:PsiDirectoryNode" />
+              <item name="examples" type="462c0819:PsiDirectoryNode" />
+              <item name="equilibria" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="symbolic_tools" type="b2602c69:ProjectViewProjectNode" />
+              <item name="symbolic_tools" type="462c0819:PsiDirectoryNode" />
               <item name="tests" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$USER_HOME$/Desktop/walberla-v3.3-47556983b46d1aae800a8e2dc9d21ed2273aee4a" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
@@ -291,8 +258,8 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python tests.Unittests in test_sym_calculations.py">
-    <configuration name="raw_moments_to_ortho_moments" type="PythonConfigurationType" factoryName="Python" temporary="true">
+  <component name="RunManager" selected="Python.eq_m">
+    <configuration name="eq_cm" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="symbolic_python_tools" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -300,12 +267,12 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/SymbolicCollisions" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/SymbolicCollisions/examples/equilibria" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/SymbolicCollisions/raw_moments_to_ortho_moments.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/SymbolicCollisions/examples/equilibria/eq_cm.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -314,7 +281,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="relax_CM_hydrodynamics" type="PythonConfigurationType" factoryName="Python" temporary="true">
+    <configuration name="eq_m" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="symbolic_python_tools" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -322,12 +289,12 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/SymbolicCollisions" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/SymbolicCollisions/examples/equilibria" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/SymbolicCollisions/relax_CM_hydrodynamics.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/SymbolicCollisions/examples/equilibria/eq_m.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -389,19 +356,19 @@
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Python tests.Unittests in test_matrix_generator.py" />
-      <item itemvalue="Python.raw_moments_to_ortho_moments" />
-      <item itemvalue="Python.relax_CM_hydrodynamics" />
       <item itemvalue="Python.relax_and_collide_CM_ADE_D3Q15" />
+      <item itemvalue="Python tests.Unittests in test_matrix_generator.py" />
       <item itemvalue="Python tests.Unittests in test_sym_calculations.py" />
+      <item itemvalue="Python.eq_cm" />
+      <item itemvalue="Python.eq_m" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.eq_m" />
+        <item itemvalue="Python.eq_cm" />
         <item itemvalue="Python tests.Unittests in test_sym_calculations.py" />
         <item itemvalue="Python tests.Unittests in test_matrix_generator.py" />
         <item itemvalue="Python.relax_and_collide_CM_ADE_D3Q15" />
-        <item itemvalue="Python.relax_CM_hydrodynamics" />
-        <item itemvalue="Python.raw_moments_to_ortho_moments" />
       </list>
     </recent_temporary>
   </component>
@@ -423,6 +390,7 @@
       <workItem from="1545911217420" duration="26653000" />
       <workItem from="1546425207662" duration="10896000" />
       <workItem from="1546453481489" duration="2627000" />
+      <workItem from="1548100968070" duration="1224000" />
     </task>
     <servers />
   </component>
@@ -459,18 +427,17 @@
     </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="46212000" />
+    <option name="totallyTimeSpent" value="47436000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="67" y="25" width="1853" height="1175" extended-state="6" />
-    <editor active="true" />
+    <frame x="1920" y="-2" width="1920" height="1202" extended-state="6" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.25013834" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.2529349" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32026768" />
-      <window_info anchor="bottom" x="67" y="264" width="1853" height="1143" id="Run" order="2" weight="0.54780114" />
+      <window_info active="true" anchor="bottom" x="67" y="264" width="1853" height="1143" id="Run" order="2" visible="true" weight="0.70083874" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.42160612" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -480,7 +447,7 @@
       <window_info anchor="bottom" id="Database Changes" order="9" show_stripe_button="false" />
       <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" />
       <window_info anchor="bottom" id="Python Console" order="11" weight="0.31070745" />
-      <window_info anchor="bottom" id="Terminal" order="12" visible="true" weight="0.3298279" />
+      <window_info anchor="bottom" id="Terminal" order="12" weight="0.32991612" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -526,31 +493,6 @@
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/SymbolicCollisions/relax_CM_hydrodynamics.py</url>
-          <line>1</line>
-          <option name="timeStamp" value="3" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/tests/test_sym_calculations.py</url>
-          <line>88</line>
-          <option name="timeStamp" value="12" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/tests/test_sym_calculations.py</url>
-          <line>50</line>
-          <option name="timeStamp" value="14" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/tests/test_sym_calculations.py</url>
-          <line>272</line>
-          <option name="timeStamp" value="16" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/SymbolicCollisions/experimental/cumulants.py</url>
-          <line>113</line>
-          <option name="timeStamp" value="41" />
-        </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/SymbolicCollisions/core/MatrixGenerator.py</url>
           <line>112</line>
@@ -609,20 +551,8 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/venv/lib/python3.6/site-packages/sympy/integrals/integrals.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="45">
-          <caret line="32" column="6" selection-start-line="32" selection-start-column="6" selection-end-line="32" selection-end-column="6" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/venv/lib/python3.6/site-packages/sympy/printing/preview.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="270">
-          <caret line="208" selection-start-line="208" selection-end-line="208" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/venv/lib/python3.6/site-packages/sympy/integrals/integrals.py" />
+    <entry file="file://$PROJECT_DIR$/venv/lib/python3.6/site-packages/sympy/printing/preview.py" />
     <entry file="file://$PROJECT_DIR$/SymbolicCollisions/experimental/probki_shift.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-120">
@@ -640,13 +570,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/venv/lib/python3.6/site-packages/sympy/polys/polyutils.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="273">
-          <caret line="214" selection-start-line="214" selection-end-line="214" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/venv/lib/python3.6/site-packages/sympy/polys/polyutils.py" />
     <entry file="file://$PROJECT_DIR$/SymbolicCollisions/experimental/probki_GS.py">
       <provider selected="true" editor-type-id="text-editor">
         <state>
@@ -679,13 +603,6 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/SymbolicCollisions/core/MatrixGenerator_new.py" />
-    <entry file="file://$PROJECT_DIR$/requirements.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="90">
-          <caret line="6" column="15" selection-start-line="6" selection-start-column="15" selection-end-line="6" selection-end-column="15" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file:///usr/lib/python3.6/unittest/suite.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="224">
@@ -775,50 +692,11 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/SymbolicCollisions/core/MatrixGenerator.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="75">
-          <caret line="5" column="45" selection-start-line="5" selection-start-column="45" selection-end-line="5" selection-end-column="45" />
-          <folding>
-            <element signature="e#0#53#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/SymbolicCollisions/relax_and_collide_CM_ADE_D3Q15.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="600">
-          <caret line="46" column="12" selection-start-line="46" selection-start-column="12" selection-end-line="46" selection-end-column="12" />
-          <folding>
-            <element signature="e#0#30#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/SymbolicCollisions/relax_and_collide_CM_ADE_D3Q15.py" />
     <entry file="file://$PROJECT_DIR$/SymbolicCollisions/raw_moments_to_ortho_moments.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="752">
           <caret line="62" lean-forward="true" selection-start-line="62" selection-end-line="62" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/SymbolicCollisions/core/cm_symbols.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1179">
-          <caret line="18" selection-start-line="18" selection-end-line="18" />
-          <folding>
-            <element signature="e#0#24#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/SymbolicCollisions/core/hardcoded_results.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1065">
-          <caret line="71" column="21" selection-start-line="71" selection-end-line="71" selection-end-column="21" />
-          <folding>
-            <element signature="e#1#34#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -849,6 +727,64 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="30">
           <caret line="2" column="93" selection-start-line="2" selection-start-column="93" selection-end-line="2" selection-end-column="93" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/SymbolicCollisions/core/cm_symbols.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="578">
+          <caret line="34" selection-start-line="34" selection-end-line="34" />
+          <folding>
+            <element signature="e#0#24#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/SymbolicCollisions/core/hardcoded_results.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1156">
+          <caret line="71" column="6" selection-start-line="71" selection-end-line="71" selection-end-column="6" />
+          <folding>
+            <element signature="e#1#34#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/SymbolicCollisions/core/MatrixGenerator.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="51">
+          <caret line="5" column="45" selection-start-line="5" selection-start-column="45" selection-end-line="5" selection-end-column="45" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/requirements.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="102">
+          <caret line="6" column="15" selection-start-line="6" selection-start-column="15" selection-end-line="6" selection-end-column="15" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/SymbolicCollisions/core/DiscreteCMTransforms.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-264">
+          <caret line="35" column="8" selection-start-line="35" selection-start-column="8" selection-end-line="35" selection-end-column="8" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/SymbolicCollisions/examples/equilibria/eq_cm.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-646">
+          <caret line="4" selection-start-line="4" selection-end-line="5" selection-end-column="26" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/SymbolicCollisions/examples/equilibria/eq_m.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="107">
+          <caret line="26" lean-forward="true" selection-start-line="26" selection-end-line="26" />
+          <folding>
+            <element signature="e#0#148#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

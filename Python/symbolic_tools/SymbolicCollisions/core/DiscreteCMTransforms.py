@@ -33,6 +33,32 @@ class DiscreteCMTransforms:
         self.F = F
         self.rho = rho
 
+    def get_gamma_first_order(self, i):
+        cs2 = 1. / 3.
+        # cs2 = Symbol('cs2')
+
+        """ 
+         OMG, sympy...
+         Matrix([1]) + 1
+
+         Traceback (most recent call last):
+           File "/home/grzegorz/Downloads/pycharm-professional-2018.3.1/pycharm-2018.3.1/helpers/pydev/_pydevd_bundle/pydevd_exec2.py", line 3, in Exec
+             exec(exp, global_vars, local_vars)
+           File "<input>", line 1, in <module>
+           File "/home/grzegorz/GITHUB/TCLB_tools/Python/symbolic_tools/venv/lib/python3.6/site-packages/sympy/core/decorators.py", line 132, in binary_op_wrapper
+             return func(self, other)
+           File "/home/grzegorz/GITHUB/TCLB_tools/Python/symbolic_tools/venv/lib/python3.6/site-packages/sympy/matrices/common.py", line 1976, in __add__
+             raise TypeError('cannot add %s and %s' % (type(self), type(other)))
+         TypeError: cannot add <class 'sympy.matrices.dense.MutableDenseMatrix'> and <class 'int'>
+         """
+
+        eu = self.e[i, :] * self.u
+        u2 = Matrix([self.u.dot(self.u)])
+        gamma = w_D2Q9[i] * (Matrix([1]) + eu / cs2 ) #+ eu * eu / (2 * cs2 * cs2) - u2 / (2 * cs2))
+        return gamma[0]
+
+
+
     def get_gamma(self, i):
         cs2 = 1. / 3.
         # cs2 = Symbol('cs2')
