@@ -24,10 +24,18 @@ print('// === discrete cm ===\n ')
 
 
 print('\n//population_eq -> cm_eq - by definition: k_mn = sum( (e_ix-ux)^m (e_iy-uy)^n * population_eq_i)')
+print("moments: first order (linear) velocity expansion.")
+pop_eq = get_mom_vector_from_discrete_def(lambda i: Symbol('m00') * dcmt.get_gamma_first_order(i),
+                                          discrete_transform=dcmt.get_cm,
+                                          moments_order=moments_dict[lattice])
+print_as_vector(pop_eq, 'pop_eq_first_order')
+
+print("moments: second order (quadratic) velocity expansion.")
 pop_eq = get_mom_vector_from_discrete_def(lambda i: Symbol('m00') * dcmt.get_gamma(i),
                                           discrete_transform=dcmt.get_cm,
                                           moments_order=moments_dict[lattice])
 print_as_vector(pop_eq, 'pop_eq')
+
 
 print('\n//population -> cm - by definition: k_mn = sum( (e_ix-ux)^m (e_iy-uy)^n * population_i)')
 pop_eq = get_mom_vector_from_discrete_def(lambda i: Symbol('%s[%d]' % ('pop', i)),
