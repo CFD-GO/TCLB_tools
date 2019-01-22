@@ -53,8 +53,7 @@ class DiscreteCMTransforms:
          """
 
         eu = self.e[i, :] * self.u
-        u2 = Matrix([self.u.dot(self.u)])
-        gamma = w_D2Q9[i] * (Matrix([1]) + eu / cs2 ) #+ eu * eu / (2 * cs2 * cs2) - u2 / (2 * cs2))
+        gamma = w_D2Q9[i] * (Matrix([1]) + eu / cs2)
         return gamma[0]
 
 

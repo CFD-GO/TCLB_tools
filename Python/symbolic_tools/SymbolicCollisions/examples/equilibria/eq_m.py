@@ -25,6 +25,7 @@ pop_eq = get_mom_vector_from_discrete_def(lambda i: Symbol('m00') * dcmt.get_gam
                                           moments_order=moments_dict[lattice])
 print_as_vector(pop_eq, 'pop_eq')
 
+print("moments: first order (linear) velocity expansion.")
 pop_eq = get_mom_vector_from_discrete_def(lambda i: Symbol('m00') * dcmt.get_gamma_first_order(i),
                                           discrete_transform=dcmt.get_m,
                                           moments_order=moments_dict[lattice])
