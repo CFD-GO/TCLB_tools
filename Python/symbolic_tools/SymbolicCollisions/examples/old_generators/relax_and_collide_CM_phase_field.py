@@ -1,8 +1,10 @@
 from sympy.matrices import eye
+from sympy.printing import print_ccode
 
-from SymbolicCollisions.core.cm_symbols import omega_v, omega_b, Mraw_D2Q9, NrawD2Q9, S_relax_D2Q9, S_relax_ADE_D2Q9
+from SymbolicCollisions.core.cm_symbols import omega_v, omega_b, Mraw_D2Q9, NrawD2Q9, S_relax_hydro_D2Q9, \
+    S_relax_ADE_D2Q9
 from SymbolicCollisions.core.DiscreteCMTransforms import get_DF, get_m00
-from SymbolicCollisions.core.printers import print_u2, print_as_vector, print_ccode
+from SymbolicCollisions.core.printers import print_u2, print_as_vector
 from SymbolicCollisions.core.hardcoded_results import hardcoded_cm_eq_compressible_D2Q9, hardcoded_F_cm_pf_D2Q9
 
 
@@ -69,7 +71,9 @@ print("//collide")
 # cm_after_collision = (eye(9) - S_relax) * temp_populations + S_relax * hardcoded_cm_pf_eq +  hardcoded_F_cm_pf
 
 # Relax 2nd moments, SOI
-cm_after_collision = (eye(9) - S_relax_D2Q9) * temp_populations + S_relax_D2Q9 * hardcoded_cm_eq_compressible_D2Q9 + (eye(9) - S_relax_D2Q9 / 2) * hardcoded_F_cm_pf_D2Q9
+cm_after_collision = (eye(
+    9) - S_relax_hydro_D2Q9) * temp_populations + S_relax_hydro_D2Q9 * hardcoded_cm_eq_compressible_D2Q9 + (
+                             eye(9) - S_relax_hydro_D2Q9 / 2) * hardcoded_F_cm_pf_D2Q9
 
 # Relax 1st moments, SOI
 #cm_after_collision = (eye(9) - S_relax_phi) * temp_populations + S_relax_phi * hardcoded_cm_pf_eq + (eye(9) - S_relax_phi / 2) * hardcoded_F_cm_pf  # eq 8

@@ -1,11 +1,21 @@
 from sympy import Symbol
 from sympy.interactive.printing import init_printing
-from sympy.matrices import Matrix, eye, zeros, ones, diag, GramSchmidt
+from sympy.matrices import Matrix, diag
 
-from sympy import simplify, Float, preorder_traversal
-import numpy as np
+# from sympy.matrices import eye, zeros, ones, GramSchmidt
+# from sympy import simplify, Float, preorder_traversal
+# import numpy as np
+
+from importlib import import_module
 
 init_printing(use_unicode=False, wrap_line=False, no_global=True)
+
+
+def dynamic_import(abs_module_path, class_name):
+    module_object = import_module(abs_module_path)
+    target_class = getattr(module_object, class_name)
+    return target_class
+
 
 # SYMBOLS:
 ux = Symbol('u.x')
@@ -29,13 +39,17 @@ Fz = Symbol('Fhydro.z')
 F2D = Matrix([Fx, Fy])
 F3D = Matrix([Fx, Fy, Fz])
 
-F_phi_x = Symbol('F_phi.x')
-F_phi_y = Symbol('F_phi.y')
-F_phi_z = Symbol('F_phi.z')
+# F_phi_x = Symbol('F_phi.x')
+# F_phi_y = Symbol('F_phi.y')
+# F_phi_z = Symbol('F_phi.z')
+Force_str = "F"
+F_phi_x = Symbol(Force_str + '.x')
+F_phi_y = Symbol(Force_str + '.y')
+F_phi_z = Symbol(Force_str + '.z')
 
-
-omega_v = Symbol('omega_v')  # omega_v = s_v = 1 /(tau + 0.5)
-omega_b = Symbol('omega_b')  # results in bulk viscosity = 1/6 since : zeta = (1/sb - 0.5)*cs^2*dt
+omega_ade = Symbol('omega_ade')
+omega_v = Symbol('omega_nu')  # omega_nu = s_nu = 1 /(tau + 0.5)
+omega_b = Symbol('omega_bulk')  # results in bulk viscosity = 1/6 since : zeta = (1/sb - 0.5)*cs^2*dt
 
 ex_D2Q9 = Matrix([0, 1, 0, -1, 0, 1, -1, -1, 1])
 ey_D2Q9 = Matrix([0, 0, 1, 0, -1, 1, 1, -1, -1])
@@ -52,7 +66,7 @@ ex_D3Q15 = Matrix([0, 1, -1, 0, 0, 0, 0, 1, -1, 1, -1, 1, -1, -1, 1])
 ey_D3Q15 = Matrix([0, 0, 0, 1, -1, 0, 0, 1, -1, 1, -1, -1, 1, 1, -1])
 ez_D3Q15 = Matrix([0, 0, 0, 0, 0, 1, -1, 1, -1, -1, 1, 1, -1, 1, -1])
 
-S_relax_ADE_D3Q15 = diag(1, omega_v, omega_v, omega_v, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+S_relax_ADE_D3Q15 = diag(1, omega_ade, omega_ade, omega_ade, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
 
 
 # D3Q19 -
@@ -62,7 +76,7 @@ ex_D3Q19 = Matrix([0, 1, -1, 0, 0, 0, 0, 1, -1, 1, -1, 1, -1, 1, -1, 0, 0, 0, 0]
 ey_D3Q19 = Matrix([0, 0, 0, 1, -1, 0, 0, 1, 1, -1, -1, 0, 0, 0, 0, 1, -1, 1, -1])
 ez_D3Q19 = Matrix([0, 0, 0, 0, 0, 1, -1, 0, 0, 0, 0, 1, 1, -1, -1, 1, 1, -1, -1])
 
-S_relax_ADE_D3Q19 = diag(1, omega_v, omega_v, omega_v, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+S_relax_ADE_D3Q19 = diag(1, omega_ade, omega_ade, omega_ade, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
 
 # FROM TCLB
 # d3q19 = matrix(c(
@@ -219,11 +233,11 @@ NrawD2Q9 = Matrix([
 s_plus = (omega_b + omega_v) / 2
 s_minus = (omega_b - omega_v) / 2
 
-S_relax_D2Q9 = diag(1, 1, 1, s_plus, s_plus, omega_v, 1, 1, 1)
-S_relax_D2Q9[3, 4] = s_minus
-S_relax_D2Q9[4, 3] = s_minus
+S_relax_hydro_D2Q9 = diag(1, 1, 1, s_plus, s_plus, omega_v, 1, 1, 1)
+S_relax_hydro_D2Q9[3, 4] = s_minus
+S_relax_hydro_D2Q9[4, 3] = s_minus
 
-S_relax_ADE_D2Q9 = diag(1, omega_v, omega_v, 1, 1, 1, 1, 1, 1)
+S_relax_ADE_D2Q9 = diag(1, omega_ade, omega_ade, 1, 1, 1, 1, 1, 1)
 
 S_relax_MRT_GS = diag(1, 1, 1, 1, 1, 1, 1, omega_v, omega_v)  #
 # S_relax_MRT_GS = diag(0, 0, 0, 0, 0, 0, 0, sv, sv)   #

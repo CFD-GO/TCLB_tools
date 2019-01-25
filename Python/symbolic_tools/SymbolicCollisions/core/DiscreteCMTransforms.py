@@ -23,7 +23,7 @@ import multiprocessing
 class DiscreteCMTransforms:
     def __init__(self, e, u, F, rho):
         """
-        :param dzeta: direction (x,y,z)
+        :param e: direction (x,y,z)
         :param u: velocity (x,y,z)
         :param u: Force (x,y,z)
         :param rho: density (not necessarily m00, for instance in multiphase flows)
@@ -55,8 +55,6 @@ class DiscreteCMTransforms:
         eu = self.e[i, :] * self.u
         gamma = w_D2Q9[i] * (Matrix([1]) + eu / cs2)
         return gamma[0]
-
-
 
     def get_gamma(self, i):
         cs2 = 1. / 3.

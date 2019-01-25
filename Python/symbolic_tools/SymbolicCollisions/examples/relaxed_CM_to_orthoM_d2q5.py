@@ -15,9 +15,9 @@ from SymbolicCollisions.core.cm_symbols import Shift_ortho_Straka_d2q5
 # pretty_print(Smat)
 
 Smat = Shift_ortho_Straka_d2q5
-k = get_DF(q=5, print_symbol='k')
+k = get_DF(q=4, print_symbol='k')
 Relax = diag(Symbol('w2'), Symbol('w3'), Symbol('w4'), Symbol('w5'))   #
-cm_neq = get_DF(q=5, print_symbol='cm_neq')
+cm_neq = get_DF(q=4, print_symbol='cm_neq')
 
 k = Smat.inv()*Relax*cm_neq
 

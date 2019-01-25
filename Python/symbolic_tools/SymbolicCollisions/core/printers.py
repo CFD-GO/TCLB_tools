@@ -5,20 +5,22 @@ from SymbolicCollisions.core.cm_symbols import ux, uy, uz, \
     ux3, uy3, uz3,\
     uxuy3
 
-from sympy.printing import print_ccode
+# from decimal import Decimal
 from sympy import simplify, Float, preorder_traversal
 from sympy.core.evalf import N as symbol_to_number
 from fractions import Fraction
-from decimal import Decimal
 
 
-def print_u2():
+def print_u2(d=3):
     print(f"\treal_t {uxuy} = {ux}*{uy};")
-    print(f"\treal_t {uxuz} = {ux}*{uz};")
-    print(f"\treal_t {uyuz} = {uy}*{uz};")
     print(f"\treal_t {ux2} = {ux}*{ux};")
     print(f"\treal_t {uy2} = {uy}*{uy};")
-    print(f"\treal_t {uz2} = {uz}*{uz};")
+
+    if d == 3:
+        print(f"\treal_t {uxuz} = {ux}*{uz};")
+        print(f"\treal_t {uyuz} = {uy}*{uz};")
+        print(f"\treal_t {uz2} = {uz}*{uz};")
+
     print("")
 
 

@@ -44,4 +44,3 @@ class TestCumulants(TestCase):
             out = f.getvalue()
 
             assert r in out
-
