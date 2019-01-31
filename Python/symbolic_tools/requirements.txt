@@ -1,0 +1,10 @@
+scipy
+matplotlib
+numpy
+sympy
+codecov
+pytest
+concurrencytest
+pyglet
+
+joblib  # experimental
