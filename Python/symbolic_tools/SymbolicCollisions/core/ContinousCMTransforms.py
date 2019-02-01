@@ -11,6 +11,7 @@ from SymbolicCollisions.core.printers import round_and_simplify
 
 from joblib import Parallel, delayed
 import multiprocessing
+from sympy import Symbol
 
 
 class ContinousCMTransforms:
@@ -50,6 +51,64 @@ class ContinousCMTransforms:
         dzeta_u2 = dzeta_minus_u.dot(dzeta_minus_u)
 
         df = psi / pow(2 * PI * cs2, dim/2)
+        df *= exp(-dzeta_u2 / (2 * cs2))
+        return df
+
+    def get_internal_energy_Maxwellian_DF(self, psi=m00, _u=None):
+        df = self.get_Maxwellian_DF(psi=psi, _u=self.u)
+        dzeta_minus_u = self.dzeta - self.u
+        df = df*0.5*dzeta_minus_u.dot(dzeta_minus_u)
+        return df
+
+    def get_total_energy_Maxwellian_DF(self, psi=m00, _u=None):
+        df = self.get_Maxwellian_DF(psi=psi, _u=self.u)
+        df = df*0.5*self.dzeta.dot(self.dzeta)
+        return df
+
+    def get_thermal_Maxwellian_DF(self, psi=m00, _u=None):
+        """
+        :param _u: velocity (x,y,z)
+        :param psi: quantity of interest aka scaling function like density
+        :return: continuous, local Maxwell-Boltzmann distribution
+        'Incorporating forcing terms in cascaded lattice Boltzmann approach by method of central moments'
+        Kannan N. Premnath, Sanjoy Banerjee, 2009
+        eq 22
+        """
+        u = None
+        if _u:
+            u = _u
+        else:
+            u = self.u
+
+        # cs2 = 1. / 3.
+        cs2 = Symbol('RT')
+
+        # PI = np.pi
+        # PI = sp.pi
+
+        PI = 3.14
+
+        dzeta_minus_u = self.dzeta - u
+        dzeta_u2 = dzeta_minus_u.dot(dzeta_minus_u)
+
+        # dim = len(self.dzeta)  # number od dimensions
+        # df = psi / pow(2 * PI * cs2, dim / 2)
+
+        # thank you sympy...
+        # df = psi / pow(2 * PI * cs2, dim/2) with cs2 = Symbol('RT') crashes sympy again with
+        # raise PolynomialDivisionFailed(f, g, K)
+        # sympy.polys.polyerrors.PolynomialDivisionFailed:
+        # couldn't reduce degree in a polynomial division algorithm when dividing [EX(RT)] by [EX(RT**0.5)].
+        # This can happen when it's not possible to detect zero in the coefficient domain.
+        # The domain of computation is EX. You may want to use a different simplification algorithm.
+        # Note that in general it's not possible to guarantee to detect zero in this domain.
+
+        # hacks:
+        # for 2D
+        # df = psi / 2 * PI * cs2
+        # df = psi / pow(2 * PI * cs2, 1) # LOL: 2/2 doesn't work
+
+        df = psi / (2 * PI * cs2)  # 2D version
         df *= exp(-dzeta_u2 / (2 * cs2))
         return df
 
