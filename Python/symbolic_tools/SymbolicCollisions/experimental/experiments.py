@@ -17,9 +17,9 @@ lattice = 'D2Q9'
 ccmt = ContinousCMTransforms(dzeta2D, u2D, F2D, rho)
 
 print("\n----------------------- calculate particular moment -------------------------------")
-# row = moments_dict['D2Q9'][0]
-# moment = ccmt.get_cm(row, ccmt.get_TotalEnergyMaxwellian_DF)
-# print_as_vector(Matrix([moment]), 'particular_moment')
+row = moments_dict['D2Q9'][0]
+moment = ccmt.get_cm(row, ccmt.get_thermal_Maxwellian_DF)
+print_as_vector(Matrix([moment]), 'particular_moment')
 
 
 print("\n----------------------- calculate all moments -------------------------------")

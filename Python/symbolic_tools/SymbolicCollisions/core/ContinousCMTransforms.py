@@ -81,18 +81,16 @@ class ContinousCMTransforms:
             u = self.u
 
         # cs2 = 1. / 3.
-        cs2 = Symbol('RT')
+        cs2 = Symbol('RT', positive=True)  # positive, negative, real, nonpositive, integer, prime and commutative.
 
         # PI = np.pi
-        # PI = sp.pi
-
-        PI = 3.14
+        PI = sp.pi
 
         dzeta_minus_u = self.dzeta - u
         dzeta_u2 = dzeta_minus_u.dot(dzeta_minus_u)
 
-        # dim = len(self.dzeta)  # number od dimensions
-        # df = psi / pow(2 * PI * cs2, dim / 2)
+        dim = len(self.dzeta)  # number od dimensions
+        df = psi / pow(2 * PI * cs2, dim / 2)
 
         # thank you sympy...
         # df = psi / pow(2 * PI * cs2, dim/2) with cs2 = Symbol('RT') crashes sympy again with
@@ -106,9 +104,9 @@ class ContinousCMTransforms:
         # hacks:
         # for 2D
         # df = psi / 2 * PI * cs2
-        # df = psi / pow(2 * PI * cs2, 1) # LOL: 2/2 doesn't work
+        # df = psi / pow(2 * PI * cs2, 1)  # LOL: 2/2 doesn't work
 
-        df = psi / (2 * PI * cs2)  # 2D version
+        # df = psi / (2 * PI * cs2)  # 2D version
         df *= exp(-dzeta_u2 / (2 * cs2))
         return df
 

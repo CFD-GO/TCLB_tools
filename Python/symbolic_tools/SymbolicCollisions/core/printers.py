@@ -78,6 +78,7 @@ def print_as_vector(some_matrix, print_symbol='default_symbol1', raw_output=Fals
                              str(Fraction(first_number).limit_denominator(max_denominator=1000)) + '.',
                              row, count=1)
 
+                row = re.sub(r"\*\*1\.\*", "", row)  # dont power by 1.0
                 row = re.sub(r"1\.\*", "", row)  # dont multiply by 1.*
                 result = re.findall(r"\d\.\d+", row)
 
@@ -85,3 +86,13 @@ def print_as_vector(some_matrix, print_symbol='default_symbol1', raw_output=Fals
             print(f"\t{print_symbol}[{i}] = {row};")
         else:
             print(f"\t{print_symbol}{i} = {row};")
+
+
+# TODO:
+#  1.0*m00*(RT*u.y**2 - RT**1.0*u.y**2 + RT**2.0);
+#  reduces to:
+#  m00*(RT*uy2 - RT**uy2 + RT**2.);
+#  and
+#  1.0*m00*u.y*(RT**1.0 - RT);
+#  reduces to:
+#  m00 * u.y * (RT ** 1. - RT);
