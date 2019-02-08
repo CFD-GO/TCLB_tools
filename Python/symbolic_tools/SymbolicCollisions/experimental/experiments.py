@@ -6,46 +6,30 @@ from SymbolicCollisions.core.cm_symbols import \
     F3D, dzeta3D, u3D, rho, \
     F2D, dzeta2D, u2D, rho
 from SymbolicCollisions.core.cm_symbols import Mraw_D2Q9, M_ortho_GS
-from SymbolicCollisions.core.cm_symbols import moments_dict
+from SymbolicCollisions.core.cm_symbols import moments_dict, ex_D2Q9, Mraw_D2Q9, NrawD2Q9
 
 import time
 
 start = time.process_time()
 
-lattice = 'D2Q9'
-# ccmt = ContinousCMTransforms(dzeta3D, u3D, F3D, rho)
-ccmt = ContinousCMTransforms(dzeta2D, u2D, F2D, rho)
+"Corrections for diagonal third order velocity moments: feee" \
+"eq 48, 49 from:"
+"Coupling lattice Boltzmann model for simulation of thermal flows on stanard lattices" \
+"by Q. Li, K. H. Luo, Y.L.He., Y.J. Gao, W.Q Tao, 2012"
 
-print("\n----------------------- calculate particular moment -------------------------------")
-row = moments_dict['D2Q9'][0]
-moment = ccmt.get_cm(row, ccmt.get_thermal_Maxwellian_DF)
-print_as_vector(Matrix([moment]), 'particular_moment')
+phi_x = Symbol("phi_x")
+phi_y = Symbol("phi_y")
+C_D2Q9 = Matrix([-1 / 9 * phi_x,
+                 -phi_x / 36 + phi_y / 4,
+                 -phi_x / 36 - phi_y / 4,  # suprisingly the article applies asymmetric correction in x and y direction
+                 -phi_x / 36 + phi_y / 4,
+                 -phi_x / 36 - phi_y / 4,
+                 phi_x / 18,
+                 phi_x / 18,
+                 phi_x / 18,
+                 phi_x / 18, ])
 
-
-print("\n----------------------- calculate all moments -------------------------------")
-cm_eq_tot_e = get_mom_vector_from_continuous_def(ccmt.get_total_energy_Maxwellian_DF,
-                                           continuous_transformation=ccmt.get_cm,
-                                           moments_order=moments_dict[lattice])
-print_as_vector(cm_eq_tot_e, 'cm_eq_tot_e')
-
-cm_eq_internal_e = get_mom_vector_from_continuous_def(ccmt.get_internal_energy_Maxwellian_DF,
-                                           continuous_transformation=ccmt.get_cm,
-                                           moments_order=moments_dict[lattice])
-print_as_vector(cm_eq_internal_e, 'cm_eq_internal_e')
-
-
-cm_eq_T = get_mom_vector_from_continuous_def(ccmt.get_thermal_Maxwellian_DF,
-                                           continuous_transformation=ccmt.get_cm,
-                                           moments_order=moments_dict[lattice])
-print_as_vector(cm_eq_T, 'cm_eq_T')
-print("\n----------------------- without regex -------------------------------")
-print_as_vector(cm_eq_T, 'cm_eq_T', raw_output=True)
-
-print('\n\n Done in %s [s].'
-      % str(time.process_time() - start))
-
-
-
+print_as_vector(C_D2Q9.transpose() * Mraw_D2Q9, print_symbol="pop_in_str")
 
 #
 # print('\n//population_eq -> cm_eq - from continous definition: \n'

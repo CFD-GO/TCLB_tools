@@ -18,6 +18,8 @@ def dynamic_import(abs_module_path, class_name):
 
 
 # SYMBOLS:
+cs2_thermal = Symbol('RT', positive=True)
+
 ux = Symbol('u.x')
 uy = Symbol('u.y')
 uz = Symbol('u.z')

@@ -1,6 +1,6 @@
 
 from sympy.matrices import Matrix
-from SymbolicCollisions.core.cm_symbols import m00, rho, \
+from SymbolicCollisions.core.cm_symbols import m00, rho, cs2_thermal, \
     Fx, Fy, Fz, F_phi_x, F_phi_y, F_phi_z, \
     ux, uy, ux2, uy2, uxuy
 
@@ -112,6 +112,17 @@ hardcoded_cm_eq_compressible_D2Q9 = Matrix([
     1. / 9. * m00,
     ])
 
+hardcoded_cm_eq_compressible_D2Q9_thermal = Matrix([
+    m00,
+    0,
+    0,
+    cs2_thermal * m00,
+    cs2_thermal * m00,
+    0,
+    0,
+    0,
+    cs2_thermal**2 * m00,
+    ])
 
 # order of 3D (central) moments as in
 # `Three-dimensional cascaded lattice Boltzmann method:
