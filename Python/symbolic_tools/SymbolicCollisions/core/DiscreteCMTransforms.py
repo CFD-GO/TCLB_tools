@@ -108,7 +108,6 @@ class DiscreteCMTransforms:
         'Discrete lattice effects on the forcing term in the lattice Boltzmann method',  Guo et al., 2001
         version for 'Improved locality of the phase-field lattice-Boltzmann model for immiscible fluids at high density ratios' A. Fakhari et. al., 2017
         """
-        # extended version with second order terms
         eu_terms = self.e[i, :] - self.u.transpose() + self.e[i, :].dot(self.u)*self.e[i, :]/self.cs2
         result = w_D2Q9[i] * self.F.dot(eu_terms) / (self.rho * self.cs2)
         return result

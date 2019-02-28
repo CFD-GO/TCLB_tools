@@ -1,6 +1,7 @@
 from sympy.matrices import eye
 from sympy.printing import print_ccode
 from SymbolicCollisions.core.cm_symbols import omega_ade, omega_b, omega_v, m00
+from SymbolicCollisions.core.cm_symbols import Force_str as F_str
 from SymbolicCollisions.core.cm_symbols import dynamic_import
 from SymbolicCollisions.core.DiscreteCMTransforms import get_DF, get_m00
 from SymbolicCollisions.core.printers import print_u2, print_as_vector
@@ -38,7 +39,7 @@ S_Relax = get_s_relax_switcher(model)
 
 hardcoded_cm_eq = dynamic_import("SymbolicCollisions.core.hardcoded_results", f"hardcoded_cm_eq_compressible_D{d}Q{q}")
 hardcoded_F_cm = dynamic_import("SymbolicCollisions.core.hardcoded_results", f"hardcoded_F_cm_pf_D{d}Q{q}")
-from SymbolicCollisions.core.cm_symbols import Force_str as F_str
+
 
 # ARRANGE STUFF
 Mraw = get_raw_moments_matrix(ex, ey, ez)
