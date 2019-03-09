@@ -75,5 +75,5 @@ cm_eq = get_mom_vector_from_continuous_def(ccmt.get_hydro_DF,
                                            continuous_transformation=ccmt.get_cm,
                                            moments_order=moments_dict[lattice])
 
-
+print_as_vector(cm_eq, 'cm_eq')
 print(f'\n\n Done in {time.process_time() - start} [s].')
