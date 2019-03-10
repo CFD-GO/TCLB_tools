@@ -18,6 +18,8 @@ def dynamic_import(abs_module_path, class_name):
 
 
 # SYMBOLS:
+cs2_thermal = Symbol('RT', positive=True)
+
 ux = Symbol('u.x')
 uy = Symbol('u.y')
 uz = Symbol('u.z')
@@ -39,9 +41,6 @@ Fz = Symbol('Fhydro.z')
 F2D = Matrix([Fx, Fy])
 F3D = Matrix([Fx, Fy, Fz])
 
-# F_phi_x = Symbol('F_phi.x')
-# F_phi_y = Symbol('F_phi.y')
-# F_phi_z = Symbol('F_phi.z')
 Force_str = "F"
 F_phi_x = Symbol(Force_str + '.x')
 F_phi_y = Symbol(Force_str + '.y')

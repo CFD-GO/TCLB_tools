@@ -19,12 +19,13 @@ from SymbolicCollisions.core.hardcoded_results import hardcoded_F_cm_hydro_densi
     hardcoded_F_cm_Guo_hydro_LB_velocity_based_D2Q9, \
     hardcoded_F_cm_hydro_density_based_D2Q9, \
     hardcoded_cm_eq_compressible_D2Q9,    hardcoded_cm_eq_compressible_D3Q19, \
-    hardcoded_cm_eq_incompressible_D2Q9
+    hardcoded_cm_eq_incompressible_D2Q9,\
+    hardcoded_cm_eq_compressible_D2Q9_thermal
 
 from SymbolicCollisions.core.ContinousCMTransforms import ContinousCMTransforms, get_mom_vector_from_continuous_def
 from SymbolicCollisions.core.cm_symbols import \
     F3D, dzeta3D, u3D, \
-    rho
+    rho, cs2_thermal
 
 from SymbolicCollisions.core.cm_symbols import moments_dict
 
@@ -100,6 +101,30 @@ class TestContinousCMTransforms(unittest.TestCase):
             '\tF_cm[8] = (-2.*Fhydro.x*m00*u.x*uy2 - 2/3.*Fhydro.x*m00*u.x + 2.*Fhydro.x*u.x*uy2 + 2/3.*Fhydro.x*u.x - 2.*Fhydro.y*m00*ux2*u.y - 2/3.*Fhydro.y*m00*u.y + 2.*Fhydro.y*ux2*u.y + 2/3.*Fhydro.y*u.y)/rho;\n'
 
         assert expected_result == out
+
+    def test_thermal_cm_eq_vector_from_continuous_def(self):
+        ccmt = ContinousCMTransforms(dzeta3D, u3D, F3D, rho, cs2=cs2_thermal)
+        import warnings
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            cm_eq = get_mom_vector_from_continuous_def(ccmt.get_Maxwellian_DF,
+                                                      continuous_transformation=ccmt.get_cm,
+                                                      moments_order=moments_dict['D2Q9'],
+                                                      serial_run=True)
+
+        f = io.StringIO()
+        with redirect_stdout(f):
+            print_as_vector(cm_eq, 'cm_eq')
+        out = f.getvalue()
+
+        f2 = io.StringIO()
+        with redirect_stdout(f2):
+            expected_result = hardcoded_cm_eq_compressible_D2Q9_thermal
+            print_as_vector(expected_result, 'cm_eq')
+
+        ccode_expected_result = f2.getvalue()
+
+        assert ccode_expected_result == out
 
     def test_cm_vector_from_continuous_def(self):
         # this test runs long without output and CI may consider it as a timeout :/

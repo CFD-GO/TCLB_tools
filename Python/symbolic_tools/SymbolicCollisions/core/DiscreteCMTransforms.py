@@ -21,21 +21,22 @@ import multiprocessing
 
 
 class DiscreteCMTransforms:
-    def __init__(self, e, u, F, rho):
+    def __init__(self, e, u, F, rho, cs2=1./3.):
         """
         :param e: direction (x,y,z)
         :param u: velocity (x,y,z)
         :param u: Force (x,y,z)
         :param rho: density (not necessarily m00, for instance in multiphase flows)
+        :param cs2: (speed of sound)^2, for isothermal LB cs2=1./3;
+            otherwise  cs2 = Symbol('RT', positive=True)  # positive, negative, real, nonpositive, integer, prime and commutative.
         """
         self.e = e
         self.u = u
         self.F = F
         self.rho = rho
+        self.cs2 = cs2
 
     def get_gamma_first_order(self, i):
-        cs2 = 1. / 3.
-        # cs2 = Symbol('cs2')
 
         """ 
          OMG, sympy...
@@ -53,13 +54,10 @@ class DiscreteCMTransforms:
          """
 
         eu = self.e[i, :] * self.u
-        gamma = w_D2Q9[i] * (Matrix([1]) + eu / cs2)
+        gamma = w_D2Q9[i] * (Matrix([1]) + eu / self.cs2)
         return gamma[0]
 
     def get_gamma(self, i):
-        cs2 = 1. / 3.
-        # cs2 = Symbol('cs2')
-
         """ 
          OMG, sympy...
          Matrix([1]) + 1
@@ -77,7 +75,7 @@ class DiscreteCMTransforms:
 
         eu = self.e[i, :] * self.u
         u2 = Matrix([self.u.dot(self.u)])
-        gamma = w_D2Q9[i] * (Matrix([1]) + eu / cs2 + eu * eu / (2 * cs2 * cs2) - u2 / (2 * cs2))
+        gamma = w_D2Q9[i] * (Matrix([1]) + eu / self.cs2 + eu * eu / (2 * self.cs2 * self.cs2) - u2 / (2 * self.cs2))
         return gamma[0]
 
     def get_EDF_hydro(self, i):
@@ -110,24 +108,17 @@ class DiscreteCMTransforms:
         'Discrete lattice effects on the forcing term in the lattice Boltzmann method',  Guo et al., 2001
         version for 'Improved locality of the phase-field lattice-Boltzmann model for immiscible fluids at high density ratios' A. Fakhari et. al., 2017
         """
-        # extended version with second order terms
-        cs2 = 1. / 3.
-        # cs2 = Symbol('cs2')
-
-        eu_terms = self.e[i, :] - self.u.transpose() + self.e[i, :].dot(self.u)*self.e[i, :]/cs2
-        result = w_D2Q9[i] * self.F.dot(eu_terms) / (self.rho * cs2)
+        eu_terms = self.e[i, :] - self.u.transpose() + self.e[i, :].dot(self.u)*self.e[i, :]/self.cs2
+        result = w_D2Q9[i] * self.F.dot(eu_terms) / (self.rho * self.cs2)
         return result
 
     def get_force_He(self, i):
         """
         'Discrete Boltzmann equation model for the incompressible Navier-Stokes equation', He et al., 1998
         """
-        cs2 = 1. / 3.
-        # cs2 = Symbol('cs2')
-
         eu_dot_f = (self.e[i, :] - self.u.transpose()).dot(self.F)
         pop_eq = m00 * self.get_gamma(i)
-        result = pop_eq * eu_dot_f / (rho * cs2)
+        result = pop_eq * eu_dot_f / (rho * self.cs2)
         return result
 
 
