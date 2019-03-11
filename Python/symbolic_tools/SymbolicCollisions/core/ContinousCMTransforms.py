@@ -155,14 +155,14 @@ class ContinousCMTransforms:
 
 def get_mom_vector_from_continuous_def(fun, continuous_transformation, moments_order, serial_run=False):
     """
-    # obviously 2D is faster
+    # Obviously 2D is faster
     # However 3D works for 2D as well
     :param fun:
     :param continuous_transformation:
     :param moments_order:
     :param serial_run:
     python debugger may crash in parallel mode.
-    Moreover code coverage doesn't work multiprocessing, since the processes are independent beings,
+    Moreover, the code coverage doesn't work with multiprocessing, because the processes are independent beings,
     :return:
     """
     # for example: continuous_transformation=get_continuous_cm

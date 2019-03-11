@@ -115,7 +115,6 @@ def make_collision(choice):
     cm_after_collision = model_switcher.get(choice, lambda: "Invalid argument")
     print_as_vector(cm_after_collision, print_symbol=pop_in_str)
 
-
 make_collision(model)
 
 print("\n\t//back to raw moments")
@@ -123,15 +122,9 @@ print("\n\t//back to raw moments")
 #  - reverse-transform central moments to raw moments
 #  - print the result as c code;
 
-m = Nraw.inv() * populations
-print_as_vector(m, print_symbol=temp_pop_str)
-
 print("\n\t//back to density-probability functions")
 # TODO: write 2 lines of code to
 #  - reverse-transform raw moments to density-probability functions
 #  - print the result as c code;
-
-populations = Mraw.inv() * temp_populations
-print_as_vector(populations, print_symbol=pop_in_str)
 
 print("\n}\n")
