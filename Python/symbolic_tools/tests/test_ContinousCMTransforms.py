@@ -22,7 +22,7 @@ from SymbolicCollisions.core.hardcoded_results import hardcoded_F_cm_hydro_densi
     hardcoded_cm_eq_incompressible_D2Q9,\
     hardcoded_cm_eq_compressible_D2Q9_thermal
 
-from SymbolicCollisions.core.ContinousCMTransforms import ContinousCMTransforms, get_mom_vector_from_continuous_def
+from SymbolicCollisions.core.ContinuousCMTransforms import ContinuousCMTransforms, get_mom_vector_from_continuous_def
 from SymbolicCollisions.core.cm_symbols import \
     F3D, dzeta3D, u3D, \
     rho, cs2_thermal
@@ -36,7 +36,7 @@ class TestContinousCMTransforms(unittest.TestCase):
         # k_mn = integrate(fun, (x, -oo, oo), (y, -oo, oo)) '
         # where fun = fM(rho,u,x,y) *(x-ux)^m *(y-uy)^n * (z-uz)^o ')
 
-        cm_i = ContinousCMTransforms(dzeta3D, u3D, F3D, rho)
+        cm_i = ContinuousCMTransforms(dzeta3D, u3D, F3D, rho)
         cm_eq = get_mom_vector_from_continuous_def(cm_i.get_hydro_DF,
                                                    continuous_transformation=cm_i.get_cm,
                                                    moments_order=moments_dict['D2Q9'],
@@ -74,7 +74,7 @@ class TestContinousCMTransforms(unittest.TestCase):
         assert expected_result == out
 
     def test_get_F_cm_using_He_scheme_and_continuous_Maxwellian_DF(self):
-        cm_i = ContinousCMTransforms(dzeta3D, u3D, F3D, rho)
+        cm_i = ContinuousCMTransforms(dzeta3D, u3D, F3D, rho)
         F_cm = get_mom_vector_from_continuous_def(cm_i.get_force_He_hydro_DF,
                                                   continuous_transformation=cm_i.get_cm,
                                                   moments_order=moments_dict['D2Q9'],
@@ -103,7 +103,7 @@ class TestContinousCMTransforms(unittest.TestCase):
         assert expected_result == out
 
     def test_thermal_cm_eq_vector_from_continuous_def(self):
-        ccmt = ContinousCMTransforms(dzeta3D, u3D, F3D, rho, cs2=cs2_thermal)
+        ccmt = ContinuousCMTransforms(dzeta3D, u3D, F3D, rho, cs2=cs2_thermal)
         import warnings
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
@@ -128,7 +128,7 @@ class TestContinousCMTransforms(unittest.TestCase):
 
     def test_cm_vector_from_continuous_def(self):
         # this test runs long without output and CI may consider it as a timeout :/
-        ccmt = ContinousCMTransforms(dzeta3D, u3D, F3D, rho)
+        ccmt = ContinuousCMTransforms(dzeta3D, u3D, F3D, rho)
 
         lattices = [
             'D2Q9',

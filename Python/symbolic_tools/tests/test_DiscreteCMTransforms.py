@@ -63,13 +63,13 @@ class TestDiscreteCMTransforms(unittest.TestCase):
                                                          moments_order=moments_dict['D2Q9'],
                                                          serial_run=True)
 
-        from SymbolicCollisions.core.ContinousCMTransforms import \
-            ContinousCMTransforms, get_mom_vector_from_continuous_def
+        from SymbolicCollisions.core.ContinuousCMTransforms import \
+            ContinuousCMTransforms, get_mom_vector_from_continuous_def
 
         from SymbolicCollisions.core.cm_symbols import \
             F3D, dzeta3D, u3D
 
-        ccmt = ContinousCMTransforms(dzeta3D, u3D, F3D, rho)
+        ccmt = ContinuousCMTransforms(dzeta3D, u3D, F3D, rho)
         F_cm_Guo_cont = get_mom_vector_from_continuous_def(ccmt.get_force_Guo,
                                                            continuous_transformation=ccmt.get_cm,
                                                            moments_order=moments_dict['D2Q9'],

@@ -1,5 +1,5 @@
 from SymbolicCollisions.core.printers import print_as_vector
-from SymbolicCollisions.core.ContinousCMTransforms import ContinousCMTransforms, get_mom_vector_from_continuous_def
+from SymbolicCollisions.core.ContinuousCMTransforms import ContinuousCMTransforms, get_mom_vector_from_continuous_def
 from SymbolicCollisions.core.cm_symbols import \
     F3D, dzeta3D, u3D, rho, \
     F2D, dzeta2D, u2D, rho,\
@@ -14,7 +14,7 @@ import time
 start = time.process_time()
 
 lattice = 'D2Q9'
-ccmt = ContinousCMTransforms(dzeta3D, u3D, F3D, rho, cs2=cs2_thermal)
+ccmt = ContinuousCMTransforms(dzeta3D, u3D, F3D, rho, cs2=cs2_thermal)
 # ccmt = ContinousCMTransforms(dzeta3D, u3D, F3D, rho)
 # ccmt = ContinousCMTransforms(dzeta2D, u2D, F2D, rho, cs2=cs2_thermal)
 

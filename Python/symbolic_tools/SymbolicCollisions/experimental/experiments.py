@@ -1,7 +1,7 @@
 from SymbolicCollisions.core.printers import print_as_vector
 from sympy.matrices import Matrix
 
-from SymbolicCollisions.core.ContinousCMTransforms import *
+from SymbolicCollisions.core.ContinuousCMTransforms import *
 from SymbolicCollisions.core.cm_symbols import \
     F3D, dzeta3D, u3D, rho, \
     F2D, dzeta2D, u2D, rho

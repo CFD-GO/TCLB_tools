@@ -14,7 +14,8 @@ import multiprocessing
 from sympy import Symbol
 import warnings
 
-class ContinousCMTransforms:
+
+class ContinuousCMTransforms:
     def __init__(self, dzeta, u, F, rho, cs2=1./3.):
         """
         :param dzeta: direction (x,y,z)
@@ -88,6 +89,62 @@ class ContinousCMTransforms:
         df_p = self.get_Maxwellian_DF(psi=(m00 - 1), _u=Matrix([0, 0, 0]))
         df_gamma = self.get_Maxwellian_DF(psi=1, _u=self.u,)
         return df_p + df_gamma
+
+    def get_Maxwellian_cht_DF(self, psi=m00, _u=None):
+        """
+        :param _u: velocity (x,y,z)
+        :param psi: quantity of interest aka scaling function like density
+        :return: continuous, local Maxwell-Boltzmann distribution
+        'Incorporating forcing terms in cascaded lattice Boltzmann approach by method of central moments'
+        Kannan N. Premnath, Sanjoy Banerjee, 2009
+        eq 22
+        """
+        u = None
+        if _u:
+            u = _u
+        else:
+            u = self.u
+
+        PI = sp.pi
+
+        B = Symbol('B', positive=True)
+        # self.dzeta = B*self.dzeta
+        dzeta_minus_u = B * self.dzeta - u
+        dzeta_u2 = dzeta_minus_u.dot(dzeta_minus_u)
+
+        # thank you sympy...
+        # hacks:
+        # for 2D
+        # df = psi / pow(2 * PI * self.cs2, 2/2)
+        # LOL: 2/2 gives not simplified result for m22 on d2q9:
+        # 1.0 * m00 * (RT * u.y ** 2 - RT ** 1.0 * u.y ** 2 + RT ** 2.0);
+        # while 1 does ;p
+        # RT ** 2 * m00;
+
+        dim = len(self.dzeta)  # number od dimensions
+        # df = psi / pow(2 * PI * self.cs2, dim / 2)  # this is to difficult for sympy :/
+
+        if dim == 2:
+            df = psi / (2 * PI * self.cs2)  # 2D version hack
+        else:
+            df = psi / pow(2 * PI * self.cs2, dim / 2)  # this may be to difficult for sympy :/
+            if self.cs2 != 1. / 3.:
+                warnings.warn("Sympy may have problem with 3D non isothermal version (cs2=RT) \n "
+                              "It also can't simplify it, thus check the raw output", UserWarning)
+
+        df *= exp(-dzeta_u2 / (2 * self.cs2))
+        return df
+
+    def get_cht_DF(self):
+        from SymbolicCollisions.core.cm_symbols import rho
+        cp = Symbol('cp')
+        T = Symbol('T')
+        df_H = self.get_Maxwellian_DF(psi=(rho * cp * T), _u=self.u, )
+
+        A = Symbol('A')
+        df_corr = self.get_Maxwellian_cht_DF(psi=A, _u=self.u)
+        # df_corr = self.get_Maxwellian_cht_DF(psi=A, _u=Matrix([0, 0, 0]))
+        return df_H + df_corr
 
     def get_force_He_hydro_DF(self):
         """
