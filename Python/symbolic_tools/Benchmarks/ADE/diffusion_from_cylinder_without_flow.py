@@ -31,20 +31,14 @@ def concentration(r, t):
     temp = 0
 
     for i in range(n_bessel_roots):
-        temp += 2.*special.j0(bessel_roots[i] * r / a) \
+        temp += 2.*special.j0(bessel_roots[i] * r / a)  \
                 * np.exp(-bessel_roots[i] * bessel_roots[i] * D * t / (a * a)) \
                 / (bessel_roots[i] * special.j1(bessel_roots[i]))
-
 
     # for i in range(n_bessel_roots):
     #     temp += 2. * special.spherical_jn(0, bessel_roots[i] * r / a) \
     #             * np.exp(-bessel_roots[i] * bessel_roots[i] * D * t / (a * a))\
     #             / (bessel_roots[i] * special.spherical_jn(1, bessel_roots[i]))
-
-    # for i in range(n_bessel_roots):
-    #     temp += 2*r
-    #     # temp += 2
-    #     # temp *=r
 
     result = cc*(1-temp)
     return result
@@ -52,7 +46,7 @@ def concentration(r, t):
 
 time = 0.1095
 x = np.linspace(0, a, 40)
-y = [concentration(i, time) for i in x]
+y = [concentration(i, time/(a*a)) for i in x]
 
 # make plot
 plt.rcParams.update({'font.size': 18})
@@ -62,7 +56,7 @@ plt.plot(x/a, y, color="black", linestyle=":",  linewidth=3, label=f'analytical 
 
 time = 0.0547
 x = np.linspace(0, a, 100)
-y = [concentration(i, time) for i in x]
+y = [concentration(i, time/(a*a)) for i in x]
 plt.plot(x/a, y, color="black", marker=">", markersize=9, linestyle="", label=f'analytical solution t={time}')
 #
 # plt.plot(u_fd, y_fd, color="black", linestyle="-",  linewidth=2, label='FD - diffuse interface')
