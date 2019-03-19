@@ -7,4 +7,6 @@ pytest
 concurrencytest
 pyglet
 
+vtk
+pandas # experimental
 joblib  # experimental
