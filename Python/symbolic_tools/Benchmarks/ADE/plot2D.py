@@ -11,16 +11,14 @@ from sympy.plotting import plot
 
 # x = symbols('x')
 # plot(-x*x + x, (x,0,1), -3*x*x + x, (x,0,1))
+# plt.plot(x, -x*x + x, 'r--', x, - np.cos(2*pi*x) - np.cos(4*pi*x) + 1/6, 'b-')
 
-# evenly sampled time at 0.01 intervals
-x = np.arange(0., 2, 0.01)
-# red dashes, blue squares and green triangles
-plt.plot(x, -x * x + x, 'r--',
+b = 100
+x = np.arange(0., b, 0.01)
+
+plt.plot(x, -4 * x * (x - b) / (b * b), 'r--',
          # x, - np.cos(2 * pi * x) / (pi * pi) - np.cos(4 * pi * x) / (4 * pi * pi) + 1 / 6, 'b-',
          # x, -np.sin(pi * x) / (pi * pi) - np.sin(2 * pi * x) / (4 * pi * pi), 'g:'
          )
-# plt.plot(x, -x*x + x, 'r--', x, - np.cos(2*pi*x) - np.cos(4*pi*x) + 1/6, 'b-')
 plt.grid()
 plt.show()
-
-# plot(-3*x*x + x, (x,0,1))
