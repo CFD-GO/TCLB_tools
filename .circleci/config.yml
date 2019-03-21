@@ -24,20 +24,29 @@ jobs:
           name: "What branch am I on?"
           command: echo ${CIRCLE_BRANCH}
 
+      - run:
+          name: Setup Environment Variables
+          command: |
+            echo 'export PYTHON_TOOLS_DIR="$Python/symbolic_tools"' >> $BASH_ENV
+
+      - run:
+          name: "What was my custom environment variable?"
+          command: echo ${MY_ENV_VAR}
 
       # Download and cache dependencies
       - restore_cache:
           keys:
-          - v1-dependencies-{{ checksum "Python/symbolic_tools/requirements.txt" }}
+          - v1-dependencies-{{ checksum "$PYTHON_TOOLS_DIR/requirements.txt" }}
           # fallback to using the latest cache if no exact match is found
           - v1-dependencies-
 
       - run:
           name: install dependencies
+          working_directory: $PYTHON_TOOLS_DIR
           command: |
             python3 -m venv venv
             . venv/bin/activate
-            pip install -r Python/symbolic_tools/requirements.txt
+            pip install -r ./requirements.txt
 
       - save_cache:
           paths:
@@ -49,7 +58,7 @@ jobs:
       - run:
           name: run tests
           no_output_timeout: 45m
-          working_directory: Python/symbolic_tools
+          working_directory: $PYTHON_TOOLS_DIR
           command: |
             . venv/bin/activate
             coverage run -m unittest discover -s ./tests/
