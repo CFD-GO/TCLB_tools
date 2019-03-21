@@ -20,6 +20,11 @@ jobs:
     steps:
       - checkout
 
+      - run:
+          name: "What branch am I on?"
+          command: echo ${CIRCLE_BRANCH}
+
+
       # Download and cache dependencies
       - restore_cache:
           keys:
@@ -44,9 +49,10 @@ jobs:
       - run:
           name: run tests
           no_output_timeout: 45m
+          working_directory: Python/symbolic_tools
           command: |
             . venv/bin/activate
-            coverage run -m unittest discover -s ./Python/symbolic_tools/tests/
+            coverage run -m unittest discover -s ./tests/
             codecov
 
       - store_artifacts:

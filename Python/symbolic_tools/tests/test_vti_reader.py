@@ -16,7 +16,8 @@ class TestVtiReader(unittest.TestCase):
             vti_reader = VTIFile(filename)
 
     def test_vtk_reader(self):
-        dir_path = os.path.dirname(os.path.realpath(__file__))
+        real_path = os.path.realpath(__file__)
+        dir_path = os.path.dirname(real_path)
         print(f'dir_path{dir_path}')
         wd = os.getcwd()
         print(f"wd{wd}")
