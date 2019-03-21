@@ -1,20 +1,30 @@
-from DataIO.VTIFile import VTIFile
-import os, sys
+import os
+import sys
 import pandas as pd
-import numpy as np
 import unittest
 
 sys.path.append(os.path.join('Python', 'symbolic_tools'))  # allow CI bot to see the stuff from the main repo dir
 sys.path.append(os.path.join('.'))  # allow CI bot to see the stuff from the main repo dir
+from DataIO.VTIFile import VTIFile
 
 
-class TestContinousCMTransforms(unittest.TestCase):
+class TestVtiReader(unittest.TestCase):
+
+    def test_vtk_reader_raise_file_not_found(self):
+        filename = 'ghost_file.vti'
+        with self.assertRaises(FileNotFoundError) as context:
+            vti_reader = VTIFile(filename)
+
     def test_vtk_reader(self):
+        dir_path = os.path.dirname(os.path.realpath(__file__))
+        print(f'dir_path{dir_path}')
         wd = os.getcwd()
-        wd = os.path.dirname(wd)  # go level up
+        print(f"wd{wd}")
+        # wd = os.path.dirname(wd)  # go level up
 
         filename = 'laplace_benchmark_d2q9_VTK_P00_00050010.vti'
-        filepath = os.path.join(wd, 'tests', 'sample_data_for_vtk_reader', filename)
+        filepath = os.path.join(wd, 'sample_data_for_vtk_reader', filename)
+        print(f"filepath{filepath}")
         vti_reader = VTIFile(filepath)
 
         T = vti_reader.get("T")
@@ -35,11 +45,11 @@ class TestContinousCMTransforms(unittest.TestCase):
 
     def test_txt_reader(self):
         wd = os.getcwd()
-        wd = os.path.dirname(wd)  # go levelup
+        # wd = os.path.dirname(wd)  # go levelup
 
-        filepathT = os.path.join(wd, 'tests', 'sample_data_for_vtk_reader',
+        filepathT = os.path.join(wd, 'sample_data_for_vtk_reader',
                                  'laplace_benchmark_d2q9_TXT_P00_00050010_T.txt')
-        filepathU = os.path.join(wd, 'tests', 'sample_data_for_vtk_reader',
+        filepathU = os.path.join(wd, 'sample_data_for_vtk_reader',
                                  f'laplace_benchmark_d2q9_TXT_P00_00050010_U.txt')
 
         dataT = pd.read_csv(filepathT, delimiter=" ")

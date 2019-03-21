@@ -13,7 +13,7 @@ import numpy as np
 class VTIFile:
     def __init__(self, vtifname, parallel=False, dtype=np.float64):
         if not os.path.isfile(vtifname):
-            raise FileNotFoundError
+            raise FileNotFoundError(vtifname)
 
         if parallel:
             self.reader = vtk.vtkXMLPImageDataReader()
