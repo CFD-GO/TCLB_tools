@@ -37,7 +37,7 @@ jobs:
 
       # Download and cache dependencies
       - restore_cache:
-          working_directory: $PYTHON_TOOLS_DIR
+          working_directory: ${PYTHON_TOOLS_DIR}
           keys:
           - v1-dependencies-{{ checksum "${PYTHON_TOOLS_DIR}/requirements.txt" }}
           # fallback to using the latest cache if no exact match is found
@@ -45,11 +45,11 @@ jobs:
 
       - run:
           name: install dependencies
-          # working_directory: $PYTHON_TOOLS_DIR
+          working_directory: ${PYTHON_TOOLS_DIR}
           command: |
             python3 -m venv venv
             . venv/bin/activate
-            pip install -r $PYTHON_TOOLS_DIR/requirements.txt
+            pip install -r ./requirements.txt
 
       - save_cache:
           paths:
@@ -61,7 +61,7 @@ jobs:
       - run:
           name: run tests
           no_output_timeout: 45m
-          working_directory: $PYTHON_TOOLS_DIR
+          working_directory: ${PYTHON_TOOLS_DIR}
           command: |
             . venv/bin/activate
             coverage run -m unittest discover -s ./tests/
@@ -70,4 +70,3 @@ jobs:
       - store_artifacts:
           path: test-reports
           destination: test-reports
-          
