@@ -29,8 +29,8 @@ class TestVtiReader(unittest.TestCase):
         # wd = os.path.dirname(wd)  # go level up
 
         filename = 'laplace_benchmark_d2q9_VTK_P00_00050010.vti'
-        # if 'circleci' in wd:
-        #     wd = os.path.join(wd, 'tests')
+        if 'circleci' in wd:
+            wd = os.path.join(wd, 'tests')
 
         filepath = os.path.join(wd, 'sample_data_for_vtk_reader', filename)
 
@@ -55,6 +55,8 @@ class TestVtiReader(unittest.TestCase):
 
     def test_txt_reader(self):
         wd = os.getcwd()
+        if 'circleci' in wd:
+            wd = os.path.join(wd, 'tests')
         # wd = os.path.dirname(wd)  # go levelup
 
         filepathT = os.path.join(wd, 'sample_data_for_vtk_reader',
