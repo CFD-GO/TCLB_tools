@@ -27,7 +27,7 @@ jobs:
       - run:
           name: Setup Environment Variables
           command: |
-            echo 'export PYTHON_TOOLS_DIR="$Python/symbolic_tools"' >> $BASH_ENV
+            echo 'export PYTHON_TOOLS_DIR="Python/symbolic_tools"' >> $BASH_ENV
 
       - run:
           name: "What was my custom environment variable?"
