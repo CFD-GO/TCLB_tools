@@ -66,8 +66,8 @@ ax = fig.gca(projection='3d')
 
 # alpha=1, rstride=1, cstride=1)
 ax.plot_surface(xx, yy, T_err_field, cmap='winter', linewidth=0.5, antialiased=True, zorder=0.5, label='T_err_field')
-# ax.plot_surface(xx, yy, T_num,  cmap='summer', linewidth=0.5, antialiased=True, zorder=0.25, label='T_num')
-# ax.plot_surface(xx, yy, T_anal,  cmap='autumn', linewidth=0.5, antialiased=True, zorder=0.1, label='T_anal')
+ax.plot_surface(xx, yy, T_num,  cmap='summer', linewidth=0.5, antialiased=True, zorder=0.25, label='T_num')
+ax.plot_surface(xx, yy, T_anal,  cmap='autumn', linewidth=0.5, antialiased=True, zorder=0.1, label='T_anal')
 
 ax.set_xlabel('X')
 ax.set_ylabel('Y')
