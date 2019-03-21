@@ -37,9 +37,9 @@ jobs:
 
       # Download and cache dependencies
       - restore_cache:
-          working_directory: ${PYTHON_TOOLS_DIR}
+          # working_directory: ${PYTHON_TOOLS_DIR}
           keys:
-          - v1-dependencies-{{ checksum "${PYTHON_TOOLS_DIR}/requirements.txt" }}
+          - v1-dependencies-{{ checksum "Python/symbolic_tools/requirements.txt" }}
           # fallback to using the latest cache if no exact match is found
           - v1-dependencies-
 
@@ -47,6 +47,7 @@ jobs:
           name: install dependencies
           working_directory: ${PYTHON_TOOLS_DIR}
           command: |
+            pwd
             python3 -m venv venv
             . venv/bin/activate
             pip install -r ./requirements.txt
@@ -63,6 +64,7 @@ jobs:
           no_output_timeout: 45m
           working_directory: ${PYTHON_TOOLS_DIR}
           command: |
+            pwd
             . venv/bin/activate
             coverage run -m unittest discover -s ./tests/
             codecov
