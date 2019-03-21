@@ -31,12 +31,15 @@ jobs:
 
       - run:
           name: "What was my custom environment variable?"
-          command: echo ${MY_ENV_VAR}
+          command: |
+            echo ${PYTHON_TOOLS_DIR}
+            echo ${BASH_ENV}
 
       # Download and cache dependencies
       - restore_cache:
+        working_directory: $PYTHON_TOOLS_DIR
           keys:
-          - v1-dependencies-{{ checksum "$PYTHON_TOOLS_DIR/requirements.txt" }}
+          - v1-dependencies-{{ checksum "./requirements.txt" }}
           # fallback to using the latest cache if no exact match is found
           - v1-dependencies-
 
