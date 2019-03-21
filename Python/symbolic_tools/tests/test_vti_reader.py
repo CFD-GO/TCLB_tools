@@ -15,6 +15,10 @@ class TestVtiReader(unittest.TestCase):
         with self.assertRaises(FileNotFoundError) as context:
             vti_reader = VTIFile(filename)
 
+    def test_path(self):
+        wd = os.getcwd()
+        raise Exception(f"My WD is {wd}")
+
     def test_vtk_reader(self):
         real_path = os.path.realpath(__file__)
         dir_path = os.path.dirname(real_path)
