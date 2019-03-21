@@ -56,8 +56,8 @@ else:
 # T_err_field = np.clip(T_err_field, -1, 1)
 
 T_err_field = T_anal - T_num
-T_norm = np.sum(np.sqrt((T_anal - T_num) * (T_anal - T_num)))  # Euclidean norm
-print(f"T Euclidean norm={T_norm}")
+T_mse = np.sum((T_anal - T_num) * (T_anal - T_num))/len(T_anal)
+print(f"T Euclidean norm={T_mse}")
 
 print("---------- PLOTTING -------------")
 
@@ -83,7 +83,7 @@ ax.zaxis.set_major_formatter(FormatStrFormatter('%.02f'))
 
 plt.title(f'Laplace benchmark\n '
           f'x={xSIZE}[lu] y={ySIZE}[lu] '
-          r'$T_{err}$' + f'={T_norm:.2f}')
+          r'$T_{mse}$' + f'={T_mse:.4f}')
 plt.grid(True)
 
 fake2Dline = mpl.lines.Line2D([0], [0], linestyle="none", c='b', marker='o')

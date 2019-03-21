@@ -45,7 +45,7 @@ jobs:
 
       - run:
           name: install dependencies
-          working_directory: ${PYTHON_TOOLS_DIR}
+          # working_directory: ${PYTHON_TOOLS_DIR}
           command: |
             pwd
             python3 -m venv venv
@@ -62,10 +62,12 @@ jobs:
       - run:
           name: run tests
           no_output_timeout: 45m
-          working_directory: ${PYTHON_TOOLS_DIR}
+          # working_directory: ${PYTHON_TOOLS_DIR}
           command: |
             pwd
             . venv/bin/activate
+            cd Python/symbolic_tools/
+            pwd
             coverage run -m unittest discover -s ./tests/
             codecov
 
