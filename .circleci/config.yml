@@ -67,9 +67,9 @@ jobs:
           command: |
             pwd
             . venv/bin/activate
-            cd Python/symbolic_tools/
+            cd Python/symbolic_tools/tests/
             pwd
-            coverage run -m unittest discover -s ./tests/
+            coverage run -m unittest discover -s .
             codecov
 
       - store_artifacts:

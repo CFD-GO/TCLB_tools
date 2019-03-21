@@ -30,9 +30,9 @@ class TestVtiReader(unittest.TestCase):
 
         filename = 'laplace_benchmark_d2q9_VTK_P00_00050010.vti'
         # if 'circleci' in wd:
-        filepath = os.path.join(wd, 'tests', 'sample_data_for_vtk_reader', filename)
-        # else:
-        #     filepath = os.path.join(wd, 'sample_data_for_vtk_reader', filename)
+        #     wd = os.path.join(wd, 'tests')
+
+        filepath = os.path.join(wd, 'sample_data_for_vtk_reader', filename)
 
         print(f"filepath{filepath}")
         vti_reader = VTIFile(filepath)
