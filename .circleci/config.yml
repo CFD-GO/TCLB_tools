@@ -37,7 +37,7 @@ jobs:
 
       # Download and cache dependencies
       - restore_cache:
-        working_directory: $PYTHON_TOOLS_DIR
+          working_directory: $PYTHON_TOOLS_DIR
           keys:
           - v1-dependencies-{{ checksum "./requirements.txt" }}
           # fallback to using the latest cache if no exact match is found
