@@ -16,11 +16,17 @@ import numpy as np
 wd = os.getcwd()
 wd = os.path.dirname(wd)  # go level up
 
-filename = 'laplace_benchmark_d2q9_VTK_P00_00100000.vti'
-home = pwd.getpwuid(os.getuid()).pw_dir
-filepath = os.path.join(home, 'DATA_FOR_PLOTS', 'Laplace_convergence', '64x64', filename)
-vti_reader = VTIFile(filepath)
+lattice_size = 32
+filename_vtk = f'laplace_template_nx_{lattice_size}_ny_{lattice_size + 2}_VTK_P00_00250000.vti'
 
+home = pwd.getpwuid(os.getuid()).pw_dir
+main_folder = os.path.join(home, 'DATA_FOR_PLOTS', 'LaplaceBenchmark')
+
+
+filepath_vtk = os.path.join(main_folder, 'eq_scheme_laplace_template', filename_vtk)
+# filepath_vtk = os.path.join(main_folder, 'DATA_FOR_PLOTS', 'abb_laplace_template', filename_vtk)
+
+vti_reader = VTIFile(filepath_vtk)
 T_num = vti_reader.get("T")
 U = vti_reader.get("U", vector=True)
 
@@ -33,9 +39,10 @@ T_num = np.delete(T_num, (n_rows - 1), axis=0)  # delete last row - extra heater
 ySIZE, xSIZE = T_num.shape
 step = 1
 my_fun = -4 * x * (x - xSIZE) / (xSIZE * xSIZE)
-anal_input = InputForLaplace2DAnalytical(xSIZE, ySIZE, step, my_fun)
+n_fourier = 25
+anal_input = InputForLaplace2DAnalytical(xSIZE, ySIZE, step, my_fun, n_fourier)
 
-dump_fname = f'T_anal_x{xSIZE}y{ySIZE}.npy'
+dump_fname = os.path.join(main_folder, f'n_fourier{n_fourier}', f'T_anal_x{xSIZE}y{ySIZE}.npy')
 
 if os.path.isfile(dump_fname):
     print(f'{dump_fname} found, loading results from disc')
@@ -57,7 +64,7 @@ else:
 
 T_err_field = T_anal - T_num
 T_mse = np.sum((T_anal - T_num) * (T_anal - T_num))/len(T_anal)
-print(f"T Euclidean norm={T_mse}")
+print(f"T_mse={T_mse}")
 
 print("---------- PLOTTING -------------")
 

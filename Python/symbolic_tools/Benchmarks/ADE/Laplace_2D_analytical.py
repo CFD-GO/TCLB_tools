@@ -25,9 +25,10 @@ class InputForLaplace2DAnalytical:
     y_high: int
     step: float
     my_fun: Callable
+    n_fourier_terms: int
     x_low: int = 0
     y_low: int = 0
-    n_fourier_terms: int = 5
+
 
 
 def analytical_laplace_2d(input_config: InputForLaplace2DAnalytical):
