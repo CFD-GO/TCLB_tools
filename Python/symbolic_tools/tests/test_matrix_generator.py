@@ -8,7 +8,6 @@ import os
 sys.path.append(os.path.join('Python', 'symbolic_tools'))  # allow CI bot to see the stuff from the main repo dir
 sys.path.append(os.path.join('.'))  # allow CI bot to see the stuff from the main repo dir
 
-
 import unittest
 from SymbolicCollisions.core.printers import print_as_vector
 
