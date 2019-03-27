@@ -4,11 +4,11 @@ import matplotlib.pyplot as plt
 
 # -------------------- prepare dummy data --------------------
 
-range = 100
+x_range = 100
 step = 0.01
-x = np.arange(0., range, step)
-y = -4 * x * (x - range) / (range * range)
-fig_name = f'sample_plot2D_param_b={range}.png'
+x = np.arange(0., x_range, step)
+y = -4 * x * (x - x_range) / (x_range * x_range)
+fig_name = f'sample_plot2D_param_b={x_range}.png'
 
 # -------------------- make dummy plot --------------------
 plt.rcParams.update({'font.size': 14})
@@ -19,6 +19,7 @@ plt.plot(x, y,
          color="black", marker="", markevery=1, markersize=15, linestyle="--", linewidth=2,
          label='current model')
 
+# ------ format y axis ------ #
 yll = y.min()
 yhl = y.max()
 axes.set_ylim([yll, yhl])
@@ -29,6 +30,8 @@ axes.set_ylim([yll, yhl])
 
 # plt.yscale('log')
 
+
+# ------ format x axis ------ #
 plt.xlim(x.min(), x.max())
 
 # plt.ticklabel_format(style='sci', axis='x', scilimits=(0, 0))
@@ -36,7 +39,7 @@ plt.xlim(x.min(), x.max())
 
 
 plt.title(f'Sample plot\n '
-          r'$x_{range}$' + f'={range}'
+          r'$x_{range}$' + f'={x_range}'
           f'; \t'
           r'$x_{step}$' + f'={step:.4f}')
 plt.xlabel(r'$x_{label}$')
