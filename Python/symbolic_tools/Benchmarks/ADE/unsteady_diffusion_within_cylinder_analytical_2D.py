@@ -5,6 +5,14 @@
 # 'Hydrodynamics, Mass and Meat Transfer in Chemical Engineering'
 # A.D. Polyanin, A.M. Kutepov, A.V. Vyazmin and D.A. Kazenin
 
+
+# 2D, unsteady state case:
+# Unsteady heat conduction inside a cylinder.
+# The cylinder is initialized with initial temperature = 0.
+# Dirichlet BC is prescribed on the wall of the cylinder and the cylinder warms up.
+
+
+
 import os
 import numpy as np
 import matplotlib.pyplot as plt

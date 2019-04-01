@@ -1,3 +1,8 @@
+
+# 2D, steady state case:
+# Rectangular plate, temperature on one of the walls is given by a quadratic function.
+
+
 # References:
 # https://www.wire.tu-bs.de/lehre/ws15/pde1/lecture_2.pdf
 # https://www.wire.tu-bs.de/lehre/ws15/pde1/lecture_3.pdf
@@ -28,7 +33,6 @@ class InputForLaplace2DAnalytical:
     n_fourier_terms: int
     x_low: int = 0
     y_low: int = 0
-
 
 
 def analytical_laplace_2d(input_config: InputForLaplace2DAnalytical):

@@ -17,11 +17,11 @@ fig1, ax1 = plt.subplots(figsize=(14, 8))
 plt.rcParams.update({'font.size': 14})
 ax1.plot(x, y_1st,
          color="black", marker=">", markevery=1, markersize=8, linestyle=":", linewidth=2,
-         label='first order')
+         label=r'first order convergence, $\mathcal{O}(n)$')
 
 ax1.plot(x, y_2nd,
          color="black", marker="D", markevery=1, markersize=8, linestyle="-", linewidth=2,
-         label='second order')
+         label=r'second order convergence, $\mathcal{O}(n^2)$')
 
 ax1.set_xscale('log')
 ax1.set_yscale('log')
