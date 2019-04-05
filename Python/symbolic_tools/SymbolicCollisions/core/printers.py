@@ -52,7 +52,7 @@ def print_as_vector(some_matrix, print_symbol='default_symbol1', raw_output=Fals
         if raw_output:
             row = str(row)
         else:
-            row = symbol_to_number(row)  # evaluate symbolic constants, like pi
+            row = symbol_to_number(round_and_simplify(row))  # evaluate symbolic constants, like pi
             row = str(round_and_simplify(row))
             row = re.sub(r"%s\*\*2" % ux, '%s' % ux2, row)
             row = re.sub(r"%s\*\*2" % uy, '%s' % uy2, row)
@@ -69,24 +69,32 @@ def print_as_vector(some_matrix, print_symbol='default_symbol1', raw_output=Fals
             row = re.sub(r"_{", "", row)  # skip curly brackets from latex
             row = re.sub(r"}", "", row)  #
 
-            # get algebraic fractions from decimal ones
-            result = re.findall(r"\d\.\d+", row)  # may return an empty list: []
-            while result:
-                first_number = result[0]
+            ugly_numbers = re.findall(r"\d\.\d+", row)  # may return an empty list: []
+            while ugly_numbers:
 
                 row = re.sub(r"\d\.\d+",  # digit, dot, one or more digits
-                             str(Fraction(first_number).limit_denominator(max_denominator=1000)) + '.',
-                             row, count=1)
+                             str(Fraction(ugly_numbers[0]).limit_denominator(max_denominator=1000))
+                             + '.',  # add '.' to let the C compiler know that it is a float
+                             row, count=1)  # get algebraic fractions from decimal ones
 
-                row = re.sub(r"\*\*1\.\*", "", row)  # dont power by 1.0
+                row = re.sub(r"\*\*1\.0", r"", row)  # dont power by 1.0
                 row = re.sub(r"1\.\*", "", row)  # dont multiply by 1.*
-                result = re.findall(r"\d\.\d+", row)
+
+                square_patterns = [r"\*\*2\.0", r"\*\*2"]
+
+                for square_pattern in square_patterns:
+                    to_be_squared = re.findall(r"(\w+)" + square_pattern, row)
+                    if len(to_be_squared) > 1:
+                        raise NotImplementedError
+                    elif len(to_be_squared) == 1:
+                        row = re.sub(square_pattern, "*" + to_be_squared[0], row)
+
+                ugly_numbers = re.findall(r"\d\.\d+", row)
 
         if withbrackets:
             print(f"\t{print_symbol}[{i}] = {row};")
         else:
             print(f"\t{print_symbol}{i} = {row};")
-
 
 # TODO:
 #  1.0*m00*(RT*u.y**2 - RT**1.0*u.y**2 + RT**2.0);

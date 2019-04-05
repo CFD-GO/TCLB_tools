@@ -19,8 +19,9 @@ from SymbolicCollisions.core.hardcoded_results import hardcoded_F_cm_hydro_densi
     hardcoded_F_cm_Guo_hydro_LB_velocity_based_D2Q9, \
     hardcoded_F_cm_hydro_density_based_D2Q9, \
     hardcoded_cm_eq_compressible_D2Q9,    hardcoded_cm_eq_compressible_D3Q19, \
-    hardcoded_cm_eq_incompressible_D2Q9,\
-    hardcoded_cm_eq_compressible_D2Q9_thermal
+    hardcoded_cm_eq_incompressible_D2Q9, \
+    hardcoded_cm_eq_compressible_D2Q9_thermal, \
+    hardcoded_cm_eq_cht_D2Q9
 
 from SymbolicCollisions.core.ContinuousCMTransforms import ContinuousCMTransforms, get_mom_vector_from_continuous_def
 from SymbolicCollisions.core.cm_symbols import \
@@ -136,6 +137,7 @@ class TestContinousCMTransforms(unittest.TestCase):
             'D2Q9',
             'D2Q9',
             'D3Q19',
+            'D2Q9'
             ]
 
         functions = [
@@ -144,6 +146,7 @@ class TestContinousCMTransforms(unittest.TestCase):
             ccmt.get_force_Guo,
             ccmt.get_force_He_MB,
             ccmt.get_force_He_MB,
+            ccmt.get_cht_DF,
         ]
 
         expected_results = [
@@ -152,6 +155,7 @@ class TestContinousCMTransforms(unittest.TestCase):
             hardcoded_F_cm_Guo_hydro_LB_velocity_based_D2Q9,
             hardcoded_F_cm_hydro_density_based_D2Q9,
             hardcoded_F_cm_hydro_density_based_D3Q19,
+            hardcoded_cm_eq_cht_D2Q9,
         ]
 
         for fun, lattice, expected_result in zip(functions, lattices, expected_results):

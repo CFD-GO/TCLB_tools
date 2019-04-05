@@ -2,25 +2,21 @@
 from sympy import exp, pi, integrate, oo
 import sympy as sp
 import numpy as np
-
-from sympy.matrices import Matrix
-
-from SymbolicCollisions.core.cm_symbols import m00
-
-from SymbolicCollisions.core.printers import round_and_simplify
-
 from joblib import Parallel, delayed
 import multiprocessing
 from sympy import Symbol
 import warnings
 
-
-cp = Symbol('cp')
+from sympy.matrices import Matrix
+from SymbolicCollisions.core.printers import round_and_simplify
+from SymbolicCollisions.core.cm_symbols import m00
 from SymbolicCollisions.core.cm_symbols import rho
-T = Symbol('T')
+from SymbolicCollisions.core.cm_symbols import Temperature, cht_gamma as cht_stability_enhancement
+from SymbolicCollisions.core.cm_symbols import cp as specific_heat_capacity
 
 class ContinuousCMTransforms:
-    def __init__(self, dzeta, u, F, rho, cs2=1./3.):
+    def __init__(self, dzeta, u, F, rho, cs2=1. / 3.,
+                 T=Temperature, cp=specific_heat_capacity, cht_gamma=cht_stability_enhancement):
         """
         :param dzeta: direction (x,y,z)
         :param u: velocity (x,y,z)
@@ -35,8 +31,12 @@ class ContinuousCMTransforms:
         self.F = F
         self.rho = rho
         self.cs2 = cs2
+        self.T = T
+        self.cp = cp
+        self.gamma = cht_gamma
 
     def get_Maxwellian_DF(self, psi=m00, _u=None):
+        # TODO: add variance as in get_Maxwellian_cht_DF
         """
         :param _u: velocity (x,y,z)
         :param psi: quantity of interest aka scaling function like density
@@ -94,56 +94,10 @@ class ContinuousCMTransforms:
         df_gamma = self.get_Maxwellian_DF(psi=1, _u=self.u,)
         return df_p + df_gamma
 
-    def get_Maxwellian_cht_DF(self, psi=m00, _u=None):
+    def get_Maxwellian_cht_DF(self, psi, _u, sigma2):
         """
         :param _u: velocity (x,y,z)
-        :param psi: quantity of interest aka scaling function like density
-        :return: continuous, local Maxwell-Boltzmann distribution
-        'Incorporating forcing terms in cascaded lattice Boltzmann approach by method of central moments'
-        Kannan N. Premnath, Sanjoy Banerjee, 2009
-        eq 22
-        """
-        u = None
-        if _u:
-            u = _u
-        else:
-            u = self.u
-
-        PI = sp.pi
-
-
-        dzeta_minus_u = self.dzeta - u
-        dzeta_u2 = dzeta_minus_u.dot(dzeta_minus_u)
-
-        # thank you sympy...
-        # hacks:
-        # for 2D
-        # df = psi / pow(2 * PI * self.cs2, 2/2)
-        # LOL: 2/2 gives not simplified result for m22 on d2q9:
-        # 1.0 * m00 * (RT * u.y ** 2 - RT ** 1.0 * u.y ** 2 + RT ** 2.0);
-        # while 1 does ;p
-        # RT ** 2 * m00;
-
-        dim = len(self.dzeta)  # number od dimensions
-        # df = psi / pow(2 * PI * self.cs2, dim / 2)  # this is to difficult for sympy :/
-
-        if dim == 2:
-            df = psi / (2 * PI * self.cs2)  # 2D version hack
-        else:
-            df = psi / pow(2 * PI * self.cs2, dim / 2)  # this may be to difficult for sympy :/
-            if self.cs2 != 1. / 3.:
-                warnings.warn("Sympy may have problem with 3D non isothermal version (cs2=RT) \n "
-                              "It also can't simplify it, thus check the raw output", UserWarning)
-
-        # B = Symbol('B', positive=True)
-        # B = 1
-        # dzeta_u2 = B * dzeta_u2
-        df *= exp(-dzeta_u2 / (2 * self.cs2))
-        return df
-
-    def get_Maxwellian_cht_DF2(self, psi=T*cp*rho, _u=None):
-        """
-        :param _u: velocity (x,y,z)
+        :param sigma2: variance of the distribution
         :param psi: quantity of interest aka scaling function like density
         :return: continuous, local Maxwell-Boltzmann distribution
         'Incorporating forcing terms in cascaded lattice Boltzmann approach by method of central moments'
@@ -173,30 +127,21 @@ class ContinuousCMTransforms:
         # df = psi / pow(2 * PI * self.cs2, dim / 2)  # this is to difficult for sympy :/
 
         if dim == 2:
-            df = psi / (2 * PI * self.cs2/(cp*rho))  # 2D version hack
+            df = psi / (2 * PI * sigma2)  # 2D version hack
         else:
-            df = psi / pow(2 * PI * self.cs2/(cp*rho), dim / 2)  # this may be to difficult for sympy :/
+            df = psi / pow(2 * PI * sigma2, dim / 2)  # this may be to difficult for sympy :/
             if self.cs2 != 1. / 3.:
                 warnings.warn("Sympy may have problem with 3D non isothermal version (cs2=RT) \n "
                               "It also can't simplify it, thus check the raw output", UserWarning)
 
-        df *= exp(-dzeta_u2 / (2 * self.cs2/(cp*rho)))
+        df *= exp(-dzeta_u2 / (2 * sigma2))
         return df
-
-    def get_cht_DF2(self):
-        df_H = self.get_Maxwellian_cht_DF2(psi=T*cp*rho, _u=self.u)
-        return df_H
 
     def get_cht_DF(self):
-
-        T = Symbol('T')
-        # df_H = self.get_Maxwellian_DF(psi=(rho * cp * T), _u=self.u, )
-        df_H = self.get_Maxwellian_cht_DF2(psi=T, _u=self.u)
+        H = self.T * self.cp * self.rho
+        Sigma = self.gamma * self.cs2 / (self.cp * rho)
+        df_H = self.get_Maxwellian_cht_DF(psi=H, _u=self.u, sigma2=Sigma)
         return df_H
-        # A = Symbol('A')
-        # df_corr = self.get_Maxwellian_cht_DF(psi=A, _u=self.u)
-        # # df_corr = self.get_Maxwellian_cht_DF(psi=A, _u=Matrix([0, 0, 0]))
-        # return df_H + df_corr
 
     def get_force_He_hydro_DF(self):
         """

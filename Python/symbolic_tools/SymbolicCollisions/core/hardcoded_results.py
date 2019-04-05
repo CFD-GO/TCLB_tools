@@ -1,10 +1,11 @@
 
 from sympy.matrices import Matrix
-from SymbolicCollisions.core.cm_symbols import m00, rho, cs2_thermal, \
+from SymbolicCollisions.core.cm_symbols import m00, rho, cp, cs2_thermal, \
     Fx, Fy, Fz, F_phi_x, F_phi_y, F_phi_z, \
     ux, uy, ux2, uy2, uxuy
 
-
+from SymbolicCollisions.core.cm_symbols import Temperature as T
+from SymbolicCollisions.core.cm_symbols import cht_gamma
 # save time and hardcode some of the results
 hardcoded_F_cm_hydro_density_based_D2Q9 = Matrix([
     0,
@@ -99,6 +100,17 @@ hardcoded_F_cm_pf_D2Q9 = Matrix([
     0,
 ])
 
+hardcoded_cm_eq_cht_D2Q9 = Matrix([
+    T * cp * rho,
+    0,
+    0,
+    1 / 3. * T * cht_gamma,
+    1 / 3. * T * cht_gamma,
+    0,
+    0,
+    0,
+    1 / 9. * T * cht_gamma * cht_gamma / (cp * rho),
+])
 
 hardcoded_cm_eq_compressible_D2Q9 = Matrix([
     m00,

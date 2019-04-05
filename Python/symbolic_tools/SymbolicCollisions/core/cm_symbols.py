@@ -113,8 +113,12 @@ S_relax_ADE_D3Q19 = diag(1, omega_ade, omega_ade, omega_ade, 1, 1, 1, 1, 1, 1, 1
 #
 # F_phi_coeff = Symbol('F_phi_coeff')  # F_phi_coeff=(1.0 - 4.0*(myPhaseF - pfavg)*(myPhaseF - pfavg))/inteface_width;
 
-m00 = Symbol('m00')
-rho = Symbol('rho')
+m00 = Symbol('m00', positive=True)
+rho = Symbol('rho', positive=True)
+Temperature = Symbol('T', positive=True)
+cp = Symbol('cp', positive=True)
+cht_gamma = Symbol('gamma', positive=True)  # magic stability enhancement
+
 w_D2Q9 = Matrix([4. / 9, 1. / 9, 1. / 9, 1. / 9, 1. / 9, 1. / 36, 1. / 36, 1. / 36, 1. / 36])
 
 
