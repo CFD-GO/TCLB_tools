@@ -1,5 +1,5 @@
 from sympy.abc import x
-from Benchmarks.ADE.Laplace_2D_analytical import analytical_laplace_2d, InputForLaplace2DAnalytical, make_anal_plot
+from Benchmarks.ADE.Laplace_2D_analytical import analytical_laplace_2d, InputForLaplace2DAnalytical
 
 from DataIO.VTIFile import VTIFile
 import os
@@ -21,8 +21,6 @@ filename_vtk = f'laplace_template_nx_{lattice_size}_ny_{lattice_size + 2}_VTK_P0
 
 home = pwd.getpwuid(os.getuid()).pw_dir
 main_folder = os.path.join(home, 'DATA_FOR_PLOTS', 'LaplaceBenchmark')
-
-
 filepath_vtk = os.path.join(main_folder, 'eq_scheme_laplace_template', filename_vtk)
 # filepath_vtk = os.path.join(main_folder, 'DATA_FOR_PLOTS', 'abb_laplace_template', filename_vtk)
 

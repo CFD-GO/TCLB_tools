@@ -18,7 +18,7 @@ pwp = PipeWithinPipe(r0, r1, r2, k1, k2, T0, T2)
 step = 0.01
 
 r = np.arange(r0, r2, step)
-y = np.array([pwp.get_temperature(r_) for r_ in r])
+y = np.array([pwp.get_temperature_r(r_) for r_ in r])
 
 
 fig_name = f'pipe_within_pipe_grid_convergence.png'

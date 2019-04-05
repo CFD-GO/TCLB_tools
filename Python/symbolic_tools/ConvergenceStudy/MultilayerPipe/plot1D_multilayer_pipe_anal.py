@@ -1,28 +1,28 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-from Benchmarks.ADE.steady_two_layer_cylinder_analytical_2D import PipeWithinPipe
+from Benchmarks.ADE.steady_two_layer_cylinder_analytical_2D import InputForMultiLayeredPipe, PipeWithinPipe
 
-r0 = 0.1  # inner radius
-r1 = 1  # interface between layers
-r2 = 3  # outer radius
+r0 = 16  # inner radius
+r2 = 128  # outer radius
+r1 = (r0 + r2) / 2  # interface between layers
 
 k1 = 1E5  # inner layer - heat conductivity for r0 < r < r1
 k2 = 1E5  # outer layer - heat conductivity for r1 < r < r2
 
-T0 = 10  # temperature for r = r0
-T2 = 100  # temperature for r = r2
+T0 = 0  # temperature for r = r0
+T2 = 1  # temperature for r = r2
 
+anal_input = InputForMultiLayeredPipe(r0, r1, r2, k1, k2, T0, T2)
+pwp = PipeWithinPipe(anal_input)
 
-pwp = PipeWithinPipe(r0, r1, r2, k1, k2, T0, T2)
 step = 0.01
 
 r = np.arange(r0, r2, step)
-y = np.array([pwp.get_temperature(r_) for r_ in r])
+y = np.array([pwp.get_temperature_r(r_) for r_ in r])
 
 
 fig_name = f'pipe_within_pipe_k1{k1}_k2{k2}.png'
-
 
 # -------------------- make dummy plot --------------------
 plt.rcParams.update({'font.size': 14})
@@ -46,15 +46,15 @@ axes.set_ylim([yll, yhl])
 
 
 # ------ format x axis ------ #
-plt.xlim(r.min(), r.max())
+plt.xlim(0, r.max())
 
 # plt.ticklabel_format(style='sci', axis='x', scilimits=(0, 0))
 # plt.ticklabel_format(style='sci', axis='y', scilimits=(0, 0))  # scilimits=(-8, 8)
 
 
-plt.title(f'Sample plot\n '
+plt.title(f'T across pipes\n '
           # r'$x_{range}$' + f'={x_range}'
-          f'; \t'
+          # f'; \t'
           r'$x_{step}$' + f'={step:.4f}')
 plt.xlabel(r'$r$')
 plt.ylabel(r'$Temperature$')
