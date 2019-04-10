@@ -2,13 +2,15 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from Benchmarks.ADE.steady_two_layer_cylinder_analytical_2D import InputForMultiLayeredPipe, PipeWithinPipe
+gauge =1
 
-r0 = 16  # inner radius
-r2 = 128  # outer radius
-r1 = (r0 + r2) / 2  # interface between layers
+r0 = gauge * (8 / 2)  # inner radius
+r2 = gauge * (30 / 2)  # outer radius
+r1 = gauge * (20 / 2)  # interface between layers
+# r1 = (r0 + r2) / 2  # interface between layers
 
-k1 = 1E5  # inner layer - heat conductivity for r0 < r < r1
-k2 = 1E5  # outer layer - heat conductivity for r1 < r < r2
+k1 = 0.1  # inner layer - heat conductivity for r0 < r < r1
+k2 = 0.01  # outer layer - heat conductivity for r1 < r < r2
 
 T0 = 0  # temperature for r = r0
 T2 = 1  # temperature for r = r2

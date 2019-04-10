@@ -139,8 +139,8 @@ class ContinuousCMTransforms:
 
     def get_cht_DF(self):
         H = self.T * self.cp * self.rho
-        Sigma = self.gamma * self.cs2 / (self.cp * rho)
-        df_H = self.get_Maxwellian_cht_DF(psi=H, _u=self.u, sigma2=Sigma)
+        Sigma2 = self.gamma * self.cs2 / (self.cp * rho)
+        df_H = self.get_Maxwellian_cht_DF(psi=H, _u=self.u, sigma2=Sigma2)
         return df_H
 
     def get_force_He_hydro_DF(self):

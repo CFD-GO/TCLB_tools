@@ -6,9 +6,9 @@ from typing import Callable
 
 @dataclass
 class InputForMultiLayeredPipe:
-    r0: int  # inner radius
-    r1: int  # interface between layers
-    r2: int  # outer radius
+    r0: float  # inner radius
+    r1: float  # interface between layers
+    r2: float  # outer radius
     k1: float  # inner layer - heat conductivity for r0 < r < r1
     k2: float  # outer layer - heat conductivity for r1 < r < r2
     T0: float  # temperature for r = r0
@@ -35,7 +35,10 @@ class PipeWithinPipe:
         R2 = np.log(self.r2 / self.r1) / (2 * np.pi * self.k2)  # outer layer - thermal resistance
         Q = (self.T2 - self.T0) / (R2 + R1)  # heat flux
         self.T1 = Q * R1 + self.T0  # temperature for r = r1 (interface between layers)
-        print(self.T1)
+
+    def get_r_from_xy(self, x, y, x0=0, y0=0):
+        r = np.sqrt(pow(x0 - x, 2) + pow(y0 - y, 2))
+        return r
 
     def get_temperature_r(self, r):
         if r < self.r0:
@@ -60,5 +63,5 @@ class PipeWithinPipe:
         :param y0: origin of radial CSYS - y center of the pipe
         :return:
         """
-        r = np.sqrt(pow(x0 - x, 2) + pow(y0 - y, 2))
+        r = self.get_r_from_xy(x, y, x0, y0)
         return self.get_temperature_r(r)

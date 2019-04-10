@@ -5,7 +5,7 @@ from DataIO.VTIFile import VTIFile
 import os
 import pwd
 import pandas as pd
-import matplotlib as mpl
+# import matplotlib as mpl
 import matplotlib.pyplot as plt
 import matplotlib.ticker
 import numpy as np
@@ -14,23 +14,24 @@ import numpy as np
 wd = os.getcwd()
 wd = os.path.dirname(wd)  # go level up
 
-x_size = np.array([32, 64, 128, 256])
-fig_name = f'LaplaceBenchmark_log_grid_convergence_from_{x_size[0]}_to_{x_size[-1]}.pdf'
+lattice_size = np.array([32, 64, 128, 256])
+fig_name = f'LaplaceBenchmark_log_grid_convergence_from_{lattice_size[0]}_to_{lattice_size[-1]}.png'
 
 home = pwd.getpwuid(os.getuid()).pw_dir
 main_folder = os.path.join(home, 'DATA_FOR_PLOTS', 'LaplaceBenchmark')
 
 
-def get_t_mse(folder, n=len(x_size)):
+def get_t_mse(folder):
+    n = len(lattice_size)
     T_mse = np.zeros(n)
     T_L2 = np.zeros(n)
     for i in range(n):
 
-        filename_vtk = f'laplace_template_nx_{x_size[i]}_ny_{x_size[i] + 2}_VTK_P00_00250000.vti'
+        filename_vtk = f'laplace_template_nx_{lattice_size[i]}_ny_{lattice_size[i] + 2}_VTK_P00_00250000.vti'
         filepath_vtk = os.path.join(main_folder, folder, filename_vtk)
         vti_reader = VTIFile(filepath_vtk)
 
-        filename_txt = f'laplace_template_nx_{x_size[i]}_ny_{x_size[i] + 2}_TXT_P00_00250000_T.txt'
+        filename_txt = f'laplace_template_nx_{lattice_size[i]}_ny_{lattice_size[i] + 2}_TXT_P00_00250000_T.txt'
         filepath_txt = os.path.join(main_folder, folder, filename_txt)
 
         T_num_txt = pd.read_csv(filepath_txt, delimiter=" ")
@@ -84,29 +85,29 @@ print("------------------------------------ PLOT -------------------------------
 
 # initial_error_1st = 0.0025
 initial_error_1st = 0.034
-y_1st = x_size.min()*initial_error_1st/x_size
+y_1st = lattice_size.min() * initial_error_1st / lattice_size
 # initial_error_2nd = 0.0015
 initial_error_2nd = 0.022
-y_2nd = x_size.min()*x_size.min()*initial_error_2nd/(x_size*x_size)
+y_2nd = lattice_size.min() * lattice_size.min() * initial_error_2nd / (lattice_size * lattice_size)
 
 
 fig1, ax1 = plt.subplots(figsize=(14, 8))
 plt.rcParams.update({'font.size': 14})
 
-ax1.plot(x_size, T_err_EQ,
+ax1.plot(lattice_size, T_err_EQ,
          color="black", marker="o", markevery=1, markersize=5, linestyle="", linewidth=2,
          label='Equilibrium scheme')
 
-ax1.plot(x_size, T_err_ABB,
+ax1.plot(lattice_size, T_err_ABB,
          color="black", marker=">", markevery=1, markersize=5, linestyle="", linewidth=2,
          label='Anti-Bounce-Back scheme')
 
 
-ax1.plot(x_size, y_1st,
+ax1.plot(lattice_size, y_1st,
          color="black", marker="", markevery=1, markersize=5, linestyle="--", linewidth=2,
          label=r'$\mathcal{O}(n)$ convergence')
 
-ax1.plot(x_size, y_2nd,
+ax1.plot(lattice_size, y_2nd,
          color="black", marker="", markevery=1, markersize=5, linestyle="-", linewidth=2,
          label=r'$\mathcal{O}(n^2)$ convergence')
 
