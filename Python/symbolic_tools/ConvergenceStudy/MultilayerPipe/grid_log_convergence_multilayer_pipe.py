@@ -17,7 +17,7 @@ basic_lattice_size = 32
 gauges = np.array([1, 2, 4, 8])
 lattices = gauges * basic_lattice_size
 
-cht = "cht_"  # "cht_" or empty string ""
+cht = ""  # "cht_" or empty string ""
 
 def get_t_mse(folder):
     n = len(gauges)
@@ -37,10 +37,10 @@ def get_t_mse(folder):
         r0 = gauges[g] * (8 / 2)  # inner radius
         r2 = gauges[g] * (30 / 2)  # outer radius
 
-        abb_correction = 0.
-        if 'abb_scheme' in filepath_vtk:
-            r0 += abb_correction
-            r2 -= abb_correction
+        abb_correction = 0.5
+        if 'eq_scheme' in filepath_vtk:
+            r0 -= abb_correction
+            r2 += abb_correction
 
         # r1 = (r0 + r2) / 2  # interface between layers
         r1 = gauges[g] * (20 / 2)  # interface between layers
@@ -62,8 +62,8 @@ def get_t_mse(folder):
         nx = int(xSIZE / step)
         ny = int(ySIZE / step)
 
-        x_grid = np.linspace(0, xSIZE, nx)
-        y_grid = np.linspace(0, ySIZE, ny)
+        x_grid = np.linspace(0, xSIZE, nx, endpoint=False) + 0.5
+        y_grid = np.linspace(0, ySIZE, ny, endpoint=False) + 0.5
         xx, yy = np.meshgrid(x_grid, y_grid)
         T_anal = np.zeros((ny, nx))
 
@@ -74,9 +74,9 @@ def get_t_mse(folder):
                 r = pwp.get_r_from_xy(xx[i][j], yy[i][j], x0, y0)
                 T_anal[i][j] = pwp.get_temperature_r(r)
 
-                # if r < r0 or r > r2:
-                #     T_anal[i][j] = 0
-                #     T_num[i][j] = 0
+                if r < r0 or r > r2:
+                    T_anal[i][j] = 0
+                    T_num[i][j] = 0
 
         T_L2[g] = np.sqrt(
             np.sum((T_anal - T_num) * (T_anal - T_num))
@@ -90,7 +90,7 @@ def get_t_mse(folder):
 home = pwd.getpwuid(os.getuid()).pw_dir
 
 T_err_EQ = get_t_mse(os.path.join(home, 'DATA_FOR_PLOTS', 'ruraWrurzeBenchmark', 'eq_scheme'))
-# T_err_ABB = get_t_mse(os.path.join(home, 'DATA_FOR_PLOTS', 'ruraWrurzeBenchmark', 'abb_scheme'))
+T_err_ABB = get_t_mse(os.path.join(home, 'DATA_FOR_PLOTS', 'ruraWrurzeBenchmark', 'abb_scheme'))
 
 
 print("------------------------------------ PLOT ------------------------------------")
@@ -111,9 +111,9 @@ ax1.plot(lattices, T_err_EQ,
          color="black", marker="o", markevery=1, markersize=5, linestyle="", linewidth=2,
          label='Equilibrium scheme')
 
-# ax1.plot(lattices, T_err_ABB,
-#          color="black", marker=">", markevery=1, markersize=5, linestyle="", linewidth=2,
-#          label='Anti-Bounce-Back scheme')
+ax1.plot(lattices, T_err_ABB,
+         color="black", marker=">", markevery=1, markersize=5, linestyle="", linewidth=2,
+         label='Anti-Bounce-Back scheme')
 
 
 ax1.plot(lattices, y_05st,

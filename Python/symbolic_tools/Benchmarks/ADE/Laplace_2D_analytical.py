@@ -53,8 +53,8 @@ def analytical_laplace_2d(input_config: InputForLaplace2DAnalytical):
 
     nx = int((input_config.x_high - input_config.x_low) / input_config.step)
     ny = int((input_config.y_high - input_config.y_low) / input_config.step)
-    x_grid = np.linspace(input_config.x_low, input_config.x_high, nx)
-    y_grid = np.linspace(input_config.y_low, input_config.y_high, ny)
+    x_grid = np.linspace(input_config.x_low, input_config.x_high, nx, endpoint=False) + 0.5
+    y_grid = np.linspace(input_config.y_low, input_config.y_high, ny, endpoint=False) + 0.5
     xx, yy = np.meshgrid(x_grid, y_grid)
     zz = np.zeros((ny, nx))
 

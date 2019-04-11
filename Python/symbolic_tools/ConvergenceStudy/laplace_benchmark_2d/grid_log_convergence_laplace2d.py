@@ -47,6 +47,7 @@ def get_t_mse(folder):
         ySIZE, xSIZE = T_num.shape
         step = 1
         my_fun = -4 * x * (x - xSIZE) / (xSIZE * xSIZE)
+        # TODO: 2 funkcje - jedna dla ABB(przykladaowo z zerami w 1 i 63) druga dla EQ (z zerami w 0.5, 63.5)
         n_fourier = 25
         anal_input = InputForLaplace2DAnalytical(xSIZE, ySIZE, step, my_fun, n_fourier)
 
@@ -55,8 +56,8 @@ def get_t_mse(folder):
         if os.path.isfile(dump_fname):
             print(f'{dump_fname} found, loading results from disc')
             T_anal = np.load(dump_fname)
-            x_grid = np.linspace(0, xSIZE, xSIZE)
-            y_grid = np.linspace(0, ySIZE, ySIZE)
+            x_grid = np.linspace(0, xSIZE, xSIZE,  endpoint=False) + 0.5
+            y_grid = np.linspace(0, ySIZE, ySIZE,  endpoint=False) + 0.5
             xx, yy = np.meshgrid(x_grid, y_grid)
         else:
             print(f'{dump_fname} not found, starting calculations')

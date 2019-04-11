@@ -45,8 +45,8 @@ dump_fname = os.path.join(main_folder, f'n_fourier{n_fourier}', f'T_anal_x{xSIZE
 if os.path.isfile(dump_fname):
     print(f'{dump_fname} found, loading results from disc')
     T_anal = np.load(dump_fname)
-    x_grid = np.linspace(0, xSIZE, xSIZE)
-    y_grid = np.linspace(0, ySIZE, ySIZE)
+    x_grid = np.linspace(0, xSIZE, xSIZE, endpoint=False) + 0.5
+    y_grid = np.linspace(0, ySIZE, ySIZE, endpoint=False) + 0.5
     xx, yy = np.meshgrid(x_grid, y_grid)
 else:
     print(f'{dump_fname} not found, starting calculations')

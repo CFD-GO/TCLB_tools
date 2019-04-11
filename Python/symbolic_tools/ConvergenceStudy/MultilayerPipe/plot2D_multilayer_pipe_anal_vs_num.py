@@ -67,8 +67,8 @@ pwp = PipeWithinPipe(anal_input)
 nx = int(xSIZE / step)
 ny = int(ySIZE / step)
 
-x_grid = np.linspace(0, xSIZE, nx)
-y_grid = np.linspace(0, ySIZE, ny)
+x_grid = np.linspace(0, xSIZE, nx, endpoint=False) + 0.5
+y_grid = np.linspace(0, ySIZE, ny, endpoint=False) + 0.5
 xx, yy = np.meshgrid(x_grid, y_grid)
 T_anal = np.zeros((ny, nx))
 
