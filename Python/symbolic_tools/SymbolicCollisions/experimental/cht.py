@@ -24,6 +24,8 @@ row = moments_dict['D2Q9'][0]
 moment = ccmt.get_cm(row, ccmt.get_cht_DF)
 print_as_vector(Matrix([moment]), 'particular_moment')
 
+
+
 # print('\n//Force -> Force_cm - from continous definition: \n'
 #       'k_mn = integrate(fun, (x, -oo, oo), (y, -oo, oo)) \n'
 #       'where fun = forceM(rho,u,x,y) *(x-ux)^m *(y-uy)^n *(z-uz)^o ')
@@ -33,15 +35,20 @@ print_as_vector(Matrix([moment]), 'particular_moment')
 # print_as_vector(F_cm, 'F_cm')
 
 
-# print('\n//population_eq -> cm_eq - from continous definition: \n'
-#       'k_mn = integrate(fun, (x, -oo, oo), (y, -oo, oo)) \n'
-#       'where fun = fM(rho,u,x,y) *(x-ux)^m *(y-uy)^n *(z-uz)^o ')
-# cm_eq = get_mom_vector_from_continuous_def(ccmt.get_Maxwellian_DF,
-#                                            continuous_transformation=ccmt.get_cm,
-#                                            moments_order=moments_dict[lattice])
-# print_as_vector(cm_eq, 'cm_eq')
+print('\n//population_eq -> cm_eq - from continous definition: \n'
+      'k_mn = integrate(fun, (x, -oo, oo), (y, -oo, oo)) \n'
+      'where fun = fM(rho,u,x,y) *(x-ux)^m *(y-uy)^n *(z-uz)^o ')
+from SymbolicCollisions.core.cm_symbols import \
+    F3D, dzeta3D, u3D, \
+    rho, cs2_thermal
+ccmt = ContinuousCMTransforms(dzeta3D, u3D, F3D, rho, cs2=cs2_thermal)
+cm_eq = get_mom_vector_from_continuous_def(ccmt.get_Maxwellian_DF,
+                                           continuous_transformation=ccmt.get_cm,
+                                           moments_order=moments_dict['D2Q9'],
+                                           serial_run=False)
+print_as_vector(cm_eq, 'cm_eq')
 
-# print('---- CHT ----')
+print('---- CHT ----')
 cm_cht_eq = get_mom_vector_from_continuous_def(ccmt.get_cht_DF,
                                                continuous_transformation=ccmt.get_cm,
                                                moments_order=moments_dict[lattice],

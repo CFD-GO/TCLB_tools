@@ -133,7 +133,7 @@ hardcoded_cm_eq_compressible_D2Q9_thermal = Matrix([
     0,
     0,
     0,
-    cs2_thermal**2 * m00,
+    cs2_thermal*cs2_thermal * m00,
     ])
 
 # order of 3D (central) moments as in

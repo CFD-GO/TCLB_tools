@@ -100,7 +100,7 @@ initial_error_05st = 0.070
 y_05st = np.sqrt(lattices.min())*initial_error_05st/np.sqrt(lattices)
 initial_error_1st = 0.034
 y_1st = lattices.min()*initial_error_1st/lattices
-initial_error_2nd = 0.022
+initial_error_2nd = 0.011
 y_2nd = lattices.min()*lattices.min()*initial_error_2nd/(lattices*lattices)
 
 
@@ -116,10 +116,9 @@ ax1.plot(lattices, T_err_ABB,
          label='Anti-Bounce-Back scheme')
 
 
-ax1.plot(lattices, y_05st,
-         color="black", marker="", markevery=1, markersize=5, linestyle=":", linewidth=2,
-         label=r'$\mathcal{O}(\sqrt{n})$ convergence')
-
+# ax1.plot(lattices, y_05st,
+#          color="black", marker="", markevery=1, markersize=5, linestyle=":", linewidth=2,
+#          label=r'$\mathcal{O}(\sqrt{n})$ convergence')
 
 ax1.plot(lattices, y_1st,
          color="black", marker="", markevery=1, markersize=5, linestyle="--", linewidth=2,
@@ -135,7 +134,7 @@ ax1.set_yscale('log')
 # ax1.set_xticks(lattices)
 
 ax1.get_xaxis().set_major_formatter(matplotlib.ticker.ScalarFormatter())
-plt.title(f'CHT Pipe within pipe Benchmark - Grid Convergence Study\n '
+plt.title(f'{cht} Pipe within pipe Benchmark - Grid Convergence Study\n '
           # r'$x_{range}$' + f'={range}'
           # f'; \t'
           # r'$x_{step}$' + f'={step:.4f}'
