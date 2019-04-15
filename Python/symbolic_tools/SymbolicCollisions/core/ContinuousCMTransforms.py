@@ -164,7 +164,20 @@ class ContinuousCMTransforms:
         """
         eu_dot_f = (self.dzeta - self.u).dot(self.F)
         result = self.get_Maxwellian_DF() * eu_dot_f / (self.rho * self.cs2)
+        return result
 
+    def get_bc_bb_concentration_cht(self):
+        return 2*self.get_cht_DF()
+
+    def get_bc_bb_heat_flux_cht(self):
+        """
+        'Discrete Boltzmann equation model for the incompressible Navier-Stokes equation', He et al., 1998
+        Use Maxwellian to calculate equilibria
+        """
+        eu_dot_f = (self.dzeta - self.u).dot(self.F)
+        Sigma2 = self.gamma * self.cs2 / (self.cp * rho)
+        H = self.T * self.cp * self.rho
+        result = -2*self.get_Maxwellian_cht_DF(psi=H, _u=self.u, sigma2=Sigma2) * eu_dot_f / (self.cs2)
         return result
 
     def get_weight(self):
