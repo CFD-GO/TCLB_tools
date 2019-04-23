@@ -4,11 +4,17 @@ import matplotlib.pyplot as plt
 
 # -------------------- prepare dummy data --------------------
 
-x_range = 1
+x1 = 0.5
+x2 = 31.5
+xm = 0.5*(x1+x2)
+ym = 1
+a = ym / ((xm - x1)*(xm-x2))
 step = 0.01
-x = np.arange(0., x_range, step)
-y = -4 * x * (x - x_range) / (x_range * x_range)
-fig_name = f'sample_plot2D_param_b={x_range}.png'
+x = np.arange(x1, x2, step)
+y = a*(x - x1)*(x-x2)
+
+# y = -4 * x * (x - x_range) / (x_range * x_range)
+fig_name = f'sample_plot2D_param_b={x2-x1}.png'
 
 # -------------------- make dummy plot --------------------
 plt.rcParams.update({'font.size': 14})
@@ -39,7 +45,7 @@ plt.xlim(x.min(), x.max())
 
 
 plt.title(f'Sample plot\n '
-          r'$x_{range}$' + f'={x_range}'
+          r'$x_{range}$' + f'={x2-x1}'
           f'; \t'
           r'$x_{step}$' + f'={step:.4f}')
 plt.xlabel(r'$x_{label}$')

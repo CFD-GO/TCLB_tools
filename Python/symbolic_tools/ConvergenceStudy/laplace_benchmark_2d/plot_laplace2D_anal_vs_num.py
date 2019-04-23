@@ -16,7 +16,7 @@ import numpy as np
 wd = os.getcwd()
 wd = os.path.dirname(wd)  # go level up
 
-lattice_size = 32
+lattice_size = 64
 filename_vtk = f'laplace_template_nx_{lattice_size}_ny_{lattice_size + 2}_VTK_P00_00250000.vti'
 
 home = pwd.getpwuid(os.getuid()).pw_dir
@@ -70,8 +70,8 @@ fig = plt.figure(figsize=(12, 8))
 ax = fig.gca(projection='3d')
 
 # alpha=1, rstride=1, cstride=1)
-ax.plot_surface(xx, yy, T_err_field, cmap='winter', linewidth=0.5, antialiased=True, zorder=0.5, label='T_err_field')
-ax.plot_surface(xx, yy, T_num,  cmap='summer', linewidth=0.5, antialiased=True, zorder=0.25, label='T_num')
+# ax.plot_surface(xx, yy, T_err_field, cmap='winter', linewidth=0.5, antialiased=True, zorder=0.5, label='T_err_field')
+# ax.plot_surface(xx, yy, T_num,  cmap='summer', linewidth=0.5, antialiased=True, zorder=0.25, label='T_num')
 ax.plot_surface(xx, yy, T_anal,  cmap='autumn', linewidth=0.5, antialiased=True, zorder=0.1, label='T_anal')
 
 ax.set_xlabel('X')
@@ -88,11 +88,12 @@ ax.zaxis.set_major_formatter(FormatStrFormatter('%.02f'))
 
 plt.title(f'Laplace benchmark\n '
           f'x={xSIZE}[lu] y={ySIZE}[lu] '
-          r'$T_{mse}$' + f'={T_mse:.4f}')
+          # r'$T_{mse}$' + f'={T_mse:.4f}'
+          )
 plt.grid(True)
 
 fake2Dline = mpl.lines.Line2D([0], [0], linestyle="none", c='b', marker='o')
-ax.legend([fake2Dline], [r'$Err_{T} = T_{anal} - T_{num}$'], numpoints=1)
+# ax.legend([fake2Dline], [r'$Err_{T} = T_{anal} - T_{num}$'], numpoints=1)
 plt.show()
 
 print("bye")

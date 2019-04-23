@@ -26,13 +26,14 @@ import time
 
 @dataclass
 class InputForLaplace2DAnalytical:
-    x_high: int
-    y_high: int
+    x_low: float
+    x_high: float
+    y_low: float
+    y_high: float
     step: float
     my_fun: Callable
     n_fourier_terms: int
-    x_low: int = 0
-    y_low: int = 0
+
 
 
 def analytical_laplace_2d(input_config: InputForLaplace2DAnalytical):
@@ -51,8 +52,8 @@ def analytical_laplace_2d(input_config: InputForLaplace2DAnalytical):
 
     print("---------- Calculating Values -------------")
 
-    nx = int((input_config.x_high - input_config.x_low) / input_config.step)
-    ny = int((input_config.y_high - input_config.y_low) / input_config.step)
+    nx = int((input_config.x_high + input_config.x_low) / input_config.step)
+    ny = int((input_config.y_high + input_config.y_low) / input_config.step)
     x_grid = np.linspace(input_config.x_low, input_config.x_high, nx, endpoint=False) + 0.5
     y_grid = np.linspace(input_config.y_low, input_config.y_high, ny, endpoint=False) + 0.5
     xx, yy = np.meshgrid(x_grid, y_grid)
@@ -75,7 +76,7 @@ def analytical_laplace_2d(input_config: InputForLaplace2DAnalytical):
     # New NumPy arrays are by default in row-major order.
     # my_hacked_fun = -4 * x * (x - input_config.x_high)/(input_config.x_high*input_config.x_high)
     for i in range(ny):
-        print(f"=== Doing i/ny: {i}/{ny}  ===")
+        print(f"=== Calculating i/ny: {i}/{ny}  ===")
         for j in range(nx):
             # print(f"Doing i/ny: {i}/{ny} \t j/nx: {j}/{nx}")
             # zz[i][j] = my_hacked_fun.subs({'x': xx[i][j]})

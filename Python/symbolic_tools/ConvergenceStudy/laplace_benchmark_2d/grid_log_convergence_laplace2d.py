@@ -15,6 +15,7 @@ wd = os.getcwd()
 wd = os.path.dirname(wd)  # go level up
 
 lattice_size = np.array([32, 64, 128, 256])
+# lattice_size = np.array([32, 64, 128])
 fig_name = f'LaplaceBenchmark_log_grid_convergence_from_{lattice_size[0]}_to_{lattice_size[-1]}.png'
 
 home = pwd.getpwuid(os.getuid()).pw_dir
@@ -26,45 +27,77 @@ def get_t_mse(folder):
     T_mse = np.zeros(n)
     T_L2 = np.zeros(n)
     for i in range(n):
+        def read_Tnum_data(nx):
+            # --------------- prepare paths ---------------
+            filename_vtk = f'laplace_template_nx_{nx}_ny_{nx + 2}_VTK_P00_00250000.vti'
+            filepath_vtk = os.path.join(main_folder, folder, filename_vtk)
+            vti_reader = VTIFile(filepath_vtk)
 
-        filename_vtk = f'laplace_template_nx_{lattice_size[i]}_ny_{lattice_size[i] + 2}_VTK_P00_00250000.vti'
-        filepath_vtk = os.path.join(main_folder, folder, filename_vtk)
-        vti_reader = VTIFile(filepath_vtk)
+            filename_txt = f'laplace_template_nx_{nx}_ny_{nx + 2}_TXT_P00_00250000_T.txt'
+            filepath_txt = os.path.join(main_folder, folder, filename_txt)
 
-        filename_txt = f'laplace_template_nx_{lattice_size[i]}_ny_{lattice_size[i] + 2}_TXT_P00_00250000_T.txt'
-        filepath_txt = os.path.join(main_folder, folder, filename_txt)
+            T_num_txt = pd.read_csv(filepath_txt, delimiter=" ")
+            T_num = vti_reader.get("T")
+            # U = vti_reader.get("U", vector=True)
 
-        T_num_txt = pd.read_csv(filepath_txt, delimiter=" ")
-        T_num = vti_reader.get("T")
-        U = vti_reader.get("U", vector=True)
+            # --------------- read vti ---------------
+            T_num = np.delete(T_num, 0, axis=0)  # delete first row - extra bc (stops periodicity)
+            n_rows, n_columns = T_num.shape
+            T_num = np.delete(T_num, (n_rows - 1), axis=0)  # delete last row - extra bc (stops periodicity)
 
-        T_num = np.delete(T_num, 0, axis=0)  # delete first row - extra bc (stops periodicity)
+            return T_num
 
-        n_rows, n_columns = T_num.shape
-        T_num = np.delete(T_num, (n_rows - 1), axis=0)  # delete last row - extra bc (stops periodicity)
+        # --------------- analytical solution ---------------
+        T_num = read_Tnum_data(lattice_size[i])
 
-        # -------- analytical solution ---------------
+        # def read_Tanal_data():
         ySIZE, xSIZE = T_num.shape
         step = 1
-        my_fun = -4 * x * (x - xSIZE) / (xSIZE * xSIZE)
-        # TODO: 2 funkcje - jedna dla ABB(przykladaowo z zerami w 1 i 63) druga dla EQ (z zerami w 0.5, 63.5)
-        n_fourier = 25
-        anal_input = InputForLaplace2DAnalytical(xSIZE, ySIZE, step, my_fun, n_fourier)
 
-        dump_fname = os.path.join(main_folder, f'n_fourier{n_fourier}', f'T_anal_x{xSIZE}y{ySIZE}.npy')
+        x1 = 0.5
+        x2 = xSIZE - 0.5
+        if 'abb' in folder:
+            x1 += 0.5
+            x2 -= 0.5
+
+        xm = 0.5 * (x1 + x2)
+        ym = 1
+        a = ym / ((xm - x1) * (xm - x2))
+        my_fun = a * (x - x1) * (x - x2)
+        # my_fun = -4 * x * (x - xSIZE) / (xSIZE * xSIZE)  # old one
+        # TODO: 2 funkcje - jedna dla ABB(przykladaowo z zerami w 1 i 63) druga dla EQ (z zerami w 0.5, 63.5)
+        n_fourier = 5
+        anal_input = InputForLaplace2DAnalytical(
+            x_low=x1, x_high=x2,
+            y_low=x1, y_high=x2,
+            step=step, my_fun=my_fun, n_fourier_terms=n_fourier
+        )
+
+        # dump_fname = os.path.join(main_folder, f'n_fourier{n_fourier}', f'T_anal_x{xSIZE}y{ySIZE}.npy')
+        dump_fname = None
+        if 'abb' in folder:
+            dump_fname = os.path.join(main_folder, f'n_fourier{n_fourier}', f'T_anal_abb_x{xSIZE}y{ySIZE}.npy')
+        else:
+            dump_fname = os.path.join(main_folder, f'n_fourier{n_fourier}', f'T_anal_eq_x{xSIZE}y{ySIZE}.npy')
 
         if os.path.isfile(dump_fname):
             print(f'{dump_fname} found, loading results from disc')
             T_anal = np.load(dump_fname)
-            x_grid = np.linspace(0, xSIZE, xSIZE,  endpoint=False) + 0.5
-            y_grid = np.linspace(0, ySIZE, ySIZE,  endpoint=False) + 0.5
-            xx, yy = np.meshgrid(x_grid, y_grid)
         else:
             print(f'{dump_fname} not found, starting calculations')
             xx, yy, T_anal = analytical_laplace_2d(anal_input)
             np.save(dump_fname, T_anal)
 
-        T_mse[i] = np.sum((T_anal - T_num) * (T_anal - T_num))/len(T_anal)
+        # clip columns --> same shape thus same input for EQ and ABB scheme and comparable L2
+        T_anal = np.delete(T_anal, 0, axis=1)  # delete first column
+        n_rows, n_columns = T_anal.shape
+        T_anal = np.delete(T_anal, (n_columns - 1), axis=1)  # delete last column
+
+        T_num = np.delete(T_num, 0, axis=1)  # delete first column
+        n_rows, n_columns = T_num.shape
+        T_num = np.delete(T_num, (n_columns - 1), axis=1)  # delete last column
+
+        # T_mse[i] = np.sum((T_anal - T_num) * (T_anal - T_num))/len(T_anal)
         T_L2[i] = np.sqrt(
                             np.sum((T_anal - T_num) * (T_anal - T_num))
                             / np.sum(T_anal*T_anal)
