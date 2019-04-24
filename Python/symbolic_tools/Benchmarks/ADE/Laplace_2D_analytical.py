@@ -23,6 +23,8 @@ from typing import Callable
 from dataclasses import dataclass
 import time
 
+import os
+import pwd
 
 @dataclass
 class InputForLaplace2DAnalytical:
@@ -33,7 +35,6 @@ class InputForLaplace2DAnalytical:
     step: float
     my_fun: Callable
     n_fourier_terms: int
-
 
 
 def analytical_laplace_2d(input_config: InputForLaplace2DAnalytical):
@@ -50,12 +51,18 @@ def analytical_laplace_2d(input_config: InputForLaplace2DAnalytical):
         c.append(result)
         u_sol += c[k] * sp.sinh(k * pi * y / Lx) * sp.sin(k * pi * x / Lx)
 
+        # result = 2 / (Lx * sp.sinh(k * pi * Ly / Lx)) * integrate(input_config.my_fun * sin(k * pi * x / Lx), lim)
+        # c.append(result)
+        # u_sol += c[k] * sp.sinh(k * pi * y / Lx) * sp.sin(k * pi * x / Lx)
+
     print("---------- Calculating Values -------------")
 
     nx = int((input_config.x_high + input_config.x_low) / input_config.step)
     ny = int((input_config.y_high + input_config.y_low) / input_config.step)
-    x_grid = np.linspace(input_config.x_low, input_config.x_high, nx, endpoint=False) + 0.5
-    y_grid = np.linspace(input_config.y_low, input_config.y_high, ny, endpoint=False) + 0.5
+    x_grid = np.linspace(input_config.x_low, input_config.x_high, nx, endpoint=True)
+    y_grid = np.linspace(input_config.y_low, input_config.y_high, ny, endpoint=True)
+    # x_grid = np.linspace(input_config.x_low, input_config.x_high, nx, endpoint=False) + 0.5
+    # y_grid = np.linspace(input_config.y_low, input_config.y_high, ny, endpoint=False) + 0.5
     xx, yy = np.meshgrid(x_grid, y_grid)
     zz = np.zeros((ny, nx))
 
@@ -84,6 +91,64 @@ def analytical_laplace_2d(input_config: InputForLaplace2DAnalytical):
 
     print(f'\n\n Done in {time.process_time() - start} [s].')
     return xx, yy, zz
+
+
+def prepare_anal_data(ySIZE, xSIZE, folder):
+    x1 = 0.5
+    x2 = xSIZE - 0.5
+    # xm = 0.5 * (x1 + x2)
+    # ym = 1
+    # if 'abb' in folder:
+    #     a = ym / ((xm - (x1+0.5)) * (xm - (x2-0.5)))
+    #     my_fun = a * (x - (x1+0.5)) * (x - (x2-0.5))
+    # else:
+    #     a = ym / ((xm - x1) * (xm - x2))
+    #     my_fun = a * (x - x1) * (x - x2)
+    #
+    # n_fourier = 25
+    # anal_input = InputForLaplace2DAnalytical(
+    #     x_low=x1, x_high=x2,
+    #     y_low=x1, y_high=x2,
+    #     step=1, my_fun=my_fun, n_fourier_terms=n_fourier
+    # )
+
+
+    # SIN fun version
+    A = sp.pi / (x2 - x1)
+    B = x1
+    my_sin_fun = sp.sin(A * (x - B))
+
+    n_fourier = 4
+    anal_input = InputForLaplace2DAnalytical(
+        x_low=x1, x_high=x2,
+        y_low=x1, y_high=x2,
+        step=1, my_fun=my_sin_fun, n_fourier_terms=n_fourier
+    )
+
+
+    # dump_fname = os.path.join(main_folder, f'n_fourier{n_fourier}', f'T_anal_x{xSIZE}y{ySIZE}.npy')  # old
+
+    # two functions are needed - one for ABB(with zeros in 1 and 63) and second for EQ (zeros in 0.5 and 63.5)
+    upper_folder = os.path.dirname(folder)
+    dump_fname = None
+    if 'abb' in folder:
+        dump_fname = os.path.join(upper_folder, f'n_fourier{n_fourier}', f'T_anal_abb_x{xSIZE}y{ySIZE}.npy')
+    else:
+        dump_fname = os.path.join(upper_folder, f'n_fourier{n_fourier}', f'T_anal_eq_x{xSIZE}y{ySIZE}.npy')
+
+    if os.path.isfile(dump_fname):
+        print(f'{dump_fname} found, loading results from disc')
+        (xx, yy, T_anal) = np.load(dump_fname)
+        # T_anal = np.load(dump_fname)
+    else:
+        print(f'{dump_fname} not found, starting calculations')
+        xx, yy, T_anal = analytical_laplace_2d(anal_input)
+        fourier_folder = os.path.dirname(dump_fname)
+        if not os.path.exists(fourier_folder):
+            os.makedirs(fourier_folder)
+        np.save(dump_fname, (xx, yy, T_anal))
+
+    return xx, yy, T_anal
 
 
 def make_anal_plot(xx, yy, zz):

@@ -1,5 +1,6 @@
 from sympy.abc import x
 from Benchmarks.ADE.Laplace_2D_analytical import analytical_laplace_2d, InputForLaplace2DAnalytical, make_anal_plot
+from Benchmarks.ADE.Laplace_2D_analytical import prepare_anal_data
 
 from DataIO.VTIFile import VTIFile
 import os
@@ -14,13 +15,13 @@ import numpy as np
 wd = os.getcwd()
 wd = os.path.dirname(wd)  # go level up
 
-lattice_size = np.array([32, 64, 128, 256])
-# lattice_size = np.array([32, 64, 128])
+# lattice_size = np.array([32, 64, 128, 256])
+lattice_size = np.array([32, 64])
 fig_name = f'LaplaceBenchmark_log_grid_convergence_from_{lattice_size[0]}_to_{lattice_size[-1]}.png'
 
 home = pwd.getpwuid(os.getuid()).pw_dir
 main_folder = os.path.join(home, 'DATA_FOR_PLOTS', 'LaplaceBenchmark')
-
+# main_folder = os.path.join(home, 'DATA_FOR_PLOTS', 'LaplaceBenchmark_old')
 
 def get_t_mse(folder):
     n = len(lattice_size)
@@ -30,11 +31,11 @@ def get_t_mse(folder):
         def read_Tnum_data(nx):
             # --------------- prepare paths ---------------
             filename_vtk = f'laplace_template_nx_{nx}_ny_{nx + 2}_VTK_P00_00250000.vti'
-            filepath_vtk = os.path.join(main_folder, folder, filename_vtk)
+            filepath_vtk = os.path.join(folder, filename_vtk)
             vti_reader = VTIFile(filepath_vtk)
 
             filename_txt = f'laplace_template_nx_{nx}_ny_{nx + 2}_TXT_P00_00250000_T.txt'
-            filepath_txt = os.path.join(main_folder, folder, filename_txt)
+            filepath_txt = os.path.join(folder, filename_txt)
 
             T_num_txt = pd.read_csv(filepath_txt, delimiter=" ")
             T_num = vti_reader.get("T")
@@ -49,44 +50,9 @@ def get_t_mse(folder):
 
         # --------------- analytical solution ---------------
         T_num = read_Tnum_data(lattice_size[i])
-
-        # def read_Tanal_data():
         ySIZE, xSIZE = T_num.shape
-        step = 1
 
-        x1 = 0.5
-        x2 = xSIZE - 0.5
-        if 'abb' in folder:
-            x1 += 0.5
-            x2 -= 0.5
-
-        xm = 0.5 * (x1 + x2)
-        ym = 1
-        a = ym / ((xm - x1) * (xm - x2))
-        my_fun = a * (x - x1) * (x - x2)
-        # my_fun = -4 * x * (x - xSIZE) / (xSIZE * xSIZE)  # old one
-        # TODO: 2 funkcje - jedna dla ABB(przykladaowo z zerami w 1 i 63) druga dla EQ (z zerami w 0.5, 63.5)
-        n_fourier = 5
-        anal_input = InputForLaplace2DAnalytical(
-            x_low=x1, x_high=x2,
-            y_low=x1, y_high=x2,
-            step=step, my_fun=my_fun, n_fourier_terms=n_fourier
-        )
-
-        # dump_fname = os.path.join(main_folder, f'n_fourier{n_fourier}', f'T_anal_x{xSIZE}y{ySIZE}.npy')
-        dump_fname = None
-        if 'abb' in folder:
-            dump_fname = os.path.join(main_folder, f'n_fourier{n_fourier}', f'T_anal_abb_x{xSIZE}y{ySIZE}.npy')
-        else:
-            dump_fname = os.path.join(main_folder, f'n_fourier{n_fourier}', f'T_anal_eq_x{xSIZE}y{ySIZE}.npy')
-
-        if os.path.isfile(dump_fname):
-            print(f'{dump_fname} found, loading results from disc')
-            T_anal = np.load(dump_fname)
-        else:
-            print(f'{dump_fname} not found, starting calculations')
-            xx, yy, T_anal = analytical_laplace_2d(anal_input)
-            np.save(dump_fname, T_anal)
+        xx, yy, T_anal = prepare_anal_data(ySIZE, xSIZE, folder)
 
         # clip columns --> same shape thus same input for EQ and ABB scheme and comparable L2
         T_anal = np.delete(T_anal, 0, axis=1)  # delete first column
@@ -99,18 +65,17 @@ def get_t_mse(folder):
 
         # T_mse[i] = np.sum((T_anal - T_num) * (T_anal - T_num))/len(T_anal)
         T_L2[i] = np.sqrt(
-                            np.sum((T_anal - T_num) * (T_anal - T_num))
-                            / np.sum(T_anal*T_anal)
-                        )  # Eq. 4.57
-
+                          np.sum((T_anal - T_num) * (T_anal - T_num))
+                          / np.sum(T_anal*T_anal)
+                         )  # Eq. 4.57
 
         # print(f"T_mse={T_mse} for grid {x_size[i]} x {x_size[i]} [lu]")
     return T_L2
     # return T_mse
 
 
-T_err_EQ = get_t_mse('eq_scheme_laplace_template')
-T_err_ABB = get_t_mse('abb_laplace_template')
+T_err_EQ = get_t_mse(os.path.join(main_folder, 'eq_scheme_laplace_template'))
+T_err_ABB = get_t_mse(os.path.join(main_folder, 'abb_laplace_template'))
 
 # T_mse_EQ = get_t_mse('eq_scheme_laplace_template_without_wall')
 # T_mse_ABB = get_t_mse('abb_laplace_template_without_wall')
@@ -148,7 +113,7 @@ ax1.plot(lattice_size, y_2nd,
 
 ax1.set_xscale('log')
 ax1.set_yscale('log')
-# ax1.set_xticks(x_size)
+ax1.set_xticks(lattice_size)
 
 ax1.get_xaxis().set_major_formatter(matplotlib.ticker.ScalarFormatter())
 plt.title(f'Laplace Benchmark - Grid Convergence Study\n '
