@@ -31,8 +31,7 @@ def get_t_mse(folder):
         T_num = vti_reader.get("T")
         ySIZE, xSIZE = T_num.shape
         assert ySIZE == xSIZE == lattices[g]
-        step = 1
-        assert xSIZE % step == 0
+        assert xSIZE % 1 == 0
 
         r0 = gauges[g] * (8 / 2)  # inner radius
         r2 = gauges[g] * (30 / 2)  # outer radius
@@ -59,17 +58,14 @@ def get_t_mse(folder):
         anal_input = InputForMultiLayeredPipe(r0, r1, r2, k1, k2, T0, T2)
         pwp = PipeWithinPipe(anal_input)
 
-        nx = int(xSIZE / step)
-        ny = int(ySIZE / step)
-
-        x_grid = np.linspace(0, xSIZE, nx, endpoint=False) + 0.5
-        y_grid = np.linspace(0, ySIZE, ny, endpoint=False) + 0.5
+        x_grid = np.linspace(0, xSIZE, xSIZE, endpoint=False) + 0.5
+        y_grid = np.linspace(0, ySIZE, ySIZE, endpoint=False) + 0.5
         xx, yy = np.meshgrid(x_grid, y_grid)
-        T_anal = np.zeros((ny, nx))
+        T_anal = np.zeros((ySIZE, xSIZE))
 
-        for i in range(ny):
+        for i in range(ySIZE):
             # print(f"=== Doing i/ny: {i}/{ny}  ===")
-            for j in range(nx):
+            for j in range(xSIZE):
                 # print(f"Doing i/ny: {i}/{ny} \t j/nx: {j}/{nx}")
                 r = pwp.get_r_from_xy(xx[i][j], yy[i][j], x0, y0)
                 T_anal[i][j] = pwp.get_temperature_r(r)

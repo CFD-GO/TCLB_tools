@@ -1,5 +1,6 @@
 from sympy.abc import x
 from Benchmarks.ADE.Laplace_2D_analytical import analytical_laplace_2d, InputForLaplace2DAnalytical
+from Benchmarks.ADE.Laplace_2D_analytical import prepare_anal_data
 
 from DataIO.VTIFile import VTIFile
 import os
@@ -21,8 +22,9 @@ filename_vtk = f'laplace_template_nx_{lattice_size}_ny_{lattice_size + 2}_VTK_P0
 
 home = pwd.getpwuid(os.getuid()).pw_dir
 main_folder = os.path.join(home, 'DATA_FOR_PLOTS', 'LaplaceBenchmark')
-filepath_vtk = os.path.join(main_folder, 'eq_scheme_laplace_template', filename_vtk)
-# filepath_vtk = os.path.join(main_folder, 'DATA_FOR_PLOTS', 'abb_laplace_template', filename_vtk)
+folder = os.path.join(main_folder, 'eq_scheme_laplace_template')
+# folder = os.path.join(main_folder, 'abb_laplace_template')
+filepath_vtk = os.path.join(folder, filename_vtk)
 
 vti_reader = VTIFile(filepath_vtk)
 T_num = vti_reader.get("T")
@@ -33,25 +35,8 @@ T_num = np.delete(T_num, 0, axis=0)  # obligatory delete first row - wall bc (st
 n_rows, n_columns = T_num.shape
 T_num = np.delete(T_num, (n_rows - 1), axis=0)  # delete last row - extra heater bc?!
 
-# -------- analytical solution ---------------
-ySIZE, xSIZE = T_num.shape
-step = 1
-my_fun = -4 * x * (x - xSIZE) / (xSIZE * xSIZE)
-n_fourier = 25
-anal_input = InputForLaplace2DAnalytical(xSIZE, ySIZE, step, my_fun, n_fourier)
+xx, yy, T_anal = prepare_anal_data(*T_num.shape, folder)
 
-dump_fname = os.path.join(main_folder, f'n_fourier{n_fourier}', f'T_anal_x{xSIZE}y{ySIZE}.npy')
-
-if os.path.isfile(dump_fname):
-    print(f'{dump_fname} found, loading results from disc')
-    T_anal = np.load(dump_fname)
-    x_grid = np.linspace(0, xSIZE, xSIZE, endpoint=False) + 0.5
-    y_grid = np.linspace(0, ySIZE, ySIZE, endpoint=False) + 0.5
-    xx, yy = np.meshgrid(x_grid, y_grid)
-else:
-    print(f'{dump_fname} not found, starting calculations')
-    xx, yy, T_anal = analytical_laplace_2d(anal_input)
-    np.save(dump_fname, T_anal)
 
 # make_anal_plot(xx, yy, T_anal)
 # -------- error norm ---------------
@@ -87,7 +72,7 @@ ax.zaxis.set_major_formatter(FormatStrFormatter('%.02f'))
 # fig.colorbar(surf, shrink=0.5, aspect=5)
 
 plt.title(f'Laplace benchmark\n '
-          f'x={xSIZE}[lu] y={ySIZE}[lu] '
+          f'lattice size={T_num.shape}[lu] '
           # r'$T_{mse}$' + f'={T_mse:.4f}'
           )
 plt.grid(True)
