@@ -20,8 +20,11 @@ def get_Nu_cylinder_by_Churchill_Bernstein(Re, Pr):
     D is the specific dimension - diameter
     k is heat conductivity [W/(m*K)]
     """
+    RePr = Re*Pr
+    if RePr < 0.2:
+        raise Exception(f"Correlation is valid for Re*Pr > 0.2, smooth surface. RePr={RePr} ")
 
-    Nu_cylinder = (0.62 * pow(Re, 2) * pow(Pr, 3))/pow((1+pow(0.4*Pr, 2/3)),1/4)
+    Nu_cylinder = (0.62 * pow(Re, 2) * pow(Pr, 3))/pow((1+pow(0.4*Pr, 2/3)), 1/4)
     Nu_cylinder *= pow(1 + pow(Re/282000, 5/8), 4/5)
     Nu_cylinder += 0.3
 
