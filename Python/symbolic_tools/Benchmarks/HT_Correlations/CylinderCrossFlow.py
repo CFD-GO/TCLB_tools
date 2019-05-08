@@ -31,10 +31,12 @@ print(f"average heat transfer coefficient from correlations={ht_coeff:0.6f} [W/(
 
 
 # Newton's law of cooling
+# To find heat flux in Paraview: Slice -> Calculator (T*U.X) --> Integrate Variables
+
 Surface = np.pi*D * 1  # [m2]
 # Surface = 150
 # q_conv = 0.05  # 0.053 [W]
-q_conv = 0.14  # [W]
+q_conv = 0.218  # [W]
 T_surf = 1
 T_inf = 0
 ht_coeff_N=q_conv/(Surface*(T_surf-T_inf))
