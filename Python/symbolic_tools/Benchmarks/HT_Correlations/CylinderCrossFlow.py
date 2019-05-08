@@ -1,9 +1,9 @@
 import numpy as np
-from Benchmarks.HT_Correlations.HT_Nu_Correlations import get_Nu_cylinder_by_Churchill_Bernstein
+from Benchmarks.HT_Correlations.HT_Nu_Correlations import get_Nu_cylinder_by_Churchill_Bernstein, get_Nu_cylinder_by_Zukauskas_Jacob
 
 
 # input in LB units
-Re = 100
+Re = 10
 u = 0.01
 D = 30
 
@@ -23,18 +23,39 @@ print(f"conductivity={k:0.6f} \t tau_k={tau_k:0.3f} \t omega_k={1/tau_k:0.3f}")
 
 
 Nu = get_Nu_cylinder_by_Churchill_Bernstein(Re=Re, Pr=Pr)
+# Nu = get_Nu_cylinder_by_Zukauskas_Jacob(Re=Re, Pr=Pr)
 print(f"Nu={Nu:0.3f}")
 
 ht_coeff = Nu*k/D
-print(f"average heat transfer coefficient from correlations={ht_coeff:0.3f} [W/(m2*K)]")
+print(f"average heat transfer coefficient from correlations={ht_coeff:0.6f} [W/(m2*K)]")
 
 
 # Newton's law of cooling
-Surface = np.pi*D *1 # [m2]
-q_conv = 4068/150 #0.053  # [W]
+Surface = np.pi*D * 1  # [m2]
+# Surface = 150
+# q_conv = 0.05  # 0.053 [W]
+q_conv = 0.14  # [W]
 T_surf = 1
 T_inf = 0
-ht_coeff_N=q_conv/Surface*(T_surf-T_inf)
-print(f"experimental heat transfer coefficient = {ht_coeff_N:0.3f} [W/(m2*K)]")
-# some notes on channel dimension
+ht_coeff_N=q_conv/(Surface*(T_surf-T_inf))
+print(f"experimental heat transfer coefficient = {ht_coeff_N:0.6f} [W/(m2*K)]")
+
+# FYI
+# # Air at ISA (15C)
+# nu = 1.47 * 1E-5
+# k = 0.025
+# alpha = 2.04 * 1E-5
+# rho = 1.225
+# cp = 1006
+# Pr=0.7323
+#
+# # Air at 100C
+# nu = 2.306 * 1E-5
+# k = 0.03095
+# alpha = 3.243 * 1E-5
+# rho = 0.9458
+# cp = 1009
+# Pr = 0.7111
+#
+
 
