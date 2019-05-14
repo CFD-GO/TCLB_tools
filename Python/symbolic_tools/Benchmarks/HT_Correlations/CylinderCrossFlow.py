@@ -17,7 +17,7 @@ tau = 3*v + 0.5
 print(f"viscosity={v:0.6f} \t tau={tau:0.3f} \t omega={1/tau:0.3f}")
 
 alpha = v/Pr  # thermal diffusivity
-k = alpha*rho*cp # thermal conductivity
+k = alpha*rho*cp  # thermal conductivity
 tau_k = 3*k + 0.5
 print(f"conductivity={k:0.6f} \t tau_k={tau_k:0.3f} \t omega_k={1/tau_k:0.3f}")
 

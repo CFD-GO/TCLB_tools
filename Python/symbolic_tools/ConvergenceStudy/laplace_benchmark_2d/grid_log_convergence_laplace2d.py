@@ -37,7 +37,7 @@ def get_t_mse(folder):
             filename_txt = f'laplace_template_nx_{nx}_ny_{nx + 2}_TXT_P00_00250000_T.txt'
             filepath_txt = os.path.join(folder, filename_txt)
 
-            T_num_txt = pd.read_csv(filepath_txt, delimiter=" ")
+            T_num_txt = pd.read_csv(filepath_txt, delimiter=" ",  header=None)
             T_num = vti_reader.get("T")
             # U = vti_reader.get("U", vector=True)
 
