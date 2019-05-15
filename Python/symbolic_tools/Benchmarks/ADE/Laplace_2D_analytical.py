@@ -64,8 +64,12 @@ def prepare_anal_data_new(ySIZE, xSIZE, folder):
             # although the BC is effectively imposed in a mid-node location,
             # the (non-physical) values are also computed at the nodes
             # to make both wet-node/link-wise reference solutions of the same size.
+            # x_grid = np.linspace(start=x1, stop=x2+1, num=x2+2, endpoint=True)
+            # y_grid = np.linspace(start=y1, stop=y2+1, num=y2+2, endpoint=True)
+
             x_grid = np.linspace(start=x1-0.5, stop=x2+0.5, num=x2+2, endpoint=True)
             y_grid = np.linspace(start=y1-0.5, stop=y2+0.5, num=y2+2, endpoint=True)
+            # y_grid = np.linspace(start=y1, stop=y2 + 1, num=y2 + 2, endpoint=True)
 
         xx, yy = np.meshgrid(x_grid, y_grid)
         zz = np.zeros((ySIZE, xSIZE))

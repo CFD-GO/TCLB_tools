@@ -35,11 +35,9 @@ T_num = vti_reader.get("T")
 
 ySIZE, xSIZE = T_num.shape
 assert ySIZE == xSIZE == int(gauge * lattice_size)
-step = 1
-assert xSIZE % step == 0
 
-r0 =gauge * (8 / 2)  # inner radius
-r2 =gauge * (30 / 2)  # outer radius
+r0 = gauge * (8 / 2)  # inner radius
+r2 = gauge * (30 / 2)  # outer radius
 
 abb_correction = 0.5
 # if bc_scheme =='abb_scheme':
@@ -64,17 +62,14 @@ y0 = gauge * (lattice_size / 2)
 anal_input = InputForMultiLayeredPipe(r0, r1, r2, k1, k2, T0, T2)
 pwp = PipeWithinPipe(anal_input)
 
-nx = int(xSIZE / step)
-ny = int(ySIZE / step)
-
-x_grid = np.linspace(0, xSIZE, nx, endpoint=False) + 0.5
-y_grid = np.linspace(0, ySIZE, ny, endpoint=False) + 0.5
+x_grid = np.linspace(0, xSIZE, xSIZE, endpoint=False) + 0.5
+y_grid = np.linspace(0, ySIZE, ySIZE, endpoint=False) + 0.5
 xx, yy = np.meshgrid(x_grid, y_grid)
-T_anal = np.zeros((ny, nx))
+T_anal = np.zeros((ySIZE, xSIZE))
 
-for i in range(ny):
+for i in range(ySIZE):
     # print(f"=== Doing i/ny: {i}/{ny}  ===")
-    for j in range(nx):
+    for j in range(xSIZE):
         # print(f"Doing i/ny: {i}/{ny} \t j/nx: {j}/{nx}")
         r = pwp.get_r_from_xy(xx[i][j], yy[i][j], x0, y0)
         T_anal[i][j] = pwp.get_temperature_r(r)
@@ -82,7 +77,6 @@ for i in range(ny):
         # if r < r0 or r > r2:
         #     T_anal[i][j] = 0
         #     T_num[i][j] = 0
-
 
 T_err_field = T_anal - T_num
 # T_L2 = np.sum(abs(T_err_field)
