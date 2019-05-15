@@ -1,6 +1,5 @@
 from sympy.abc import x
-from Benchmarks.ADE.Laplace_2D_analytical import analytical_laplace_2d, InputForLaplace2DAnalytical, make_anal_plot
-from Benchmarks.ADE.Laplace_2D_analytical import prepare_anal_data
+from Benchmarks.ADE.Laplace_2D_analytical import prepare_anal_data_new, peel_the_skin
 
 from DataIO.VTIFile import VTIFile
 import os
@@ -16,12 +15,11 @@ wd = os.getcwd()
 wd = os.path.dirname(wd)  # go level up
 
 # lattice_size = np.array([32, 64, 128, 256])
-lattice_size = np.array([32, 64])
+lattice_size = np.array([32, 64, 128])
 fig_name = f'LaplaceBenchmark_log_grid_convergence_from_{lattice_size[0]}_to_{lattice_size[-1]}.png'
 
 home = pwd.getpwuid(os.getuid()).pw_dir
 main_folder = os.path.join(home, 'DATA_FOR_PLOTS', 'LaplaceBenchmark')
-# main_folder = os.path.join(home, 'DATA_FOR_PLOTS', 'LaplaceBenchmark_old')
 
 def get_t_mse(folder):
     n = len(lattice_size)
@@ -52,16 +50,9 @@ def get_t_mse(folder):
         T_num = read_Tnum_data(lattice_size[i])
         ySIZE, xSIZE = T_num.shape
 
-        xx, yy, T_anal = prepare_anal_data(ySIZE, xSIZE, folder)
-
-        # clip columns --> same shape thus same input for EQ and ABB scheme and comparable L2
-        T_anal = np.delete(T_anal, 0, axis=1)  # delete first column
-        n_rows, n_columns = T_anal.shape
-        T_anal = np.delete(T_anal, (n_columns - 1), axis=1)  # delete last column
-
-        T_num = np.delete(T_num, 0, axis=1)  # delete first column
-        n_rows, n_columns = T_num.shape
-        T_num = np.delete(T_num, (n_columns - 1), axis=1)  # delete last column
+        xx, yy, T_anal = prepare_anal_data_new(ySIZE, xSIZE, folder)
+        T_num = peel_the_skin(T_num)
+        T_anal = peel_the_skin(T_anal)
 
         # T_mse[i] = np.sum((T_anal - T_num) * (T_anal - T_num))/len(T_anal)
         T_L2[i] = np.sqrt(
@@ -77,15 +68,10 @@ def get_t_mse(folder):
 T_err_EQ = get_t_mse(os.path.join(main_folder, 'eq_scheme_laplace_template'))
 T_err_ABB = get_t_mse(os.path.join(main_folder, 'abb_laplace_template'))
 
-# T_mse_EQ = get_t_mse('eq_scheme_laplace_template_without_wall')
-# T_mse_ABB = get_t_mse('abb_laplace_template_without_wall')
-
 print("------------------------------------ PLOT ------------------------------------")
 
-# initial_error_1st = 0.0025
-initial_error_1st = 0.034
+initial_error_1st = 0.040
 y_1st = lattice_size.min() * initial_error_1st / lattice_size
-# initial_error_2nd = 0.0015
 initial_error_2nd = 0.022
 y_2nd = lattice_size.min() * lattice_size.min() * initial_error_2nd / (lattice_size * lattice_size)
 

@@ -26,8 +26,8 @@ Nu = get_Nu_cylinder_by_Churchill_Bernstein(Re=Re, Pr=Pr)
 # Nu = get_Nu_cylinder_by_Zukauskas_Jacob(Re=Re, Pr=Pr)
 print(f"Nu={Nu:0.3f}")
 
-ht_coeff = Nu*k/D
-print(f"average heat transfer coefficient from correlations={ht_coeff:0.6f} [W/(m2*K)]")
+ht_coeff_correl = Nu*k/D
+print(f"average heat transfer coefficient from correlations={ht_coeff_correl:0.6f} [W/(m2*K)]")
 
 
 # Newton's law of cooling
@@ -39,8 +39,10 @@ Surface = np.pi*D * 1  # [m2]
 q_conv = 0.218  # [W]
 T_surf = 1
 T_inf = 0
-ht_coeff_N=q_conv/(Surface*(T_surf-T_inf))
-print(f"experimental heat transfer coefficient = {ht_coeff_N:0.6f} [W/(m2*K)]")
+ht_coeff_experimental= q_conv / (Surface * (T_surf - T_inf))
+print(f"experimental heat transfer coefficient = {ht_coeff_experimental:0.6f} [W/(m2*K)]")
+
+print(f"experimental/correlation heat transfer coefficient = {ht_coeff_experimental/ht_coeff_correl:0.6f} [-]")
 
 # FYI
 # # Air at ISA (15C)
