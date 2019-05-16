@@ -32,10 +32,10 @@ def get_t_mse(folder):
             filepath_vtk = os.path.join(folder, filename_vtk)
             vti_reader = VTIFile(filepath_vtk)
 
-            filename_txt = f'laplace_template_nx_{nx}_ny_{nx + 2}_TXT_P00_00250000_T.txt'
-            filepath_txt = os.path.join(folder, filename_txt)
+            # filename_txt = f'laplace_template_nx_{nx}_ny_{nx + 2}_TXT_P00_00250000_T.txt'
+            # filepath_txt = os.path.join(folder, filename_txt)
+            # T_num_txt = pd.read_csv(filepath_txt, delimiter=" ",  header=None)
 
-            T_num_txt = pd.read_csv(filepath_txt, delimiter=" ",  header=None)
             T_num = vti_reader.get("T")
             # U = vti_reader.get("U", vector=True)
 
@@ -54,7 +54,7 @@ def get_t_mse(folder):
         T_num = peel_the_skin(T_num)
         T_anal = peel_the_skin(T_anal)
 
-        # T_mse[i] = np.sum((T_anal - T_num) * (T_anal - T_num))/len(T_anal)
+        T_mse[i] = np.sum((T_anal - T_num) * (T_anal - T_num))/len(T_anal)
         T_L2[i] = np.sqrt(
                           np.sum((T_anal - T_num) * (T_anal - T_num))
                           / np.sum(T_anal*T_anal)
@@ -66,7 +66,7 @@ def get_t_mse(folder):
 
 
 T_err_EQ = get_t_mse(os.path.join(main_folder, 'eq_scheme_laplace_template'))
-T_err_ABB = get_t_mse(os.path.join(main_folder, 'abb_laplace_template'))
+T_err_ABB = get_t_mse(os.path.join(main_folder, 'abb_laplace_template_corr05'))
 
 print("------------------------------------ PLOT ------------------------------------")
 

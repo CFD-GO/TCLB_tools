@@ -17,7 +17,8 @@ basic_lattice_size = 32
 gauges = np.array([1, 2, 4, 8])
 lattices = gauges * basic_lattice_size
 
-cht = ""  # "cht_" or empty string ""
+k_inner = 0.1  # k_inner is fixed
+k_outer = 0.1  # 0.01, 0.001
 
 def get_t_mse(folder):
     n = len(gauges)
@@ -25,7 +26,9 @@ def get_t_mse(folder):
     T_L2 = np.zeros(n)
 
     for g in range(n):
-        filepath_vtk = os.path.join(folder, f'ruraWrurze_{cht}{lattices[g]}lu', f'ruraWrurze_{cht}VTK_P00_00500000.vti')
+        filepath_vtk = os.path.join(folder,
+                                    f'k_outer_{k_outer}_size_{lattices[g]}lu',
+                                    f'k_outer_{k_outer}_size_{lattices[g]}lu_VTK_P00_00500000.vti')
         vti_reader = VTIFile(filepath_vtk)
 
         T_num = vti_reader.get("T")
@@ -37,25 +40,16 @@ def get_t_mse(folder):
         r2 = gauges[g] * (30 / 2)  # outer radius
 
         abb_correction = 0.5
-        if 'eq_scheme' in filepath_vtk:
+        if 'abb_scheme' in filepath_vtk:
             r0 -= abb_correction
             r2 += abb_correction
 
-        # r1 = (r0 + r2) / 2  # interface between layers
         r1 = gauges[g] * (20 / 2)  # interface between layers
-        k1 = 0.1  # inner layer - heat conductivity for r0 < r < r1
-        k2 = 0.01  # outer layer - heat conductivity for r1 < r < r2
-        if not cht:
-            k2 = k1  # outer layer - heat conductivity for r1 < r < r2
-
-        T0 = 0  # temperature for r = r0
-        T2 = 1  # temperature for r = r2
-
         x0 = lattices[g] / 2  # center of the pipe
         y0 = lattices[g] / 2
 
         # ----------------------- compute anal solution ---------------------------
-        anal_input = InputForMultiLayeredPipe(r0, r1, r2, k1, k2, T0, T2)
+        anal_input = InputForMultiLayeredPipe(r0, r1, r2, k_inner, k_outer, T0=0, T2=1)
         pwp = PipeWithinPipe(anal_input)
 
         x_grid = np.linspace(0, xSIZE, xSIZE, endpoint=False) + 0.5
@@ -70,33 +64,42 @@ def get_t_mse(folder):
                 r = pwp.get_r_from_xy(xx[i][j], yy[i][j], x0, y0)
                 T_anal[i][j] = pwp.get_temperature_r(r)
 
-                if r < r0 or r > r2:
-                    T_anal[i][j] = 0
-                    T_num[i][j] = 0
+                # if r < r0 or r > r2:
+                #     T_anal[i][j] = 0
+                #     T_num[i][j] = 0
+
+        # 2d clip
+        T_anal = T_anal[:, int(xSIZE / 2)]
+        T_num = T_num[:, int(xSIZE / 2)]
 
         T_L2[g] = np.sqrt(
             np.sum((T_anal - T_num) * (T_anal - T_num))
             / np.sum(T_anal * T_anal))  # Eq. 4.57
 
-        # print(f"T_mse={T_mse} for grid {x_size[i]} x {x_size[i]} [lu]")
-    return T_L2
 
+        T_mse[g] = np.sum((T_anal - T_num) * (T_anal - T_num)) / len(T_anal)
+        print(f"T_mse={T_mse[g]:.2e} for grid {xSIZE} x {xSIZE} [lu]")
+        print(f"T_L2={T_L2[g]:.2e} for grid {xSIZE} x {xSIZE} [lu]")
+    return T_L2
+    # return T_mse
 
 
 home = pwd.getpwuid(os.getuid()).pw_dir
-
-T_err_EQ = get_t_mse(os.path.join(home, 'DATA_FOR_PLOTS', 'ruraWrurzeBenchmark', 'eq_scheme'))
-T_err_ABB = get_t_mse(os.path.join(home, 'DATA_FOR_PLOTS', 'ruraWrurzeBenchmark', 'abb_scheme'))
+T_err_EQ = get_t_mse(os.path.join(home, 'DATA_FOR_PLOTS', 'batch_ruraWrurze_variable_k', 'eq_scheme'))
+T_err_ABB = get_t_mse(os.path.join(home, 'DATA_FOR_PLOTS', 'batch_ruraWrurze_variable_k', 'abb_scheme'))
 
 
 print("------------------------------------ PLOT ------------------------------------")
-fig_name = f'pipe_within_pipe_grid_convergence.png'
+fig_name = f'pipe_within_pipe_grid_convergence_k_inner{k_inner}_k_outer{k_outer}.png'
 
 initial_error_05st = 0.070
 y_05st = np.sqrt(lattices.min())*initial_error_05st/np.sqrt(lattices)
-initial_error_1st = 0.034
+initial_error_1st = 0.2
+# initial_error_1st = 0.044
+# initial_error_1st = 4.7e-4  # mse
 y_1st = lattices.min()*initial_error_1st/lattices
-initial_error_2nd = 0.011
+initial_error_2nd = 0.01
+# initial_error_2nd = 1.0e-5  # mse
 y_2nd = lattices.min()*lattices.min()*initial_error_2nd/(lattices*lattices)
 
 
@@ -110,7 +113,6 @@ ax1.plot(lattices, T_err_EQ,
 ax1.plot(lattices, T_err_ABB,
          color="black", marker=">", markevery=1, markersize=5, linestyle="", linewidth=2,
          label='Anti-Bounce-Back scheme')
-
 
 # ax1.plot(lattices, y_05st,
 #          color="black", marker="", markevery=1, markersize=5, linestyle=":", linewidth=2,
@@ -127,10 +129,13 @@ ax1.plot(lattices, y_2nd,
 
 ax1.set_xscale('log')
 ax1.set_yscale('log')
-# ax1.set_xticks(lattices)
+ax1.set_xticks(lattices)
+
 
 ax1.get_xaxis().set_major_formatter(matplotlib.ticker.ScalarFormatter())
-plt.title(f'{cht} Pipe within pipe Benchmark - Grid Convergence Study\n '
+plt.title(f'Pipe within pipe Benchmark - Grid Convergence Study\n '
+          r'$k_{inner}$=' + f'{k_inner} \t;\t' 
+          r'$k_{outer}$=' + f'{k_outer} '
           # r'$x_{range}$' + f'={range}'
           # f'; \t'
           # r'$x_{step}$' + f'={step:.4f}'

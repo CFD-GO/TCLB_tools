@@ -1,6 +1,5 @@
 from sympy.abc import x
-from Benchmarks.ADE.Laplace_2D_analytical import analytical_laplace_2d, InputForLaplace2DAnalytical, make_anal_plot
-
+from Benchmarks.ADE.Laplace_2D_analytical import prepare_anal_data_new
 from DataIO.VTIFile import VTIFile
 import os
 import pwd
