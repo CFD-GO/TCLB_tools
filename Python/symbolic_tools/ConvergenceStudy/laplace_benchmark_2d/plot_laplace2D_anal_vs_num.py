@@ -16,15 +16,15 @@ import numpy as np
 wd = os.getcwd()
 wd = os.path.dirname(wd)  # go level up
 
-lattice_size = 64
+lattice_size = 32
 filename_vtk = f'laplace_template_nx_{lattice_size}_ny_{lattice_size + 2}_VTK_P00_00250000.vti'
 
 home = pwd.getpwuid(os.getuid()).pw_dir
 main_folder = os.path.join(home, 'DATA_FOR_PLOTS', 'LaplaceBenchmark')
-folder = os.path.join(main_folder, 'eq_scheme_laplace_template')
+# folder = os.path.join(main_folder, 'eq_scheme_laplace_template')
 # folder = os.path.join(main_folder, 'abb_laplace_template')
 
-# folder = os.path.join(main_folder, 'abb_laplace_template_corr05')  # refers to tclb:  real_t x1 = 0.5; nreal_t x2 = PeriodX-0.5;
+folder = os.path.join(main_folder, 'abb_laplace_template_corr05')  # refers to tclb:  real_t x1 = 0.5; nreal_t x2 = PeriodX-0.5;
 # folder = os.path.join(main_folder, 'abb_laplace_template_corr1')  # refers to tclb:  real_t x1 = 1.0; nreal_t x2 = PeriodX-1.0;
 filepath_vtk = os.path.join(folder, filename_vtk)
 
@@ -65,16 +65,16 @@ T_L2 = np.sqrt(
     / np.sum(T_anal * T_anal)
 )
 print(f"T_mse={T_mse}")
-
+print(f"T_L2={T_L2}")
 print("---------- PLOTTING -------------")
 
 fig = plt.figure(figsize=(12, 8))
 ax = fig.gca(projection='3d')
 
 # alpha=1, rstride=1, cstride=1)
-ax.plot_surface(xx, yy, T_err_field, cmap='winter', linewidth=0.5, antialiased=True, zorder=0.5, label='T_err_field')
-# ax.plot_surface(xx, yy, T_num,  cmap='summer', linewidth=0.5, antialiased=True, zorder=0.25, label='T_num')
-# ax.plot_surface(xx, yy, T_anal,  cmap='autumn', linewidth=0.5, antialiased=True, zorder=0.1, label='T_anal')
+# ax.plot_surface(xx, yy, T_err_field, cmap='winter', linewidth=0.5, antialiased=True, zorder=0.5, label='T_err_field')
+ax.plot_surface(xx, yy, T_num,  cmap='summer', linewidth=0.5, antialiased=True, zorder=0.25, label='T_num')
+ax.plot_surface(xx, yy, T_anal,  cmap='autumn', linewidth=0.5, antialiased=True, zorder=0.1, label='T_anal')
 
 ax.set_xlabel('X')
 ax.set_ylabel('Y')

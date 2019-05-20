@@ -14,12 +14,12 @@ import numpy as np
 wd = os.getcwd()
 wd = os.path.dirname(wd)  # go level up
 
-# lattice_size = np.array([32, 64, 128, 256])
 lattice_size = np.array([32, 64, 128])
 fig_name = f'LaplaceBenchmark_log_grid_convergence_from_{lattice_size[0]}_to_{lattice_size[-1]}.png'
 
 home = pwd.getpwuid(os.getuid()).pw_dir
 main_folder = os.path.join(home, 'DATA_FOR_PLOTS', 'LaplaceBenchmark')
+
 
 def get_t_mse(folder):
     n = len(lattice_size)

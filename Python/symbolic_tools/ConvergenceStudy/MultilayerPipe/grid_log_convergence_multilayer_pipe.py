@@ -18,7 +18,7 @@ gauges = np.array([1, 2, 4, 8])
 lattices = gauges * basic_lattice_size
 
 k_inner = 0.1  # k_inner is fixed
-k_outer = 0.1  # 0.01, 0.001
+k_outer = 0.01  # 0.01, 0.001
 
 def get_t_mse(folder):
     n = len(gauges)

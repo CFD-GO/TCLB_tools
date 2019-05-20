@@ -86,7 +86,10 @@ def prepare_anal_data_new(ySIZE, xSIZE, folder):
         for k in range(1, n_fourier_terms):  # skip zero
             result = 2 / (Lx * sp.sinh(k * pi * Ly / Lx)) * integrate(my_fun * sin(k * pi * x / Lx), lim)
             c.append(result)
+            # if is_bc_wet_node_type:
             u_sol += c[k] * sp.sinh(k * pi * y / Lx) * sp.sin(k * pi * x / Lx)
+            # else:
+                # u_sol += c[k] * sp.sinh(k * pi * (y-0.5) / Lx) * sp.sin(k * pi * x / Lx)
 
         print("---------- Calculating values on the grid nodes -------------")
         # Row-major order is also known as the C order, as the C programming language uses it.

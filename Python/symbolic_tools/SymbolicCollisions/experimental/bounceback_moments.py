@@ -34,8 +34,15 @@ mom_bc = get_mom_vector_from_discrete_def(lambda i: Symbol('m00') * dcmt.get_pre
 
 print_as_vector(mom_bc, 'drm_pressure_bc')
 
-print("\n\n continuous raw moments: concentration bc")
+print("\n\n discrete raw moments: pressure bc")
+mom_bc = get_mom_vector_from_discrete_def(lambda i: Symbol('m00') * dcmt.get_pressure_bc(i),
+                                          discrete_transform=dcmt.get_cm,
+                                          moments_order=moments_dict[lattice])
 
+print_as_vector(mom_bc, 'dcm_pressure_bc')
+
+
+print("\n\n continuous raw moments: concentration bc")
 mom_bc = get_mom_vector_from_continuous_def(ccmt.get_bc_bb_concentration_cht,
                                           continuous_transformation=ccmt.get_m,
                                           moments_order=moments_dict[lattice])

@@ -177,7 +177,7 @@ class ContinuousCMTransforms:
         eu_dot_f = (self.dzeta - self.u).dot(self.F)
         Sigma2 = self.gamma * self.cs2 / (self.cp * rho)
         H = self.T * self.cp * self.rho
-        result = -2*self.get_Maxwellian_cht_DF(psi=H, _u=self.u, sigma2=Sigma2) * eu_dot_f / (self.cs2)
+        result = -2*self.get_Maxwellian_cht_DF(psi=H, _u=self.u, sigma2=Sigma2) * eu_dot_f / self.cs2
         return result
 
     def get_weight(self):
