@@ -5,3 +5,5 @@
 .spyder*
 *pyc
 .idea/*
+*.png
+*.pdf
