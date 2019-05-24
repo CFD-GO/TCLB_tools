@@ -50,7 +50,7 @@ def get_t_mse(folder):
         T_num = read_Tnum_data(lattice_size[i])
         ySIZE, xSIZE = T_num.shape
 
-        xx, yy, T_anal = prepare_anal_data_new(ySIZE, xSIZE, folder)
+        xx, yy, T_anal = prepare_anal_data_new(ySIZE, xSIZE, folder, shall_recalculate_results=False)
         T_num = peel_the_skin(T_num)
         T_anal = peel_the_skin(T_anal)
 
@@ -65,14 +65,14 @@ def get_t_mse(folder):
     # return T_mse
 
 
-T_err_EQ = get_t_mse(os.path.join(main_folder, 'eq_scheme_laplace_template'))
-T_err_ABB = get_t_mse(os.path.join(main_folder, 'abb_laplace_template_corr05'))
+T_err_EQ = get_t_mse(os.path.join(main_folder, 'eq_sin_scheme_laplace_template'))
+T_err_ABB = get_t_mse(os.path.join(main_folder, 'abb_sin_scheme_laplace_template'))
 
 print("------------------------------------ PLOT ------------------------------------")
 
-initial_error_1st = 0.040
+initial_error_1st = 2.1e-9
 y_1st = lattice_size.min() * initial_error_1st / lattice_size
-initial_error_2nd = 0.022
+initial_error_2nd = 1.4e-9
 y_2nd = lattice_size.min() * lattice_size.min() * initial_error_2nd / (lattice_size * lattice_size)
 
 
@@ -83,10 +83,10 @@ ax1.plot(lattice_size, T_err_EQ,
          color="black", marker="o", markevery=1, markersize=5, linestyle="", linewidth=2,
          label='Equilibrium scheme')
 
-ax1.plot(lattice_size, T_err_ABB,
-         color="black", marker=">", markevery=1, markersize=5, linestyle="", linewidth=2,
-         label='Anti-Bounce-Back scheme')
-
+# ax1.plot(lattice_size, T_err_ABB,
+#          color="black", marker=">", markevery=1, markersize=5, linestyle="", linewidth=2,
+#          label='Anti-Bounce-Back scheme')
+#
 
 ax1.plot(lattice_size, y_1st,
          color="black", marker="", markevery=1, markersize=5, linestyle="--", linewidth=2,

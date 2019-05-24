@@ -21,7 +21,7 @@ Chapter 7 External Forced Convection, p413-414
 def get_Nu_cylinder_by_Churchill_Bernstein(Re, Pr):
     """
     For cross flow above a cylinder.
-    Valid for Re*Pr > 0.2, smooth surface.
+    Valid for Re*Pr > 0.2, smooth surface. best accuracy for Pr ~ 1
     Fluid properties are evaluated at the film temperature T_f =  (T_{surf} + T_{inf})/2
     :param Re:
     :param Pr:
