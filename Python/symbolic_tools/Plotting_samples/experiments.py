@@ -6,8 +6,8 @@ import matplotlib.pyplot as plt
 
 x_range = 1
 step = 0.01
-x = np.arange(0.5, x_range, step)
-y = -4 * x * (x - x_range) / (x_range * x_range)
+x = np.arange(0.0, x_range, step)
+# y = -4 * x * (x - x_range) / (x_range * x_range)
 fig_name = f'sample_plot2D_param_b={x_range}.png'
 
 # -------------------- make dummy plot --------------------
@@ -15,17 +15,24 @@ plt.rcParams.update({'font.size': 14})
 plt.figure(figsize=(14, 8))
 
 axes = plt.gca()
-plt.plot(x, 1/(2*x),
+plt.plot(x, 1/(x+1),
          color="black", marker="", markevery=1, markersize=15, linestyle="--", linewidth=2,
-         label=r'$f^{\star}_i$')
+         label=r'$f^{wall}_{\bar{i}}$')
 
-plt.plot(x, (2*x-1)/(2*x),
+plt.plot(x, x/(x+1),
          color="black", marker="", markevery=1, markersize=15, linestyle="-", linewidth=2,
          label=r'$f^{\star}_{\bar{i}}$')
+# plt.plot(x, 1/(2*x),
+#          color="black", marker="", markevery=1, markersize=15, linestyle="--", linewidth=2,
+#          label=r'$f^{\star}_i$')
+#
+# plt.plot(x, (2*x-1)/(2*x),
+#          color="black", marker="", markevery=1, markersize=15, linestyle="-", linewidth=2,
+#          label=r'$f^{\star}_{\bar{i}}$')
 
 # ------ format y axis ------ #
-yll = y.min()
-yhl = y.max()
+# yll = y.min()
+# yhl = y.max()
 # axes.set_ylim([yll, yhl])
 # axes.set_yticks(np.linspace(yll, yhl, 5))
 # axes.set_yticks(np.arange(yll, yhl, 1E-2))
