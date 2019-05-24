@@ -29,3 +29,12 @@ example = Matrix([1.0 * m00 * uy * (RT ** 1.0 - RT)])
 # example = hardcoded_cm_eq_compressible_D2Q9_thermal
 
 print_as_vector(example, 'abc', raw_output=False)
+
+# TODO:
+#  1.0*m00*(RT*u.y**2 - RT**1.0*u.y**2 + RT**2.0);
+#  reduces to:
+#  m00*(RT*uy2 - RT**uy2 + RT**2.);
+#  and
+#  1.0*m00*u.y*(RT**1.0 - RT);
+#  reduces to:
+#  m00 * u.y * (RT ** 1. - RT);

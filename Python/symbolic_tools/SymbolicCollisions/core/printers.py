@@ -47,7 +47,7 @@ def print_as_vector(some_matrix, print_symbol='default_symbol1', raw_output=Fals
     rows = some_matrix._mat
 
     for i in range(len(rows)):
-        row = rows[i]  # evaluate symbolic constants, like pi
+        row = rows[i]
 
         if raw_output:
             row = str(row)
@@ -100,7 +100,8 @@ def print_as_vector(some_matrix, print_symbol='default_symbol1', raw_output=Fals
                 for square_pattern in square_patterns:
                     to_be_squared = re.findall(r"(\w+)" + square_pattern, row)
                     if len(to_be_squared) > 1:
-                        raise NotImplementedError
+                        raise NotImplementedError('There is to much square patterns '
+                                                  'and I dont know not how to simplify them yet.')
                     elif len(to_be_squared) == 1:
                         row = re.sub(square_pattern, "*" + to_be_squared[0], row)
 
@@ -108,12 +109,3 @@ def print_as_vector(some_matrix, print_symbol='default_symbol1', raw_output=Fals
             print(f"\t{print_symbol}[{i}] = {row};")
         else:
             print(f"\t{print_symbol}{i} = {row};")
-
-# TODO:
-#  1.0*m00*(RT*u.y**2 - RT**1.0*u.y**2 + RT**2.0);
-#  reduces to:
-#  m00*(RT*uy2 - RT**uy2 + RT**2.);
-#  and
-#  1.0*m00*u.y*(RT**1.0 - RT);
-#  reduces to:
-#  m00 * u.y * (RT ** 1. - RT);

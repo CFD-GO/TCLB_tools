@@ -13,7 +13,7 @@ from SymbolicCollisions.core.DiscreteCMTransforms import \
     DiscreteCMTransforms, get_mom_vector_from_discrete_def, get_mom_vector_from_shift_mat
 
 
-lattice = 'D2Q9'
+lattice = 'D3Q27'
 ccmt = ContinuousCMTransforms(dzeta3D, u3D, F3D, rho)
 dcmt = DiscreteCMTransforms(e_D2Q9, u2D, F2D, rho)
 
@@ -71,7 +71,7 @@ print_as_vector(cm_eq, 'cm_eq')
 print('\n//population_eq -> cm_eq - from continous definition: \n'
       'k_mn = integrate(fun, (x, -oo, oo), (y, -oo, oo)) \n'
       'where fun = fM(rho,u,x,y) *(x-ux)^m *(y-uy)^n *(z-uz)^o ')
-cm_eq = get_mom_vector_from_continuous_def(ccmt.get_hydro_DF,
+cm_eq = get_mom_vector_from_continuous_def(ccmt.get_incompressible_DF,
                                            continuous_transformation=ccmt.get_cm,
                                            moments_order=moments_dict[lattice])
 

@@ -2,7 +2,8 @@
 from sympy.matrices import Matrix
 from SymbolicCollisions.core.cm_symbols import m00, rho, cp, cs2_thermal, \
     Fx, Fy, Fz, F_phi_x, F_phi_y, F_phi_z, \
-    ux, uy, ux2, uy2, uxuy
+    ux, uy, ux2, uy2, uxuy, \
+    uz, uz2, uxuz, uyuz
 
 from SymbolicCollisions.core.cm_symbols import Temperature as T
 from SymbolicCollisions.core.cm_symbols import cht_gamma
@@ -183,3 +184,34 @@ hardcoded_cm_eq_incompressible_D2Q9 = Matrix([
 # cm_eq[6] = u.y*(-m00*ux2 - 1./3.*m00 + ux2 + 1./3.);
 # cm_eq[7] = u.x*(-m00*uy2 - 1./3.*m00 + uy2 + 1./3.);
 # cm_eq[8] = m00*ux2*uy2 + 1./3.*m00*ux2 + 1./3.*m00*uy2 + 1./9.*m00 - ux2*uy2 - 1./3.*ux2 - 1./3.*uy2;
+
+
+hardcoded_cm_eq_incompressible_D3Q27 = Matrix([
+    m00,
+    ux*(-m00 + 1),
+    uy*(-m00 + 1),
+    uz*(-m00 + 1),
+    uxuy*(m00 - 1.),
+    uxuz*(m00 - 1.),
+    uyuz*(m00 - 1.),
+    m00*ux2 + 1/3.*m00 - ux2,
+    m00*uy2 + 1/3.*m00 - uy2,
+    m00*uz2 + 1/3.*m00 - uz2,
+    ux*(-m00*uy2 - 1/3.*m00 + uy2 + 1/3.),
+    ux*(-m00*uz2 - 1/3.*m00 + uz2 + 1/3.),
+    uy*(-m00*ux2 - 1/3.*m00 + ux2 + 1/3.),
+    uz*(-m00*ux2 - 1/3.*m00 + ux2 + 1/3.),
+    uy*(-m00*uz2 - 1/3.*m00 + uz2 + 1/3.),
+    uz*(-m00*uy2 - 1/3.*m00 + uy2 + 1/3.),
+    uxuy*uz*(-m00 + 1),
+    m00*ux2*uy2 + 1/3.*m00*ux2 + 1/3.*m00*uy2 + 1/9.*m00 - ux2*uy2 - 1/3.*ux2 - 1/3.*uy2,
+    m00*ux2*uz2 + 1/3.*m00*ux2 + 1/3.*m00*uz2 + 1/9.*m00 - ux2*uz2 - 1/3.*ux2 - 1/3.*uz2,
+    m00*uy2*uz2 + 1/3.*m00*uy2 + 1/3.*m00*uz2 + 1/9.*m00 - uy2*uz2 - 1/3.*uy2 - 1/3.*uz2,
+    uyuz*(m00*ux2 + 1/3.*m00 - ux2 - 1/3.),
+    uxuz*(m00*uy2 + 1/3.*m00 - uy2 - 1/3.),
+    uxuy*(m00*uz2 + 1/3.*m00 - uz2 - 1/3.),
+    ux*(-m00*uy2*uz2 - 1/3.*m00*uy2 - 1/3.*m00*uz2 - 1/9.*m00 + uy2*uz2 + 1/3.*uy2 + 1/3.*uz2 + 1/9.),
+    uy*(-m00*ux2*uz2 - 1/3.*m00*ux2 - 1/3.*m00*uz2 - 1/9.*m00 + ux2*uz2 + 1/3.*ux2 + 1/3.*uz2 + 1/9.),
+    uz*(-m00*ux2*uy2 - 1/3.*m00*ux2 - 1/3.*m00*uy2 - 1/9.*m00 + ux2*uy2 + 1/3.*ux2 + 1/3.*uy2 + 1/9.),
+    m00*ux2*uy2*uz2 + 1/3.*m00*ux2*uy2 + 1/3.*m00*ux2*uz2 + 1/9.*m00*ux2 + 1/3.*m00*uy2*uz2 + 1/9.*m00*uy2 + 1/9.*m00*uz2 + 1/27.*m00 - ux2*uy2*uz2 - 1/3.*ux2*uy2 - 1/3.*ux2*uz2 - 1/9.*ux2 - 1/3.*uy2*uz2 - 1/9.*uy2 - 1/9.*uz2,
+])

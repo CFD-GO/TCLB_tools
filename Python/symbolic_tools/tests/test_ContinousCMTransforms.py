@@ -38,7 +38,7 @@ class TestContinousCMTransforms(unittest.TestCase):
         # where fun = fM(rho,u,x,y) *(x-ux)^m *(y-uy)^n * (z-uz)^o ')
 
         cm_i = ContinuousCMTransforms(dzeta3D, u3D, F3D, rho)
-        cm_eq = get_mom_vector_from_continuous_def(cm_i.get_hydro_DF,
+        cm_eq = get_mom_vector_from_continuous_def(cm_i.get_incompressible_DF,
                                                    continuous_transformation=cm_i.get_cm,
                                                    moments_order=moments_dict['D2Q9'],
                                                    serial_run=True)

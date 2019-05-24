@@ -29,7 +29,7 @@ with warnings.catch_warnings():
     row = moments_dict['D2Q9'][8]
     moment = ccmt.get_cm(row, ccmt.get_Maxwellian_DF)
     print_as_vector(Matrix([moment]), 'particular_moment')
-
+    print_as_vector(Matrix([moment]), 'particular_moment', raw_output=True)
 
 print("\n----------------------- calculate all moments -------------------------------")
 cm_eq = get_mom_vector_from_continuous_def(ccmt.get_Maxwellian_DF,
@@ -40,15 +40,13 @@ print_as_vector(cm_eq, 'cm_eq')
 cm_eq_tot_e = get_mom_vector_from_continuous_def(ccmt.get_total_energy_Maxwellian_DF,
                                            continuous_transformation=ccmt.get_cm,
                                            moments_order=moments_dict[lattice])
-print_as_vector(cm_eq_tot_e, 'cm_eq_tot_e')
+print_as_vector(cm_eq_tot_e, 'cm_eq_tot_e', raw_output=True)
+# print_as_vector(cm_eq_tot_e, 'cm_eq_tot_e', raw_output=False)  # TODO: implement printer for these kind of terms
 
 cm_eq_internal_e = get_mom_vector_from_continuous_def(ccmt.get_internal_energy_Maxwellian_DF,
                                            continuous_transformation=ccmt.get_cm,
                                            moments_order=moments_dict[lattice])
 print_as_vector(cm_eq_internal_e, 'cm_eq_internal_e')
-
-print("\n----------------------- without regex -------------------------------")
-print_as_vector(cm_eq, 'cm_eq', raw_output=True)
 
 print('\n\n Done in %s [s].'
       % str(time.process_time() - start))
