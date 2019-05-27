@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<VTKFile type="PImageData" version="0.1" byte_order="LittleEndian">
+<PImageData WholeExtent="0 1024 0 150 0 3" Origin="0 0 0" Spacing="1 1 1">
+<Piece Extent="0 1024 0 37 0 3" Source="HotKarman3D_template_sizer_1_nu_0.03_k_0.003_VTK_P00_00600000.vti"/>
+<Piece Extent="0 1024 37 74 0 3" Source="HotKarman3D_template_sizer_1_nu_0.03_k_0.003_VTK_P01_00600000.vti"/>
+<Piece Extent="0 1024 74 112 0 3" Source="HotKarman3D_template_sizer_1_nu_0.03_k_0.003_VTK_P02_00600000.vti"/>
+<Piece Extent="0 1024 112 150 0 3" Source="HotKarman3D_template_sizer_1_nu_0.03_k_0.003_VTK_P03_00600000.vti"/>
+<PCellData Scalars="rho" Vectors="velocity">
+<PDataArray type="UInt16" Name="flag" format="binary" encoding="base64" NumberOfComponents="1"/>
+<PDataArray type="UInt8" Name="ADDITIONALS" format="binary" encoding="base64" NumberOfComponents="1"/>
+<PDataArray type="UInt8" Name="ADDITIONALS_HEAT" format="binary" encoding="base64" NumberOfComponents="1"/>
+<PDataArray type="UInt8" Name="BOUNDARY" format="binary" encoding="base64" NumberOfComponents="1"/>
+<PDataArray type="UInt8" Name="COLLISION" format="binary" encoding="base64" NumberOfComponents="1"/>
+<PDataArray type="UInt8" Name="DESIGNSPACE" format="binary" encoding="base64" NumberOfComponents="1"/>
+<PDataArray type="UInt8" Name="OBJECTIVE" format="binary" encoding="base64" NumberOfComponents="1"/>
+<PDataArray type="UInt8" Name="SETTINGZONE" format="binary" encoding="base64" NumberOfComponents="1"/>
+<PDataArray type="UInt8" Name="NONE" format="binary" encoding="base64" NumberOfComponents="1"/>
+<PDataArray type="Float64" Name="Rho" format="binary" encoding="base64" NumberOfComponents="1"/>
+<PDataArray type="Float64" Name="T" format="binary" encoding="base64" NumberOfComponents="1"/>
+<PDataArray type="Float64" Name="U" format="binary" encoding="base64" NumberOfComponents="3"/>
+</PCellData>
+</PImageData>
+</VTKFile>
