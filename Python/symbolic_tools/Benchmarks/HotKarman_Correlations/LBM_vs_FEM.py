@@ -8,7 +8,8 @@ import matplotlib.pyplot as plt
 
 home = pwd.getpwuid(os.getuid()).pw_dir
 main_folder = os.path.join(home, 'DATA_FOR_PLOTS', 'HotBarman3D')
-sizer = 2
+sizer = 1
+clmax = 1
 # readme:
 # sizer 1 = LB mesh: 1000x150x3 -- sample 150 y points from toolbox
 # sizer 2 = LB mesh: 2000x300x6 -- sample 300 y points from toolbox
@@ -33,7 +34,7 @@ T_num_slice = T_num[:, :, 1]
 
 
 # Read data from toolbox
-filepath_csv = os.path.join(main_folder, 'from_toolbox', f'Temperature_{int(150*sizer)}_results_clmax_3_Re_10_Pr_10.csv')
+filepath_csv = os.path.join(main_folder, 'from_toolbox', f'Temperature_{int(150*sizer)}_results_clmax_{clmax}_Re_10_Pr_10.csv')
 # pdT = pd.read_csv(filepath_csv, delimiter=",", header=None)
 pdT2 = pd.read_csv(filepath_csv, delimiter=",")
 # T_toolbox = np.genfromtxt(filepath_csv, delimiter=',', names=True)
@@ -97,6 +98,6 @@ def make_plot(y, T_lbm, T_qs_toolbox, title, fig_name):
 x_cuts = np.array([270, 300, 330, 960, 999])*sizer
 
 for i in range(len(x_cuts)):
-    title = f'LBM vs ToolBox \n {int(1000*sizer)}x{int(150*sizer)}[lu] x_cut={x_cuts[i]}'
-    fig_name = f'LBM_vs_ToolBox_size={int(1000*sizer)}x{int(150*sizer)}[lu]_x_cut={x_cuts[i]}'
+    title = f'LBM vs ToolBox \n {int(1000*sizer)}x{int(150*sizer)}[lu] clmax={clmax} x_cut={x_cuts[i]}'
+    fig_name = f'LBM_vs_ToolBox_size={int(1000*sizer)}x{int(150*sizer)}[lu]_clmax{clmax}_x_cut={x_cuts[i]}'
     make_plot(y, T_num_slice[:, x_cuts[i]], T_toolbox[:, i], title, fig_name)
