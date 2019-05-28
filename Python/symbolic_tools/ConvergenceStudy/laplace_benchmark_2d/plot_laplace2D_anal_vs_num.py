@@ -22,7 +22,6 @@ filename_vtk = f'laplace_template_nx_{lattice_size}_ny_{lattice_size + 2}_VTK_P0
 home = pwd.getpwuid(os.getuid()).pw_dir
 main_folder = os.path.join(home, 'DATA_FOR_PLOTS', 'LaplaceBenchmark')
 folder = os.path.join(main_folder, 'eq_sin_scheme_laplace_template')
-folder = os.path.join(main_folder, 'eq_scheme_laplace_template')
 # folder = os.path.join(main_folder, 'eq_x2_scheme_laplace_template')
 
 # folder = os.path.join(main_folder, 'abb_sin_scheme_laplace_template')
@@ -41,7 +40,7 @@ n_rows, n_columns = T_num.shape
 T_num = np.delete(T_num, (n_rows - 1), axis=0)  # delete last row - extra heater bc
 
 # ---------------------- calculate solution --------------------
-xx, yy, T_anal = prepare_anal_data_new(*T_num.shape, folder, shall_recalculate_results=False)
+xx, yy, T_anal = prepare_anal_data_new(*T_num.shape, folder, shall_recalculate_results=True)
 
 # ---------------------- clip again --------------------
 T_num = peel_the_skin(T_num)
@@ -63,9 +62,9 @@ fig = plt.figure(figsize=(12, 8))
 ax = fig.gca(projection='3d')
 
 # alpha=1, rstride=1, cstride=1)
-# ax.plot_surface(xx, yy, T_err_field, cmap='winter', linewidth=0.5, antialiased=True, zorder=0.5, label='T_err_field')
-ax.plot_surface(xx, yy, T_num,  cmap='summer', linewidth=0.5, antialiased=True, zorder=0.25, label='T_num')
-ax.plot_surface(xx, yy, T_anal,  cmap='autumn', linewidth=0.5, antialiased=True, zorder=0.1, label='T_anal')
+ax.plot_surface(xx, yy, T_err_field, cmap='winter', linewidth=0.5, antialiased=True, zorder=0.5, label='T_err_field')
+# ax.plot_surface(xx, yy, T_num,  cmap='summer', linewidth=0.5, antialiased=True, zorder=0.25, label='T_num')
+# ax.plot_surface(xx, yy, T_anal,  cmap='autumn', linewidth=0.5, antialiased=True, zorder=0.1, label='T_anal')
 
 ax.set_xlabel('X')
 ax.set_ylabel('Y')

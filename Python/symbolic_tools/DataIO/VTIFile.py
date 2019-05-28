@@ -24,14 +24,16 @@ class VTIFile:
         self.data = self.reader.GetOutput()
         self.dim = self.data.GetDimensions()
 
-        self.s_vec = [self.dim[1] - 1, self.dim[0] - 1, 3]
+        # self.s_vec = [self.dim[1] - 1, self.dim[0] - 1, 3]
 
         self.trim_0 = [0, 0, 0]
         self.trim_1 = [x - 1 for x in self.dim]
 
+        self.s_vec = [self.dim[2] - 1, self.dim[1] - 1, self.dim[0] - 1]
         if self.dim[2] > 2:
             self.subspace = np.meshgrid(*[range(self.trim_0[i], self.trim_1[i]) for i in range(3)])
             self.s_scal = [self.dim[2] - 1, self.dim[1] - 1, self.dim[0] - 1]
+
         else:
             self.s_scal = [self.dim[1] - 1, self.dim[0] - 1]
             self.subspace = np.meshgrid(*[range(self.trim_0[i], self.trim_1[i]) for i in range(2)])
@@ -39,18 +41,15 @@ class VTIFile:
         self.dtype = dtype
 
     def get(self, name, vector=False, dtype=False):
-
         if vector:
-            # TODO: vetor may be for 2D data only
-            subspace = np.meshgrid(
-                range(self.trim_0[0], self.trim_1[0]),
-                range(self.trim_0[1], self.trim_1[1]),
-                range(3)
-            )
-            T = np.transpose(VN.vtk_to_numpy(self.data.GetCellData().GetArray(name)).reshape(self.s_vec), (1, 0, 2))[
-                tuple(subspace)]
+            T = VN.vtk_to_numpy(self.data.GetCellData().GetArray(name))
+            ux = np.transpose(T[:, 0].reshape(self.s_vec), (1, 2, 0))
+            uy = np.transpose(T[:, 1].reshape(self.s_vec), (1, 2, 0))
+            uz = np.transpose(T[:, 2].reshape(self.s_vec), (1, 2, 0))
+            return [ux, uy, uz]
         else:
             T = VN.vtk_to_numpy(self.data.GetCellData().GetArray(name)).reshape(self.s_scal).T[tuple(self.subspace)]
+
         if dtype:
             T = np.array(T, dtype=dtype)
         return T
