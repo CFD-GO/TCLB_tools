@@ -15,8 +15,15 @@ clmax = 1
 # sizer 2 = LB mesh: 2000x300x6 -- sample 300 y points from toolbox
 # sizer 4 = LB mesh: 4000x600x12 -- sample 600 y points from toolbox
 
-filename_vtk = f'HotKarman3D_template_sizer_{sizer}_nu_0.03_k_0.003_VTK_P00_00600000.pvti'
-filepath_pvti = os.path.join(main_folder, f'lbm_template_sizer_{sizer}_nu_0.03_k_0.003', filename_vtk)
+
+# filename_vtk = f'HotKarman3D_template_sizer_{sizer}_nu_0.03_k_0.003_VTK_P00_00600000.pvti'
+# filepath_pvti = os.path.join(main_folder, f'lbm_template_sizer_{sizer}_nu_0.03_k_0.003', filename_vtk)
+
+Re = 10
+Pr = 10
+# filename_vtk = f'HotKarman3D_template_sizer_{sizer}_nu_0.03_k_0.003_VTK_P00_01000000.pvti'
+filename_vtk = f'HotKarman3D_template_sizer_{sizer}_Re{Re}_Pr{Pr}_VTK_P00_00980000.pvti'
+filepath_pvti = os.path.join(main_folder, f'keepU_sizer_{sizer}_Re{Re}_Pr{Pr}', filename_vtk)
 
 vti_reader = VTIFile(filepath_pvti, parallel=True)
 
@@ -28,10 +35,10 @@ ux_num_slice = ux_num[:, :, 1]
 T_num_slice = T_num[:, :, 1]
 
 # Read data from toolbox
-filepath_csv = os.path.join(main_folder, 'from_toolbox', f'Temperature_{int(150*sizer)}_results_clmax_{clmax}_Re_10_Pr_10.csv')
+filepath_csv = os.path.join(main_folder, 'from_toolbox', f'Temperature_{int(150*sizer)}_clmax_{clmax}_Re_{Re}_Pr_{Pr}.csv')
 T_toolbox = np.loadtxt(filepath_csv, delimiter=',', skiprows=1)
 
-filepath_csv = os.path.join(main_folder, 'from_toolbox', f'ux_{int(150*sizer)}_results_clmax_{clmax}_Re_10_Pr_10.csv')
+filepath_csv = os.path.join(main_folder, 'from_toolbox', f'ux_{int(150*sizer)}_clmax_{clmax}_Re_{Re}_Pr_{Pr}.csv')
 ux_toolbox = np.loadtxt(filepath_csv, delimiter=',', skiprows=1)
 
 print("data reading complete, lets plot it!")
@@ -54,7 +61,7 @@ def make_plot(y, T_lbm, T_qs_toolbox, x_label, title, fig_name):
 
     plt.plot(T_qs_toolbox, y,
              color="black", marker="", markevery=1, markersize=15, linestyle="--", linewidth=2,
-             label='toolbox')
+             label='FEM')
 
     # ------ format y axis ------ #
     # yll = y.min()
@@ -90,13 +97,16 @@ def make_plot(y, T_lbm, T_qs_toolbox, x_label, title, fig_name):
 # make_plot(y, T_num_slice[:, 330*sizer], T_toolbox[:, 2],  r'$Temperature$', 'title', 'figname')
 # make_plot(y, ux_num_slice[:, 300*sizer], ux_toolbox[:, 1], r'$U_x$', 'title', 'figname')
 #
-x_cuts = np.array([270, 300, 330, 960, 999])*sizer
+x_cuts = np.array([270, 300, 330, 390, 450, 960, 999])*sizer
+cross_sections = ['A', 'B', 'C', 'D', 'E', 'F', 'G']
 
-for i in range(len(x_cuts)):
-    title = f'T_LBM vs ToolBox \n {int(1000*sizer)}x{int(150*sizer)}[lu] clmax={clmax} x_cut={x_cuts[i]}'
-    fig_name = f'T_LBM_vs_ToolBox_size={int(1000*sizer)}x{int(150*sizer)}[lu]_clmax{clmax}_x_cut={x_cuts[i]}'
-    make_plot(y, T_num_slice[:, x_cuts[i]], T_toolbox[:, i], r'$Temperature$', title, fig_name)
-    title = f'Ux LBM vs ToolBox \n {int(1000*sizer)}x{int(150*sizer)}[lu] clmax={clmax} x_cut={x_cuts[i]}'
-    fig_name = f'ux_LBM_vs_ToolBox_size={int(1000*sizer)}x{int(150*sizer)}[lu]_clmax{clmax}_x_cut={x_cuts[i]}'
-    # make_plot(y, ux_num_slice[:, x_cuts[i]], ux_toolbox[:, i], r'$U_x$', title, fig_name)
-    make_plot(y, ux_num_slice[:, x_cuts[i]] * sizer * sizer, ux_toolbox[:, i], r'$U_x$', title, fig_name)  # Re-skalowanie :/
+for i, cross_section in zip(range(len(x_cuts)), cross_sections):
+    title = f'Temperature LBM vs FEM \n {int(1000*sizer)}x{int(150*sizer)}[lu] cross-section {cross_section}'
+    fig_name = f'T_LBM_vs_ToolBox_size={int(1000*sizer)}x{int(150*sizer)}[lu]_clmax{clmax}_Re{Re}_Pr{Pr}_cross_section_{cross_section}'
+    make_plot(y, T_num_slice[:, x_cuts[i]], T_toolbox[:, i], r'$Temperature$', '', fig_name)
+
+    title = r'$U_x$' + f' LBM vs FEM \n {int(1000*sizer)}x{int(150*sizer)}[lu] cross-section {cross_section}'
+    fig_name = f'ux_LBM_vs_ToolBox_size={int(1000*sizer)}x{int(150*sizer)}[lu]_clmax{clmax}_Re{Re}_Pr{Pr}_cross_section_{cross_section}'
+    make_plot(y, ux_num_slice[:, x_cuts[i]], ux_toolbox[:, i], r'$U_x$', '', fig_name)
+
+    # make_plot(y, ux_num_slice[:, x_cuts[i]] * sizer * sizer, ux_toolbox[:, i], r'$U_x$', '', fig_name)  # Re-skalowanie :/
