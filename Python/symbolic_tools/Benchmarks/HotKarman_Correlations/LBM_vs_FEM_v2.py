@@ -12,7 +12,7 @@ main_folder = os.path.join(home, 'DATA_FOR_PLOTS', 'HotBarman3D')
 clmax = 1
 
 Re = 10
-Pr = 1000
+Pr = 10
 
 
 # README:
@@ -20,11 +20,7 @@ Pr = 1000
 # size 2 = LB mesh: 2000x300x6 -- sample 300 y points from toolbox
 # size 4 = LB mesh: 4000x600x12 -- sample 600 y points from toolbox
 
-def read_data_from_LBM(size):
-    # filename_vtk = f'HotKarman3D_template_sizer_{sizer}_nu_0.03_k_0.003_VTK_P00_01000000.pvti'
-    filename_vtk = f'HotKarman3D_template_sizer_{size}_Re{Re}_Pr{Pr}_VTK_P00_00980000.pvti'
-    filepath_pvti = os.path.join(main_folder, f'keepU_sizer_{size}_Re{Re}_Pr{Pr}', filename_vtk)
-
+def read_data_from_LBM(filepath_pvti):
     vti_reader = VTIFile(filepath_pvti, parallel=True)
 
     T_num = vti_reader.get("T")
@@ -63,9 +59,25 @@ cross_sections['F'] = 960
 cross_sections['G'] = 999
 
 T_qs, ux_qs, y_qs = read_data_from_toolbox()
-T_lb_slice1, ux_lb1, y_lb1 = read_data_from_LBM(size=1)
-T_lb_slice2, ux_lb2, y_lb2 = read_data_from_LBM(size=2)
-T_lb_slice3, ux_lb3, y_lb3 = read_data_from_LBM(size=4)
+
+# scaling_type = "keepU"
+scaling_type = "keep_nu_and_k"
+
+T_lb_slice1, ux_lb1, y_lb1 = read_data_from_LBM(
+    os.path.join(main_folder, f'{scaling_type}_sizer_{1}_Re{Re}_Pr{Pr}',
+                 f'HotKarman3D_template_sizer_{1}_Re{Re}_Pr{Pr}_VTK_P00_00980000.pvti'))
+
+T_lb_slice2, ux_lb2, y_lb2 = read_data_from_LBM(
+    os.path.join(main_folder, f'{scaling_type}_sizer_{2}_Re{Re}_Pr{Pr}',
+                 f'HotKarman3D_template_sizer_{2}_Re{Re}_Pr{Pr}_VTK_P00_00980000.pvti'))
+
+# T_lb_slice3, ux_lb3, y_lb3 = read_data_from_LBM(
+#     os.path.join(main_folder, f'{scaling_type}_sizer_{4}_Re{Re}_Pr{Pr}',
+#                  f'HotKarman3D_template_sizer_{4}_Re{Re}_Pr{Pr}_VTK_P00_00980000.pvti'))
+
+T_lb_slice3, ux_lb3, y_lb3 = read_data_from_LBM(
+    os.path.join(main_folder, f'{scaling_type}_sizer_{4}_Re{Re}_Pr{Pr}',
+                 f'HotKarman3D_template_sizer_{4}_Re{Re}_Pr{Pr}_VTK_P00_01900000.pvti'))
 
 
 for cross_section, x_cut in cross_sections.items():
@@ -131,15 +143,15 @@ for cross_section, x_cut in cross_sections.items():
     plt.figure(figsize=(14, 8))
     axes = plt.gca()
 
-    plt.plot(ux_lb1[:, x_cut*1], y_lb1,
+    plt.plot(ux_lb1[:, x_cut*1]*1, y_lb1,
              color="black", marker="", markevery=3, markersize=5, linestyle=":", linewidth=2,
              label='LBM - lattice I')
 
-    plt.plot(ux_lb2[:, x_cut*2], y_lb2,
+    plt.plot(ux_lb2[:, x_cut*2]*2, y_lb2,
              color="black", marker="", markevery=4, markersize=5, linestyle="-.", linewidth=2,
              label='LBM - lattice II')
 
-    plt.plot(ux_lb3[:, x_cut*4], y_lb3,
+    plt.plot(ux_lb3[:, x_cut*4]*4, y_lb3,
              color="black", marker="", markevery=5, markersize=5, linestyle="--", linewidth=2,
              label='LBM - lattice III')
 
