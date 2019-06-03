@@ -16,7 +16,7 @@ sys.path.append(os.path.join('.'))  # allow CI bot to see the stuff from the mai
 from SymbolicCollisions.core.printers import print_as_vector
 
 from SymbolicCollisions.core.hardcoded_results import hardcoded_F_cm_hydro_density_based_D3Q19, \
-    hardcoded_F_cm_Guo_hydro_LB_velocity_based_D2Q9, \
+    hardcoded_F_cm_Guo_hydro_LB_incompressible_D2Q9, \
     hardcoded_F_cm_hydro_density_based_D2Q9, \
     hardcoded_cm_eq_compressible_D2Q9,    hardcoded_cm_eq_compressible_D3Q19, \
     hardcoded_cm_eq_incompressible_D2Q9, \
@@ -152,7 +152,7 @@ class TestContinousCMTransforms(unittest.TestCase):
         expected_results = [
             hardcoded_cm_eq_compressible_D2Q9,
             hardcoded_cm_eq_compressible_D3Q19,
-            hardcoded_F_cm_Guo_hydro_LB_velocity_based_D2Q9,
+            hardcoded_F_cm_Guo_hydro_LB_incompressible_D2Q9,
             hardcoded_F_cm_hydro_density_based_D2Q9,
             hardcoded_F_cm_hydro_density_based_D3Q19,
             hardcoded_cm_eq_cht_D2Q9,

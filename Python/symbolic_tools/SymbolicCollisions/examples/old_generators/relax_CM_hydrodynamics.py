@@ -3,7 +3,7 @@ from SymbolicCollisions.core.cm_symbols import omega_v, omega_b, Mraw_D2Q9, Nraw
 from SymbolicCollisions.core.DiscreteCMTransforms import get_DF, get_m00
 from SymbolicCollisions.core.printers import print_u2, print_as_vector
 from SymbolicCollisions.core.hardcoded_results import hardcoded_cm_eq_incompressible_D2Q9, \
-    hardcoded_F_cm_He_hydro_LB_velocity_based_D2Q9
+    hardcoded_F_cm_He_hydro_LB_incompressible_D2Q9
 
 print("\n\n=== PRETTY CODE relax eq ===\n\n")
 q = 9

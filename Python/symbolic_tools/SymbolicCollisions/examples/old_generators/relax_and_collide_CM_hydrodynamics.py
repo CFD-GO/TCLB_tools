@@ -5,7 +5,7 @@ from SymbolicCollisions.core.cm_symbols import omega_v, omega_b, Mraw_D2Q9, Nraw
 from SymbolicCollisions.core.DiscreteCMTransforms import get_DF, get_m00
 from SymbolicCollisions.core.printers import print_u2, print_as_vector
 from SymbolicCollisions.core.hardcoded_results import hardcoded_cm_eq_incompressible_D2Q9, \
-      hardcoded_F_cm_He_hydro_LB_velocity_based_D2Q9, hardcoded_F_cm_Guo_hydro_LB_velocity_based_D2Q9
+      hardcoded_F_cm_He_hydro_LB_incompressible_D2Q9, hardcoded_F_cm_Guo_hydro_LB_incompressible_D2Q9
 
 
 print("\n\n=== PRETTY CODE: relax and collide ===\n\n")
@@ -60,12 +60,12 @@ print_as_vector(hardcoded_cm_eq_incompressible_D2Q9, cm_eq_pop_str)  # save time
 print("//calculate forces in cm space")
 # print_as_vector(get_cm_vector_from_discrete_def(get_force_Guo_second_order), F_cm_str)
 # print_as_vector(get_cm_vector_from_continuous_def(get_continuous_force_He_MB), F_cm_str)
-print_as_vector(hardcoded_F_cm_He_hydro_LB_velocity_based_D2Q9, F_cm_str)  # save time
+print_as_vector(hardcoded_F_cm_He_hydro_LB_incompressible_D2Q9, F_cm_str)  # save time
 
 print("//collide eq: (eye(9)-S)*cm + S*cm_eq + (eye(9)-S/2.)*force_in_cm_space")
 # cm_after_collision = (eye(9) - S_relax) * temp_populations + S_relax * cm_eq + (eye(9) - S_relax / 2) * F_cm
 cm_after_collision = (eye(9) - S_relax_hydro_D2Q9) * temp_populations + S_relax_hydro_D2Q9 * cm_eq + (eye(
-    9) - S_relax_hydro_D2Q9 / 2) * hardcoded_F_cm_He_hydro_LB_velocity_based_D2Q9  # FOI - use `hardcoded` to skip zero terms
+    9) - S_relax_hydro_D2Q9 / 2) * hardcoded_F_cm_He_hydro_LB_incompressible_D2Q9  # FOI - use `hardcoded` to skip zero terms
 print_as_vector(cm_after_collision, print_symbol=pop_in_str)
 
 print("\n//back to raw moments")

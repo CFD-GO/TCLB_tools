@@ -61,14 +61,14 @@ ez_D3Q7 = Matrix([0, 0, 0, 0, 0, 1, -1])
 
 
 # D3Q15 - notation from 'LBM Principles and Practise' Book p. 89
-ex_D3Q15 = Matrix([0, 1, -1, 0, 0, 0, 0, 1, -1, 1, -1, 1, -1, -1, 1])
-ey_D3Q15 = Matrix([0, 0, 0, 1, -1, 0, 0, 1, -1, 1, -1, -1, 1, 1, -1])
-ez_D3Q15 = Matrix([0, 0, 0, 0, 0, 1, -1, 1, -1, -1, 1, 1, -1, 1, -1])
+# ex_D3Q15 = Matrix([0, 1, -1, 0, 0, 0, 0, 1, -1, 1, -1, 1, -1, -1, 1])
+# ey_D3Q15 = Matrix([0, 0, 0, 1, -1, 0, 0, 1, -1, 1, -1, -1, 1, 1, -1])
+# ez_D3Q15 = Matrix([0, 0, 0, 0, 0, 1, -1, 1, -1, -1, 1, 1, -1, 1, -1])
 
 # D3Q15 - notation for phase-field as in TCLB's d3q27_pf_velocity model
-# ex_D3Q15 = Matrix([0, 1,-1, 0, 0, 0, 0, 1,-1, 1,-1, 1,-1, 1,-1])
-# ey_D3Q15 = Matrix([0, 0, 0, 1,-1, 0, 0, 1, 1,-1,-1, 1, 1,-1,-1])
-# ez_D3Q15 = Matrix([0, 0, 0, 0, 0, 1,-1, 1, 1, 1, 1,-1,-1,-1,-1])
+ex_D3Q15 = Matrix([0, 1, -1, 0, 0, 0, 0, 1, -1, 1, -1, 1, -1, 1, -1])
+ey_D3Q15 = Matrix([0, 0, 0, 1, -1, 0, 0, 1, 1, -1, -1, 1, 1, -1, -1])
+ez_D3Q15 = Matrix([0, 0, 0, 0, 0, 1, -1, 1, 1, 1, 1, -1, -1, -1, -1])
 
 S_relax_ADE_D3Q15 = diag(1, omega_ade, omega_ade, omega_ade, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
 
@@ -112,9 +112,9 @@ S_relax_ADE_D3Q19 = diag(1, omega_ade, omega_ade, omega_ade, 1, 1, 1, 1, 1, 1, 1
 
 
 # D3Q27 - notation for hydrodynamics as in TCLB's d3q27_pf_velocity model
-ex_D3Q27 = Matrix([0, 1,-1, 0, 0,0, 0, 1,-1, 1,-1, 1,-1, 1,-1, 1,-1, 1,-1, 1,-1, 1,-1, 0, 0, 0, 0])
-ey_D3Q27 = Matrix([0, 0, 0, 1,-1,0, 0, 1, 1,-1,-1, 1, 1,-1,-1, 1, 1,-1,-1, 0, 0, 0, 0, 1,-1, 1,-1])
-ez_D3Q27 = Matrix([0, 0, 0, 0, 0,1,-1, 1, 1, 1, 1,-1,-1,-1,-1, 0, 0, 0, 0, 1, 1,-1,-1, 1, 1,-1,-1])
+ex_D3Q27 = Matrix([0, 1, -1, 0, 0, 0, 0, 1, -1, 1, -1, 1, -1, 1, -1, 1, -1, 1, -1, 1, -1, 1, -1, 0, 0, 0, 0])
+ey_D3Q27 = Matrix([0, 0, 0, 1, -1, 0, 0, 1, 1, -1, -1, 1, 1, -1, -1, 1, 1, -1, -1, 0, 0, 0, 0, 1, -1, 1, -1])
+ez_D3Q27 = Matrix([0, 0, 0, 0, 0, 1, -1, 1, 1, 1, 1, -1, -1, -1, -1, 0, 0, 0, 0, 1, 1, -1, -1, 1, 1, -1, -1])
 
 
 # phi_norm_grad_x = Symbol('norm_grad_phi.x')  # normalized gradient of the phase field in the x direction

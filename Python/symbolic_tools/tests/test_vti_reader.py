@@ -2,6 +2,10 @@ import os
 import sys
 import pandas as pd
 import unittest
+import matplotlib.pyplot as plt
+import numpy as np
+
+import hashlib
 
 sys.path.append(os.path.join('Python', 'symbolic_tools'))  # allow CI bot to see the stuff from the main repo dir
 sys.path.append(os.path.join('.'))  # allow CI bot to see the stuff from the main repo dir
@@ -15,7 +19,7 @@ class TestVtiReader(unittest.TestCase):
         with self.assertRaises(FileNotFoundError) as context:
             vti_reader = VTIFile(filename)
 
-    def test_vtk_reader(self):
+    def test_vtk_reader_2D(self):
         # real_path = os.path.realpath(__file__)
         # dir_path = os.path.dirname(real_path)
         # print(f'dir_path{dir_path}')
@@ -45,9 +49,78 @@ class TestVtiReader(unittest.TestCase):
         pdT2 = pd.DataFrame(data)
 
         assert T.size > 0
-        assert U.size > 0
+        assert U[0].size > 0
+        assert U[1].size > 0
+        assert U[2].size > 0
         assert pdT.size > 0
         assert pdT2.size > 0
+
+    def test_vtk_reader_3D_and_plotter(self):
+        filename = 'HotKarman3D_template_sizer_1_nu_0.03_k_0.003_VTK_P00_00600000.pvti'
+        wd = os.getcwd()
+        # wd = os.path.dirname(wd)  # go level up
+
+        if 'circleci' in wd:
+            wd = os.path.join(wd, 'tests')
+        filepath = os.path.join(wd, 'sample_data_for_vtk_reader', '3D_multiGPU', filename)
+
+        vti_reader = VTIFile(filepath, parallel=True)
+        T_num = vti_reader.get("T")
+        [ux_num, uy_num, uz_num] = vti_reader.get("U", vector=True)
+
+        ny, nx, nz = T_num.shape
+        x_grid = np.linspace(start=0, stop=nx, num=nx, endpoint=False)
+        y_grid = np.linspace(start=0, stop=ny, num=ny, endpoint=False)
+        z_grid = np.linspace(start=0, stop=nz, num=nz, endpoint=False)
+        xx, yy = np.meshgrid(x_grid, y_grid)
+        T_num_slice = T_num[:, :, 1]
+        U_num_slice = ux_num[:, :, 1]
+
+        def make_plot(ZZ, file_name):
+            fig = plt.figure(figsize=(12, 8))
+            ax = fig.gca()
+
+            cntr = ax.pcolormesh(xx, yy, ZZ, cmap='coolwarm', label='T_num')  # this one has smooth colors
+            # cntr = ax.contourf(xx, yy, ZZ, cmap='coolwarm', antialiased=True)  # this one is has step colors
+
+            ax.set_xlabel('X')
+            ax.set_ylabel('Y')
+            # ax.set_zlabel('Z')
+            ax.set_aspect('equal')
+
+            fig.colorbar(cntr, shrink=0.5, aspect=5)
+
+            plt.title(f'Laplace benchmark\n ')
+            plt.grid(True)
+
+            fig.savefig(file_name, bbox_inches='tight')
+            # plt.show()
+            plt.close(fig)  # close the figure
+
+        fig_names = [f'Plot_T_slice_from_3D_data.png', f'Plot_U_slice_from_3D_data.png']
+        expected_hashes = ['ed92f929df4b9da3631978b589b66a55', '87035f0563ffa38e4816e61684382157']
+        zzs = [T_num_slice, U_num_slice]
+
+        for fig_name, expected_hash, zz in zip(fig_names, expected_hashes, zzs):
+            try:
+                os.remove(fig_name)
+            except OSError:
+                pass
+
+            make_plot(zz, fig_name)
+
+            hasher = hashlib.md5()
+            with open(fig_name, 'rb') as afile:
+                buf = afile.read()
+                hasher.update(buf)
+
+            hash = hasher.hexdigest()
+            assert expected_hash == hash
+
+            try:
+                os.remove(fig_name)
+            except OSError:
+                pass
 
     def test_txt_reader(self):
         wd = os.getcwd()
@@ -60,8 +133,8 @@ class TestVtiReader(unittest.TestCase):
         filepathU = os.path.join(wd, 'sample_data_for_vtk_reader',
                                  f'laplace_benchmark_d2q9_TXT_P00_00050010_U.txt')
 
-        dataT = pd.read_csv(filepathT, delimiter=" ")
-        dataU = pd.read_csv(filepathU, delimiter=" ")
+        dataT = pd.read_csv(filepathT, delimiter=" ", header=None)
+        dataU = pd.read_csv(filepathU, delimiter=" ", header=None)
 
         assert dataT.size > 0
         assert dataU.size > 0

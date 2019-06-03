@@ -13,7 +13,7 @@ from SymbolicCollisions.core.DiscreteCMTransforms import \
     DiscreteCMTransforms, get_mom_vector_from_discrete_def, get_mom_vector_from_shift_mat
 
 
-lattice = 'D3Q27'
+lattice = 'D2Q9'
 ccmt = ContinuousCMTransforms(dzeta3D, u3D, F3D, rho)
 dcmt = DiscreteCMTransforms(e_D2Q9, u2D, F2D, rho)
 

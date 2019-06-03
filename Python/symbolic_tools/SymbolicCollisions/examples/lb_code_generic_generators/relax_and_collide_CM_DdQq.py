@@ -12,9 +12,9 @@ from SymbolicCollisions.core.MatrixGenerator import get_raw_moments_matrix, get_
 # eqs 8-12 : (eye(q)-S)*cm + S*cm_eq + (eye(q)-S/2.)*force_in_cm_space
 
 # SETUP
-d = 2
-q = 9
-model = 'hydro'  # choose from '['hydro', 'ade', 'ade_with_f']
+d = 3
+q = 19
+model = 'ade_with_f'  # choose from '['hydro', 'ade', 'ade_with_f']
 
 # DYNAMIC IMPORTS
 ex = dynamic_import("SymbolicCollisions.core.cm_symbols", f"ex_D{d}Q{q}")
@@ -37,8 +37,33 @@ def get_s_relax_switcher(choice):
 
 S_Relax = get_s_relax_switcher(model)
 
-hardcoded_cm_eq = dynamic_import("SymbolicCollisions.core.hardcoded_results", f"hardcoded_cm_eq_compressible_D{d}Q{q}")
-hardcoded_F_cm = dynamic_import("SymbolicCollisions.core.hardcoded_results", f"hardcoded_F_cm_pf_D{d}Q{q}")
+
+def get_cm_eq_and_F_cm_switcher(choice):
+    cm_eq_switcher = {
+        'hydro': ("SymbolicCollisions.core.hardcoded_results", f"hardcoded_cm_eq_incompressible_D{d}Q{q}"),
+        'ade_with_f': ("SymbolicCollisions.core.hardcoded_results", f"hardcoded_cm_eq_compressible_D{d}Q{q}"),
+        'ade': ("SymbolicCollisions.core.hardcoded_results", f"hardcoded_cm_eq_compressible_D{d}Q{q}"),
+    }
+    which_cm_eq = cm_eq_switcher.get(choice, lambda: "Invalid argument")
+    hardcoded_cm_eq = dynamic_import(*which_cm_eq)
+
+
+    F_cm_switcher = {
+        'hydro': ("SymbolicCollisions.core.hardcoded_results", f"hardcoded_cm_eq_incompressible_D{d}Q{q}"),
+        'ade_with_f': ("SymbolicCollisions.core.hardcoded_results", f"hardcoded_F_cm_pf_D{d}Q{q}"),
+        'ade': None,
+    }
+    which_F_cm = F_cm_switcher.get(choice, lambda: "Invalid argument")
+    hardcoded_F_cm = dynamic_import(*which_F_cm)
+    return hardcoded_cm_eq, hardcoded_F_cm
+
+
+hardcoded_cm_eq, hardcoded_F_cm = get_cm_eq_and_F_cm_switcher(model)
+# hardcoded_cm_eq = dynamic_import("SymbolicCollisions.core.hardcoded_results", f"hardcoded_cm_eq_compressible_D{d}Q{q}")
+# hardcoded_F_cm = dynamic_import("SymbolicCollisions.core.hardcoded_results", f"hardcoded_F_cm_pf_D{d}Q{q}")
+
+# hardcoded_cm_eq = dynamic_import("SymbolicCollisions.core.hardcoded_results", f"hardcoded_cm_eq_incompressible_D{d}Q{q}")
+# hardcoded_F_cm = dynamic_import("SymbolicCollisions.core.hardcoded_results", f"hardcoded_F_cm_He_hydro_LB_incompressible_D{d}Q{q}")
 
 
 # ARRANGE STUFF

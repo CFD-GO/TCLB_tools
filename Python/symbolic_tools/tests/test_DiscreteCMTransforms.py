@@ -27,7 +27,7 @@ from SymbolicCollisions.core.cm_symbols import \
 from SymbolicCollisions.core.printers import print_as_vector
 
 from SymbolicCollisions.core.hardcoded_results import \
-    hardcoded_F_cm_Guo_hydro_LB_velocity_based_D2Q9, hardcoded_cm_eq_compressible_D2Q9
+    hardcoded_F_cm_Guo_hydro_LB_incompressible_D2Q9, hardcoded_cm_eq_compressible_D2Q9
 
 
 class TestDiscreteCMTransforms(unittest.TestCase):
@@ -80,7 +80,7 @@ class TestDiscreteCMTransforms(unittest.TestCase):
 
         f = io.StringIO()
         with redirect_stdout(f):
-            print_as_vector(hardcoded_F_cm_Guo_hydro_LB_velocity_based_D2Q9, 'F_cm')
+            print_as_vector(hardcoded_F_cm_Guo_hydro_LB_incompressible_D2Q9, 'F_cm')
         expected_result = f.getvalue()
 
         for result in results:
