@@ -47,12 +47,12 @@ def print_as_vector(some_matrix, print_symbol='default_symbol1', raw_output=Fals
     rows = some_matrix._mat
 
     for i in range(len(rows)):
-        row = rows[i]  # evaluate symbolic constants, like pi
+        row = rows[i]
 
         if raw_output:
             row = str(row)
         else:
-            row = symbol_to_number(row)  # evaluate symbolic constants, like pi
+            row = symbol_to_number(round_and_simplify(row))  # evaluate symbolic constants, like pi
             row = str(round_and_simplify(row))
             row = re.sub(r"%s\*\*2" % ux, '%s' % ux2, row)
             row = re.sub(r"%s\*\*2" % uy, '%s' % uy2, row)
@@ -69,30 +69,43 @@ def print_as_vector(some_matrix, print_symbol='default_symbol1', raw_output=Fals
             row = re.sub(r"_{", "", row)  # skip curly brackets from latex
             row = re.sub(r"}", "", row)  #
 
-            # get algebraic fractions from decimal ones
-            result = re.findall(r"\d\.\d+", row)  # may return an empty list: []
-            while result:
-                first_number = result[0]
+            ugly_fractions = re.findall(r"\d\.\d+", row)   # may return an empty list: []
+            while ugly_fractions:
 
                 row = re.sub(r"\d\.\d+",  # digit, dot, one or more digits
-                             str(Fraction(first_number).limit_denominator(max_denominator=1000)) + '.',
-                             row, count=1)
+                             str(Fraction(ugly_fractions[0]).limit_denominator(max_denominator=1000))
+                             + '.',  # add '.' to let the C compiler know that it is a float
+                             row, count=1)  # get algebraic fractions from decimal ones
+                ugly_fractions = re.findall(r"\d\.\d+", row)
 
-                row = re.sub(r"\*\*1\.\*", "", row)  # dont power by 1.0
+            def find_ugly_operations():
+                ugly_operations_patterns = [r"(\w+)\*\*1\.0",
+                                            r"(\w+)\*\*1\.",  # dont power by 1.0
+                                            r"1\.\*",  # dont multiply by 1.*
+                                            r"(\w+)\*\*2\.0",
+                                            r"(\w+)\*\*2"  # x**2 --> x*x
+                                            ]
+                ugly_operations = []
+                for ugly_operations_pattern in ugly_operations_patterns:
+                    ugly_operations += re.findall(ugly_operations_pattern, row)
+                return ugly_operations
+
+            while find_ugly_operations():
+                row = re.sub(r"\*\*1\.0", r"", row)  # dont power by 1.0
+                row = re.sub(r"\*\*1\.", r"", row)  # dont power by 1.0
                 row = re.sub(r"1\.\*", "", row)  # dont multiply by 1.*
-                result = re.findall(r"\d\.\d+", row)
+
+                square_patterns = [r"\*\*2\.0", r"\*\*2\.", r"\*\*2"]  # order matters
+
+                for square_pattern in square_patterns:
+                    to_be_squared = re.findall(r"(\w+)" + square_pattern, row)
+                    if len(to_be_squared) > 1:
+                        raise NotImplementedError('There is to much square patterns '
+                                                  'and I dont know not how to simplify them yet.')
+                    elif len(to_be_squared) == 1:
+                        row = re.sub(square_pattern, "*" + to_be_squared[0], row)
 
         if withbrackets:
             print(f"\t{print_symbol}[{i}] = {row};")
         else:
             print(f"\t{print_symbol}{i} = {row};")
-
-
-# TODO:
-#  1.0*m00*(RT*u.y**2 - RT**1.0*u.y**2 + RT**2.0);
-#  reduces to:
-#  m00*(RT*uy2 - RT**uy2 + RT**2.);
-#  and
-#  1.0*m00*u.y*(RT**1.0 - RT);
-#  reduces to:
-#  m00 * u.y * (RT ** 1. - RT);

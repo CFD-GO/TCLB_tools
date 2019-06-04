@@ -47,8 +47,8 @@ F_phi_y = Symbol(Force_str + '.y')
 F_phi_z = Symbol(Force_str + '.z')
 
 omega_ade = Symbol('omega_ade')
-omega_v = Symbol('omega_nu')  # omega_nu = s_nu = 1 /(tau + 0.5)
-omega_b = Symbol('omega_bulk')  # results in bulk viscosity = 1/6 since : zeta = (1/sb - 0.5)*cs^2*dt
+omega_v = Symbol('omega_nu')
+omega_b = Symbol('omega_bulk')  # omega_bulk='1.0/(3*bulk_visc+0.5)'
 
 ex_D2Q9 = Matrix([0, 1, 0, -1, 0, 1, -1, -1, 1])
 ey_D2Q9 = Matrix([0, 0, 1, 0, -1, 1, 1, -1, -1])
@@ -61,9 +61,14 @@ ez_D3Q7 = Matrix([0, 0, 0, 0, 0, 1, -1])
 
 
 # D3Q15 - notation from 'LBM Principles and Practise' Book p. 89
-ex_D3Q15 = Matrix([0, 1, -1, 0, 0, 0, 0, 1, -1, 1, -1, 1, -1, -1, 1])
-ey_D3Q15 = Matrix([0, 0, 0, 1, -1, 0, 0, 1, -1, 1, -1, -1, 1, 1, -1])
-ez_D3Q15 = Matrix([0, 0, 0, 0, 0, 1, -1, 1, -1, -1, 1, 1, -1, 1, -1])
+# ex_D3Q15 = Matrix([0, 1, -1, 0, 0, 0, 0, 1, -1, 1, -1, 1, -1, -1, 1])
+# ey_D3Q15 = Matrix([0, 0, 0, 1, -1, 0, 0, 1, -1, 1, -1, -1, 1, 1, -1])
+# ez_D3Q15 = Matrix([0, 0, 0, 0, 0, 1, -1, 1, -1, -1, 1, 1, -1, 1, -1])
+
+# D3Q15 - notation for phase-field as in TCLB's d3q27_pf_velocity model
+ex_D3Q15 = Matrix([0, 1, -1, 0, 0, 0, 0, 1, -1, 1, -1, 1, -1, 1, -1])
+ey_D3Q15 = Matrix([0, 0, 0, 1, -1, 0, 0, 1, 1, -1, -1, 1, 1, -1, -1])
+ez_D3Q15 = Matrix([0, 0, 0, 0, 0, 1, -1, 1, 1, 1, 1, -1, -1, -1, -1])
 
 S_relax_ADE_D3Q15 = diag(1, omega_ade, omega_ade, omega_ade, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
 
@@ -106,6 +111,11 @@ S_relax_ADE_D3Q19 = diag(1, omega_ade, omega_ade, omega_ade, 1, 1, 1, 1, 1, 1, 1
 
 
 
+# D3Q27 - notation for hydrodynamics as in TCLB's d3q27_pf_velocity model
+ex_D3Q27 = Matrix([0, 1, -1, 0, 0, 0, 0, 1, -1, 1, -1, 1, -1, 1, -1, 1, -1, 1, -1, 1, -1, 1, -1, 0, 0, 0, 0])
+ey_D3Q27 = Matrix([0, 0, 0, 1, -1, 0, 0, 1, 1, -1, -1, 1, 1, -1, -1, 1, 1, -1, -1, 0, 0, 0, 0, 1, -1, 1, -1])
+ez_D3Q27 = Matrix([0, 0, 0, 0, 0, 1, -1, 1, 1, 1, 1, -1, -1, -1, -1, 0, 0, 0, 0, 1, 1, -1, -1, 1, 1, -1, -1])
+
 
 # phi_norm_grad_x = Symbol('norm_grad_phi.x')  # normalized gradient of the phase field in the x direction
 # phi_norm_grad_y = Symbol('norm_grad_phi.y')  # normalized gradient of the phase field in the y direction
@@ -113,8 +123,12 @@ S_relax_ADE_D3Q19 = diag(1, omega_ade, omega_ade, omega_ade, 1, 1, 1, 1, 1, 1, 1
 #
 # F_phi_coeff = Symbol('F_phi_coeff')  # F_phi_coeff=(1.0 - 4.0*(myPhaseF - pfavg)*(myPhaseF - pfavg))/inteface_width;
 
-m00 = Symbol('m00')
-rho = Symbol('rho')
+m00 = Symbol('m00', positive=True)
+rho = Symbol('rho', positive=True)
+Temperature = Symbol('T', positive=True)
+cp = Symbol('cp', positive=True)
+cht_gamma = Symbol('gamma', positive=True)  # magic stability enhancement
+
 w_D2Q9 = Matrix([4. / 9, 1. / 9, 1. / 9, 1. / 9, 1. / 9, 1. / 36, 1. / 36, 1. / 36, 1. / 36])
 
 
@@ -229,14 +243,34 @@ NrawD2Q9 = Matrix([
 ])
 
 # RELAXATION MATRIX
-s_plus = (omega_b + omega_v) / 2
-s_minus = (omega_b - omega_v) / 2
+s_plus_D2Q9 = (omega_b + omega_v) / 2
+s_minus_D2Q9 = (omega_b - omega_v) / 2
 
-S_relax_hydro_D2Q9 = diag(1, 1, 1, s_plus, s_plus, omega_v, 1, 1, 1)
-S_relax_hydro_D2Q9[3, 4] = s_minus
-S_relax_hydro_D2Q9[4, 3] = s_minus
+S_relax_hydro_D2Q9 = diag(1, 1, 1, s_plus_D2Q9, s_plus_D2Q9, omega_v, 1, 1, 1)
+S_relax_hydro_D2Q9[3, 4] = s_minus_D2Q9
+S_relax_hydro_D2Q9[4, 3] = s_minus_D2Q9
 
 S_relax_ADE_D2Q9 = diag(1, omega_ade, omega_ade, 1, 1, 1, 1, 1, 1)
+
+# Both S_relax_D3Q27 andorder of 3D (central) moments as in
+# `Three-dimensional cascaded lattice Boltzmann method:
+# Improved implementation and consistent forcing scheme`
+# by Linlin Fei, Kai H.  Luo,  Qing Li. 2018
+
+# bulk_visc_3D = cs2*(2/3)*(1/sb -0.5)  # this is different than in 2D for some reason...
+#  kin_visc_3D = cs2(1/s_v -0.5)
+
+s_plus_D3Q27 = (omega_b + 2*omega_v)/3
+s_minus_D3Q27 = (omega_b - omega_v)/3
+S_relax_hydro_D3Q27 = diag(1, 1, 1, 1, omega_v, omega_v, omega_v, s_plus_D3Q27, s_plus_D3Q27, s_plus_D3Q27, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+S_relax_hydro_D3Q27[7, 8] = s_minus_D3Q27
+S_relax_hydro_D3Q27[7, 9] = s_minus_D3Q27
+S_relax_hydro_D3Q27[8, 7] = s_minus_D3Q27
+S_relax_hydro_D3Q27[8, 9] = s_minus_D3Q27
+S_relax_hydro_D3Q27[9, 7] = s_minus_D3Q27
+S_relax_hydro_D3Q27[9, 8] = s_minus_D3Q27
+
+
 
 S_relax_MRT_GS = diag(1, 1, 1, 1, 1, 1, 1, omega_v, omega_v)  #
 # S_relax_MRT_GS = diag(0, 0, 0, 0, 0, 0, 0, sv, sv)   #

@@ -62,7 +62,7 @@ print_as_vector(F_cm, 'F_cm')
 print('\n//Force -> Force_cm - from continous definition: \n'
       'k_mn = integrate(fun, (x, -oo, oo), (y, -oo, oo)) \n'
       'where fun = forceM(rho,u,x,y) *(x-ux)^m *(y-uy)^n *(z-uz)^o ')
-F_cm = +get_mom_vector_from_continuous_def(ccmt.get_force_Guo,
+F_cm = get_mom_vector_from_continuous_def(ccmt.get_force_Guo,
                                            continuous_transformation=ccmt.get_cm,
                                            moments_order=moments_dict[lattice])
 print_as_vector(F_cm, 'F_cm')

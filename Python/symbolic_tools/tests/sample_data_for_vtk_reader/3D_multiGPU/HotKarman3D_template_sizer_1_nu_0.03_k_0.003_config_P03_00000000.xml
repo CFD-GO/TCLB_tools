@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<CLBConfig version="2.0" output="/net/scratch/people/plgmuaddieb/output/batch_HotKarman3D/HotKarman3D_template_sizer_1_nu_0.03_k_0.003/">
+	<Units>
+		<Params size="1m" gauge="1.000000" />
+	</Units>
+	<Geometry nx="1000m" ny="150m" nz="3m">
+		<CM>
+			<Box />
+		</CM>
+		<CM>
+			<Box />
+		</CM>
+		<WVelocity>
+			<Inlet />
+		</WVelocity>
+		<ENeumann>
+			<Outlet />
+		</ENeumann>
+		<Wall mask="ALL">
+			<Cylinder dx="285m" dy="60m" nx="30m" ny="30m" nz="50m" />
+		</Wall>
+		<HeaterDirichletTemperature name="dirichlet_hot">
+			<Cylinder dx="285m" dy="60m" nx="30m" ny="30m" nz="50m" />
+		</HeaterDirichletTemperature>
+		<MeasurmentArea>
+			<Outlet />
+		</MeasurmentArea>
+	</Geometry>
+	<Model>
+		<Params InitTemperature="0" InitTemperature-dirichlet_hot="1" InitTemperature-dirichlet_cold="0" />
+		<Params />
+		<Params nu="0.030000" conductivity="0.003000" h_stability_enhancement="1." cp="1" material_density="1" />
+		<Params />
+		<Params VelocityX="0.010000" />
+	</Model>
+	<Failcheck Iterations="10000" nx="1000m" ny="150m" nz="3m" />
+	<TXT Iterations="50000" what="T,U" />
+	<Log Iterations="1000" />
+	<Solve Iterations="120000" />
+	<Solve Iterations="480000">
+		<VTK Iterations="10000" />
+	</Solve>
+	<Run model="d3q27_cm_cht_OutFlow">
+		<Code version="v6.0-beta-1111-g0383767" precision="double" cross="GPU" />
+	</Run>
+</CLBConfig>

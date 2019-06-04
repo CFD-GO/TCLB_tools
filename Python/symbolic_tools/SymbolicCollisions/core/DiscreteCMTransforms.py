@@ -57,6 +57,17 @@ class DiscreteCMTransforms:
         gamma = w_D2Q9[i] * (Matrix([1]) + eu / self.cs2)
         return gamma[0]
 
+    def get_velocity_bc(self, i):
+        eu = self.e[i, :] * self.u
+        gamma = w_D2Q9[i] * (eu / self.cs2)
+        return -2*gamma[0]
+
+    def get_pressure_bc(self, i):
+        eu = self.e[i, :] * self.u
+        u2 = Matrix([self.u.dot(self.u)])
+        gamma = w_D2Q9[i] * (Matrix([1]) + eu * eu / (2 * self.cs2 * self.cs2) - u2 / (2 * self.cs2))
+        return 2*gamma[0]
+
     def get_gamma(self, i):
         """ 
          OMG, sympy...

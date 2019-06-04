@@ -2,21 +2,21 @@
 from sympy import exp, pi, integrate, oo
 import sympy as sp
 import numpy as np
-
-from sympy.matrices import Matrix
-
-from SymbolicCollisions.core.cm_symbols import m00
-
-from SymbolicCollisions.core.printers import round_and_simplify
-
 from joblib import Parallel, delayed
 import multiprocessing
 from sympy import Symbol
 import warnings
 
+from sympy.matrices import Matrix
+from SymbolicCollisions.core.printers import round_and_simplify
+from SymbolicCollisions.core.cm_symbols import m00
+# from SymbolicCollisions.core.cm_symbols import rho
+from SymbolicCollisions.core.cm_symbols import Temperature, cht_gamma as cht_stability_enhancement
+from SymbolicCollisions.core.cm_symbols import cp as specific_heat_capacity
 
 class ContinuousCMTransforms:
-    def __init__(self, dzeta, u, F, rho, cs2=1./3.):
+    def __init__(self, dzeta, u, F, rho, cs2=1. / 3.,
+                 T=Temperature, cp=specific_heat_capacity, cht_gamma=cht_stability_enhancement):
         """
         :param dzeta: direction (x,y,z)
         :param u: velocity (x,y,z)
@@ -31,8 +31,11 @@ class ContinuousCMTransforms:
         self.F = F
         self.rho = rho
         self.cs2 = cs2
+        self.T = T
+        self.cp = cp
+        self.gamma = cht_gamma
 
-    def get_Maxwellian_DF(self, psi=m00, _u=None):
+    def get_Maxwellian_DF_old(self, psi=m00, _u=None):
         """
         :param _u: velocity (x,y,z)
         :param psi: quantity of interest aka scaling function like density
@@ -74,42 +77,42 @@ class ContinuousCMTransforms:
         df *= exp(-dzeta_u2 / (2 * self.cs2))
         return df
 
-    def get_internal_energy_Maxwellian_DF(self, psi=m00, _u=None):
-        df = self.get_Maxwellian_DF(psi=psi, _u=self.u)
+    def get_internal_energy_Maxwellian_DF(self):
+        df = self.get_Maxwellian_DF(psi=m00, u=self.u, sigma2=self.cs2)
         dzeta_minus_u = self.dzeta - self.u
         df = df*0.5*dzeta_minus_u.dot(dzeta_minus_u)
         return df
 
-    def get_total_energy_Maxwellian_DF(self, psi=m00, _u=None):
-        df = self.get_Maxwellian_DF(psi=psi, _u=self.u)
+    def get_total_energy_Maxwellian_DF(self):
+        df = self.get_Maxwellian_DF(psi=m00, u=self.u, sigma2=self.cs2)
         df = df*0.5*self.dzeta.dot(self.dzeta)
         return df
 
-    def get_hydro_DF(self):
-        df_p = self.get_Maxwellian_DF(psi=(m00 - 1), _u=Matrix([0, 0, 0]))
-        df_gamma = self.get_Maxwellian_DF(psi=1, _u=self.u,)
+    def get_incompressible_DF(self):
+        df_p = self.get_Maxwellian_DF(psi=(m00 - 1), u=Matrix([0, 0, 0]))
+        df_gamma = self.get_Maxwellian_DF(psi=1, u=self.u, sigma2=self.cs2)
         return df_p + df_gamma
 
-    def get_Maxwellian_cht_DF(self, psi=m00, _u=None):
+    def get_Maxwellian_DF(self, psi=m00, u=None, sigma2=None):
         """
-        :param _u: velocity (x,y,z)
+        :param u: velocity (x,y,z)
+        :param sigma2: variance of the distribution
         :param psi: quantity of interest aka scaling function like density
         :return: continuous, local Maxwell-Boltzmann distribution
         'Incorporating forcing terms in cascaded lattice Boltzmann approach by method of central moments'
         Kannan N. Premnath, Sanjoy Banerjee, 2009
         eq 22
         """
-        u = None
-        if _u:
-            u = _u
-        else:
+
+        if not u:
             u = self.u
 
-        PI = sp.pi
+        if not sigma2:
+            sigma2 = self.cs2
 
-        B = Symbol('B', positive=True)
-        # self.dzeta = B*self.dzeta
-        dzeta_minus_u = B * self.dzeta - u
+
+        PI = sp.pi
+        dzeta_minus_u = self.dzeta - u
         dzeta_u2 = dzeta_minus_u.dot(dzeta_minus_u)
 
         # thank you sympy...
@@ -125,36 +128,31 @@ class ContinuousCMTransforms:
         # df = psi / pow(2 * PI * self.cs2, dim / 2)  # this is to difficult for sympy :/
 
         if dim == 2:
-            df = psi / (2 * PI * self.cs2)  # 2D version hack
+            df = psi / (2 * PI * sigma2)  # 2D version hack
         else:
-            df = psi / pow(2 * PI * self.cs2, dim / 2)  # this may be to difficult for sympy :/
-            if self.cs2 != 1. / 3.:
-                warnings.warn("Sympy may have problem with 3D non isothermal version (cs2=RT) \n "
-                              "It also can't simplify it, thus check the raw output", UserWarning)
+            df = psi / pow(2 * PI * sigma2, dim / 2)  # this may be to difficult for sympy :/
+            # if self.cs2 != 1. / 3.:
+            #     warnings.warn("Sympy may have problem with 3D non isothermal version (cs2=RT) \n "
+            #                   "It also can't simplify it, thus check the raw output", UserWarning)
 
-        df *= exp(-dzeta_u2 / (2 * self.cs2))
+        df *= exp(-dzeta_u2 / (2 * sigma2))
         return df
 
     def get_cht_DF(self):
-        from SymbolicCollisions.core.cm_symbols import rho
-        cp = Symbol('cp')
-        T = Symbol('T')
-        df_H = self.get_Maxwellian_DF(psi=(rho * cp * T), _u=self.u, )
-
-        A = Symbol('A')
-        df_corr = self.get_Maxwellian_cht_DF(psi=A, _u=self.u)
-        # df_corr = self.get_Maxwellian_cht_DF(psi=A, _u=Matrix([0, 0, 0]))
-        return df_H + df_corr
+        H = self.T * self.cp * self.rho
+        Sigma2 = self.gamma * self.cs2 / (self.cp * self.rho)
+        df_H = self.get_Maxwellian_DF(psi=H, u=self.u, sigma2=Sigma2)
+        return df_H
 
     def get_force_He_hydro_DF(self):
         """
         'Discrete Boltzmann equation model for the incompressible Navier-Stokes equation', He et al., 1998
         """
         eu = self.dzeta.dot(self.F)
-        df_p = self.get_Maxwellian_DF(psi=(m00 - 1), _u=Matrix([0, 0, 0]))
+        df_p = self.get_Maxwellian_DF(psi=(m00 - 1), u=Matrix([0, 0, 0]), sigma2=self.cs2)
 
         euf = (self.dzeta - self.u).dot(self.F)
-        df_gamma = self.get_Maxwellian_DF(psi=1, _u=self.u)
+        df_gamma = self.get_Maxwellian_DF(psi=1, u=self.u, sigma2=self.cs2)
 
         R = -(eu * df_p + euf * df_gamma) / (self.rho * self.cs2)
         R = -R  # `-` sign is skipped to ease code copy-paste ;p
@@ -166,8 +164,21 @@ class ContinuousCMTransforms:
         Use Maxwellian to calculate equilibria
         """
         eu_dot_f = (self.dzeta - self.u).dot(self.F)
-        result = self.get_Maxwellian_DF() * eu_dot_f / (self.rho * self.cs2)
+        result = self.get_Maxwellian_DF(psi=m00, u=None, sigma2=self.cs2) * eu_dot_f / (self.rho * self.cs2)
+        return result
 
+    def get_bc_bb_concentration_cht(self):
+        return 2*self.get_cht_DF()
+
+    def get_bc_bb_heat_flux_cht(self):
+        """
+        'Discrete Boltzmann equation model for the incompressible Navier-Stokes equation', He et al., 1998
+        Use Maxwellian to calculate equilibria
+        """
+        eu_dot_f = (self.dzeta - self.u).dot(self.F)
+        Sigma2 = self.gamma * self.cs2 / (self.cp * self.rho)
+        H = self.T * self.cp * self.rho
+        result = -2*self.get_Maxwellian_DF(psi=H, u=self.u, sigma2=Sigma2) * eu_dot_f / self.cs2
         return result
 
     def get_weight(self):

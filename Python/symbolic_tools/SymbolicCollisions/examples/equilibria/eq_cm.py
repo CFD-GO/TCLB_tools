@@ -71,9 +71,16 @@ print_as_vector(cm_eq, 'cm_eq')
 print('\n//population_eq -> cm_eq - from continous definition: \n'
       'k_mn = integrate(fun, (x, -oo, oo), (y, -oo, oo)) \n'
       'where fun = fM(rho,u,x,y) *(x-ux)^m *(y-uy)^n *(z-uz)^o ')
-cm_eq = get_mom_vector_from_continuous_def(ccmt.get_hydro_DF,
+cm_eq = get_mom_vector_from_continuous_def(ccmt.get_incompressible_DF,
                                            continuous_transformation=ccmt.get_cm,
                                            moments_order=moments_dict[lattice])
 
 print_as_vector(cm_eq, 'cm_eq')
+
+cm_cht_eq = get_mom_vector_from_continuous_def(ccmt.get_cht_DF,
+                                               continuous_transformation=ccmt.get_cm,
+                                               moments_order=moments_dict[lattice],
+                                               serial_run=False)
+print_as_vector(cm_cht_eq, 'cm_cht_eq', raw_output=False)
+
 print(f'\n\n Done in {time.process_time() - start} [s].')
