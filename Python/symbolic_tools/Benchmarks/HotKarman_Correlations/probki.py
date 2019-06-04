@@ -1,7 +1,7 @@
+
 import os
 import subprocess
 import pandas as pd
-from Benchmarks.HotKarman_Correlations.HT_Nu_Correlations import get_Nu_cylinder_by_Churchill_Bernstein
 import numpy as np
 import pwd
 
@@ -29,10 +29,9 @@ cmd ="echo  hoho ${FROM_PRO}"
 # print(cmd)
 
 os.system(cmd)
+os.system('/bin/bash -c "echo $HOME aa $FROM_PRO"')
 
-os.system('/bin/bash -c "echo $HOME aa ${FROM_PRO}"')
-
-subprocess.call(["bash","-c",cmd])
+subprocess.call(["bash", "-c", cmd])
 
 print('FROM_PRO' in os.environ)
 print('HOME' in os.environ)

@@ -4,43 +4,37 @@ from Benchmarks.HotKarman_Correlations.HT_Nu_Correlations import get_Nu_cylinder
 import numpy as np
 import pwd
 import matplotlib.pyplot as plt
-
 import re
+
+#######################################################
+#                       README
+# to see OS environment variables from python script,
+# you need to put them in ~/.profile
+#
+#######################################################
+
 home = pwd.getpwuid(os.getuid()).pw_dir
 local_logs_folder = os.path.join(home, 'DATA_FOR_PLOTS', 'logs_pro')
-
-USER = "plgmuaddieb"
-HOST = "prometheus.cyfronet.pl"
-
-# os.system(f"ssh {USER}@{HOST} ls $SCRATCH/")
-
-print("-------------")
-#os.system(f"ssh {USER}@{HOST} ls /net/scratch/people/{USER}")
-# main_folder = os.path.join("/net/scratch/people/{USER}", 'output', 'batch_HotKarman3D')
-
+host_folder = os.path.join(f'$FROM_PRO', 'batch_HotKarman3D', 'keep_nu_and_k_sizer*')
 
 if not os.path.exists(local_logs_folder):
     os.makedirs(local_logs_folder)
 
-cmd = "rsync -zarv  --prune-empty-dirs --include \"*/\"  --include=\"*.csv\" --exclude=\"*\" \"$FROM_PRO/batch_HotKarman3D\"" + f" \"{local_logs_folder}\""
-
-# cmd = f"rsync -zarv  --prune-empty-dirs " \
-#     f"--include \"*/\"  " \
-#     f"--include=\"*.csv\" " \
-#     f"--exclude=\"*\" " \
-#     f"\"plgmuaddieb@prometheus.cyfronet.pl:/net/scratch/people/plgmuaddieb/output/batch_HotKarman3D/keep_nuk_old/\" \"{local_logs_folder}\""
+cmd = "rsync -zarv  --prune-empty-dirs --include \"*/\"  --include=\"*.csv\" --exclude=\"*\" "\
+      + f"\"{host_folder}\""\
+      + f" \"{local_logs_folder}\""
 
 print(cmd)
-os.system(cmd)
+# os.system(cmd)
 
 
-folders = os.listdir(local_logs_folder)
+# folders = os.listdir(local_logs_folder)
 #
-logs = []
-for folder in folders:
-    files = os.listdir(os.path.join(local_logs_folder, folder))
-    log = [i for i in files if i.endswith('.csv')]
-    logs.append(log)
+# logs = []
+# for folder in folders:
+#     files = os.listdir(os.path.join(local_logs_folder, folder))
+#     log = [i for i in files if i.endswith('.csv')]
+#     logs.append(log)
 
 
 def calc_Nu(q_conv, k, D, L):
@@ -59,11 +53,11 @@ def make_plot(x, y, x2, y2, fig_name):
 
     axes = plt.gca()
     plt.plot(x, y,
-             color="black", marker="", markevery=12, markersize=7, linestyle="-", linewidth=2,
+             color="black", marker="", markevery=25, markersize=7, linestyle="-", linewidth=2,
              label='HeatSource')
 
     plt.plot(x2, y2,
-             color="black", marker=">", markevery=12, markersize=7, linestyle=":", linewidth=2,
+             color="black", marker=">", markevery=25, markersize=7, linestyle=":", linewidth=2,
              label='HeatFluxX')
     # ------ format y axis ------ #
     yll = min(y.min(), y2.min())
@@ -78,13 +72,13 @@ def make_plot(x, y, x2, y2, fig_name):
     plt.yscale('log')
 
     # ------ format x axis ------ #
-    plt.xlim(x.min(), x.max())
+    plt.xlim(0, x.max())
 
-    # plt.ticklabel_format(style='sci', axis='x', scilimits=(0, 0))
+    plt.ticklabel_format(style='sci', axis='x', scilimits=(0, 0))
     # plt.ticklabel_format(style='sci', axis='y', scilimits=(0, 0))  # scilimits=(-8, 8)
 
     plt.title(f'Convergence Monitor - Moving Average')
-    plt.xlabel(r'$iterations \times 10^3$')
+    plt.xlabel(r'$iterations$')
     plt.ylabel(r'$|\frac{\sigma}{\mu}|$')
     plt.legend()
     plt.grid()
@@ -96,37 +90,42 @@ def make_plot(x, y, x2, y2, fig_name):
     plt.close(fig)  # close the figure
 
 
+print("--- rsync complete, time for plotting ---")
+
 for root, dirs, files in os.walk(local_logs_folder):
     for file in files:
         if file.endswith('.csv') and 'toolbox' not in root:
             # print(file)
             filepath = os.path.join(root, file)
             log = pd.read_csv(filepath, delimiter=",")
+
             # get Re, Pr numbers from LB log
-            u = 0.01
-            match = re.search('sizer_(\d+)', file, re.IGNORECASE)
-            size = int(match.group(1))
-            D = 30*size
-            v = log['nu'][0]
-            Re = u*D/v
+            # match = re.search('sizer_(\d+)', file, re.IGNORECASE)
+            # size = int(match.group(1))
+            #
+            # u = 0.01
+            # D = 30*size
+            # v = log['nu'][0]
+            # Re = u*D/v
+            #
+            # k = log['conductivity-DefaultZone'][0]
+            # rho = 1
+            # cp = 1
+            # Pr = v*rho*cp/k
+            #
+            # # calculate Nu in all possible ways
+            # q_conv_avg_source = log['HeatSource'][-100:].mean()
+            # q_conv_avg_outlet = log['HeatFluxX'][-100:].mean()
+            #
+            # L = 3
+            # Nu_conv_avg_source = calc_Nu(q_conv_avg_outlet, k, D, L)
+            # Nu_conv_avg_outlet = calc_Nu(q_conv_avg_outlet, k, D, L)
+            #
+            # Nu_corr = get_Nu_cylinder_by_Churchill_Bernstein(Re=Re, Pr=Pr)
 
-            k = log['conductivity-DefaultZone'][0]
-            rho = 1
-            cp = 1
-            Pr = v*rho*cp/k
-
-            # calculate Nu in all possible ways
-            q_conv_avg_source = log['HeatSource'][-100:].mean()
-            q_conv_avg_outlet = log['HeatFluxX'][-100:].mean()
-
-            L = 3
-            Nu_conv_avg_source = calc_Nu(q_conv_avg_outlet, k, D, L)
-            Nu_conv_avg_outlet = calc_Nu(q_conv_avg_outlet, k, D, L)
-
-            Nu_corr = get_Nu_cylinder_by_Churchill_Bernstein(Re=Re, Pr=Pr)
-            print(f"Re={Re:0.1f} Pr={Pr:0.1f} size={size} "
-                  f"Nu_conv_avg_source={Nu_conv_avg_source:0.1f} Nu_conv_avg_outlet={Nu_conv_avg_outlet:0.1f} Nu_corr={Nu_corr:0.1f} "
-                  f"--- Extracted from file {file}")
+            # print(f"Re={Re:0.1f} Pr={Pr:0.1f} size={size} "
+            #       f"Nu_conv_avg_source={Nu_conv_avg_source:0.1f} Nu_conv_avg_outlet={Nu_conv_avg_outlet:0.1f} Nu_corr={Nu_corr:0.1f} "
+            #       f"--- Extracted from file {file}")
 
             def calc_norm_std(x):
                 result = abs(np.std(x) / np.mean(x))
@@ -136,17 +135,17 @@ for root, dirs, files in os.walk(local_logs_folder):
             skip_first_iterations = 100
             # y1 = log['HeatSource'][100:].rolling(window).apply(lambda x: np.std(x) / np.mean(x)).dropna()
             y1 = log['HeatSource'][skip_first_iterations:].rolling(window).apply(calc_norm_std).dropna()
-            x1 = np.linspace(start=window - 1, stop=len(y1) + 1, num=len(y1), endpoint=True)
+            # x1 = np.linspace(start=window - 1, stop=len(y1) + 1, num=len(y1), endpoint=True)
 
             y2 = log['HeatFluxX'][skip_first_iterations:].rolling(window).apply(calc_norm_std).dropna()
-            x2 = np.linspace(start=window - 1, stop=len(y2) + 1, num=len(y2), endpoint=True)
+            # x2 = np.linspace(start=window - 1, stop=len(y2) + 1, num=len(y2), endpoint=True)
+
+            x = log['Iteration'][skip_first_iterations + window - 1:]
 
             plot_name = "convergence_MA_" + re.sub(r".csv", r".png", file)
-            make_plot(x1, y1, x2, y2, plot_name)
+            make_plot(x, y1, x, y2, plot_name)
 
             print(f"processed {file}.")
-            # y2 = y[window - 1:]
-            # x = np.linspace(start=window - 1, stop=len(y2) + 1, num=len(y2), endpoint=True)
 
 
 print("bye")
