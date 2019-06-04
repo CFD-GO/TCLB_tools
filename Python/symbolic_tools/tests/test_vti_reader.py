@@ -68,59 +68,19 @@ class TestVtiReader(unittest.TestCase):
         T_num = vti_reader.get("T")
         [ux_num, uy_num, uz_num] = vti_reader.get("U", vector=True)
 
-        ny, nx, nz = T_num.shape
-        x_grid = np.linspace(start=0, stop=nx, num=nx, endpoint=False)
-        y_grid = np.linspace(start=0, stop=ny, num=ny, endpoint=False)
-        z_grid = np.linspace(start=0, stop=nz, num=nz, endpoint=False)
-        xx, yy = np.meshgrid(x_grid, y_grid)
-        T_num_slice = T_num[:, :, 1]
-        U_num_slice = ux_num[:, :, 1]
+        expected_hashes = ['5849cd96453a0452c80e37d582fca19f',
+                           '20f827ffad4ad10aa50839797316a0eb',
+                           '3533e058238c125fcf00592c2269e3d4',
+                           '25436c02e5c33da5c8da71338248c423']
 
-        def make_plot(ZZ, file_name):
-            fig = plt.figure(figsize=(12, 8))
-            ax = fig.gca()
+        zzs = [T_num, ux_num, uy_num, uz_num]
 
-            cntr = ax.pcolormesh(xx, yy, ZZ, cmap='coolwarm', label='T_num')  # this one has smooth colors
-            # cntr = ax.contourf(xx, yy, ZZ, cmap='coolwarm', antialiased=True)  # this one is has step colors
-
-            ax.set_xlabel('X')
-            ax.set_ylabel('Y')
-            # ax.set_zlabel('Z')
-            ax.set_aspect('equal')
-
-            fig.colorbar(cntr, shrink=0.5, aspect=5)
-
-            plt.title(f'Laplace benchmark\n ')
-            plt.grid(True)
-
-            fig.savefig(file_name, bbox_inches='tight')
-            # plt.show()
-            plt.close(fig)  # close the figure
-
-        fig_names = [f'Plot_T_slice_from_3D_data.png', f'Plot_U_slice_from_3D_data.png']
-        expected_hashes = ['ed92f929df4b9da3631978b589b66a55', '87035f0563ffa38e4816e61684382157']
-        zzs = [T_num_slice, U_num_slice]
-
-        for fig_name, expected_hash, zz in zip(fig_names, expected_hashes, zzs):
-            try:
-                os.remove(fig_name)
-            except OSError:
-                pass
-
-            make_plot(zz, fig_name)
-
-            hasher = hashlib.md5()
-            with open(fig_name, 'rb') as afile:
-                buf = afile.read()
-                hasher.update(buf)
-
+        hasher = hashlib.md5()
+        for expected_hash, zz in zip(expected_hashes, zzs):
+            hasher.update(zz.copy(order='C'))
             hash = hasher.hexdigest()
             assert expected_hash == hash
 
-            try:
-                os.remove(fig_name)
-            except OSError:
-                pass
 
     def test_txt_reader(self):
         wd = os.getcwd()
