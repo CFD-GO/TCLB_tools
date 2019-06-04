@@ -4,7 +4,7 @@ from SymbolicCollisions.core.printers import print_as_vector
 from sympy.matrices import Matrix
 from sympy import pprint
 
-cumulant, trunc_cumulant = get_cumulant(2, 1, 0)
+cumulant, trunc_cumulant = get_cumulant(2, 0, 0)
 
 
 pprint(cumulant)

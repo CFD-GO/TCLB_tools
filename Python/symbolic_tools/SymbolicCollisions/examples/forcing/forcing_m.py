@@ -1,7 +1,7 @@
 
 from SymbolicCollisions.core.cm_symbols import Mraw_D2Q9, M_ortho_GS
 
-from SymbolicCollisions.core.ContinousCMTransforms import ContinousCMTransforms, get_mom_vector_from_continuous_def
+from SymbolicCollisions.core.ContinuousCMTransforms import ContinuousCMTransforms, get_mom_vector_from_continuous_def
 from SymbolicCollisions.core.cm_symbols import \
     F3D, dzeta3D, u3D, rho
 
@@ -15,7 +15,7 @@ import time
 start = time.process_time()
 
 lattice = 'D2Q9'
-ccmt = ContinousCMTransforms(dzeta3D, u3D, F3D, rho)
+ccmt = ContinuousCMTransforms(dzeta3D, u3D, F3D, rho)
 dcmt = DiscreteCMTransforms(e_D2Q9, u2D, F2D, rho)
 
 T_raw_to_ortho = M_ortho_GS * Mraw_D2Q9.inv()

@@ -4,7 +4,7 @@
 [![codecov](https://codecov.io/gh/ggruszczynski/TCLB_tools/badge.svg)](https://codecov.io/gh/ggruszczynski/TCLB_tools)
 
 
-Various tools for the [TCLB](/CFD-GO/TCLB/) project
+Various tools for the [TCLB](/CFD-GO/TCLB/) project.
 
 ## Structure
 All tools are divided by language: [R](R/), [Python](Python/), etc. In each directory, the subdirectories should be specific packages related to different aspects of interaction with TCLB

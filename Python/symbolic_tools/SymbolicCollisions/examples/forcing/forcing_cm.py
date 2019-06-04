@@ -1,6 +1,6 @@
 from SymbolicCollisions.core.printers import print_as_vector
-from SymbolicCollisions.core.ContinousCMTransforms import \
-    ContinousCMTransforms, get_mom_vector_from_continuous_def
+from SymbolicCollisions.core.ContinuousCMTransforms import \
+    ContinuousCMTransforms, get_mom_vector_from_continuous_def
 from SymbolicCollisions.core.cm_symbols import \
     F3D, dzeta3D, u3D, rho
 
@@ -9,8 +9,7 @@ from SymbolicCollisions.core.DiscreteCMTransforms import \
 
 from SymbolicCollisions.core.cm_symbols import e_D2Q9, u2D, F2D, rho, moments_dict, NrawD2Q9, Mraw_D2Q9
 
-
-ccmt = ContinousCMTransforms(dzeta3D, u3D, F3D, rho)
+ccmt = ContinuousCMTransforms(dzeta3D, u3D, F3D, rho)
 import time
 
 start = time.process_time()
@@ -63,7 +62,7 @@ print_as_vector(F_cm, 'F_cm')
 print('\n//Force -> Force_cm - from continous definition: \n'
       'k_mn = integrate(fun, (x, -oo, oo), (y, -oo, oo)) \n'
       'where fun = forceM(rho,u,x,y) *(x-ux)^m *(y-uy)^n *(z-uz)^o ')
-F_cm = +get_mom_vector_from_continuous_def(ccmt.get_force_Guo,
+F_cm = get_mom_vector_from_continuous_def(ccmt.get_force_Guo,
                                            continuous_transformation=ccmt.get_cm,
                                            moments_order=moments_dict[lattice])
 print_as_vector(F_cm, 'F_cm')

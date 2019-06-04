@@ -1,7 +1,7 @@
 from SymbolicCollisions.core.printers import print_as_vector
 from sympy.matrices import Matrix
 from sympy import Symbol
-from SymbolicCollisions.core.ContinousCMTransforms import ContinousCMTransforms, get_mom_vector_from_continuous_def
+from SymbolicCollisions.core.ContinuousCMTransforms import ContinuousCMTransforms, get_mom_vector_from_continuous_def
 from SymbolicCollisions.core.cm_symbols import \
     F3D, dzeta3D, u3D, rho
 from SymbolicCollisions.core.cm_symbols import Mraw_D2Q9, M_ortho_GS
@@ -14,7 +14,7 @@ from SymbolicCollisions.core.DiscreteCMTransforms import \
 
 
 lattice = 'D2Q9'
-ccmt = ContinousCMTransforms(dzeta3D, u3D, F3D, rho)
+ccmt = ContinuousCMTransforms(dzeta3D, u3D, F3D, rho)
 dcmt = DiscreteCMTransforms(e_D2Q9, u2D, F2D, rho)
 
 start = time.process_time()
@@ -71,9 +71,16 @@ print_as_vector(cm_eq, 'cm_eq')
 print('\n//population_eq -> cm_eq - from continous definition: \n'
       'k_mn = integrate(fun, (x, -oo, oo), (y, -oo, oo)) \n'
       'where fun = fM(rho,u,x,y) *(x-ux)^m *(y-uy)^n *(z-uz)^o ')
-cm_eq = get_mom_vector_from_continuous_def(ccmt.get_hydro_DF,
+cm_eq = get_mom_vector_from_continuous_def(ccmt.get_incompressible_DF,
                                            continuous_transformation=ccmt.get_cm,
                                            moments_order=moments_dict[lattice])
 
 print_as_vector(cm_eq, 'cm_eq')
+
+cm_cht_eq = get_mom_vector_from_continuous_def(ccmt.get_cht_DF,
+                                               continuous_transformation=ccmt.get_cm,
+                                               moments_order=moments_dict[lattice],
+                                               serial_run=False)
+print_as_vector(cm_cht_eq, 'cm_cht_eq', raw_output=False)
+
 print(f'\n\n Done in {time.process_time() - start} [s].')

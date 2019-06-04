@@ -27,7 +27,7 @@ from SymbolicCollisions.core.cm_symbols import \
 from SymbolicCollisions.core.printers import print_as_vector
 
 from SymbolicCollisions.core.hardcoded_results import \
-    hardcoded_F_cm_Guo_hydro_LB_velocity_based_D2Q9, hardcoded_cm_eq_compressible_D2Q9
+    hardcoded_F_cm_Guo_hydro_LB_incompressible_D2Q9, hardcoded_cm_eq_compressible_D2Q9
 
 
 class TestDiscreteCMTransforms(unittest.TestCase):
@@ -63,13 +63,13 @@ class TestDiscreteCMTransforms(unittest.TestCase):
                                                          moments_order=moments_dict['D2Q9'],
                                                          serial_run=True)
 
-        from SymbolicCollisions.core.ContinousCMTransforms import \
-            ContinousCMTransforms, get_mom_vector_from_continuous_def
+        from SymbolicCollisions.core.ContinuousCMTransforms import \
+            ContinuousCMTransforms, get_mom_vector_from_continuous_def
 
         from SymbolicCollisions.core.cm_symbols import \
             F3D, dzeta3D, u3D
 
-        ccmt = ContinousCMTransforms(dzeta3D, u3D, F3D, rho)
+        ccmt = ContinuousCMTransforms(dzeta3D, u3D, F3D, rho)
         F_cm_Guo_cont = get_mom_vector_from_continuous_def(ccmt.get_force_Guo,
                                                            continuous_transformation=ccmt.get_cm,
                                                            moments_order=moments_dict['D2Q9'],
@@ -80,7 +80,7 @@ class TestDiscreteCMTransforms(unittest.TestCase):
 
         f = io.StringIO()
         with redirect_stdout(f):
-            print_as_vector(hardcoded_F_cm_Guo_hydro_LB_velocity_based_D2Q9, 'F_cm')
+            print_as_vector(hardcoded_F_cm_Guo_hydro_LB_incompressible_D2Q9, 'F_cm')
         expected_result = f.getvalue()
 
         for result in results:
@@ -136,8 +136,8 @@ class TestDiscreteCMTransforms(unittest.TestCase):
         out = f.getvalue()
 
         expected_result = '\tcm_eq[0] = m00;\n' \
-                          '\tcm_eq[1] = u.x*(-m00 + 1);\n' \
-                          '\tcm_eq[2] = u.y*(-m00 + 1);\n' \
+                          '\tcm_eq[1] = u.x*(1 - m00);\n' \
+                          '\tcm_eq[2] = u.y*(1 - m00);\n' \
                           '\tcm_eq[3] = m00*ux2 + 1/3.*m00 - ux2;\n' \
                           '\tcm_eq[4] = m00*uy2 + 1/3.*m00 - uy2;\n' \
                           '\tcm_eq[5] = uxuy*(m00 - 1.);\n' \
@@ -146,8 +146,8 @@ class TestDiscreteCMTransforms(unittest.TestCase):
                           '\tcm_eq[8] = m00*ux2*uy2 + 1/3.*m00*ux2 + 1/3.*m00*uy2 + 1/9.*m00 + 2.*ux2*uy2 - 1/3.*ux2 - 1/3.*uy2;\n'  # noqa
 
         assert 'cm_eq[0] = m00;' in out
-        assert 'cm_eq[1] = u.x*(-m00 + 1)' in out
-        assert 'cm_eq[2] = u.y*(-m00 + 1);' in out
+        assert 'cm_eq[1] = u.x*(1 - m00);' in out
+        assert 'cm_eq[2] = u.y*(1 - m00);' in out
         assert 'cm_eq[3] = m00*ux2 + 1/3.*m00 - ux2;\n' in out
         assert 'cm_eq[4] = m00*uy2 + 1/3.*m00 - uy2;\n' in out
         assert 'cm_eq[5] = uxuy*(m00 - 1.);\n' in out

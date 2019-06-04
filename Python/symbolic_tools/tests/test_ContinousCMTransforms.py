@@ -16,13 +16,14 @@ sys.path.append(os.path.join('.'))  # allow CI bot to see the stuff from the mai
 from SymbolicCollisions.core.printers import print_as_vector
 
 from SymbolicCollisions.core.hardcoded_results import hardcoded_F_cm_hydro_density_based_D3Q19, \
-    hardcoded_F_cm_Guo_hydro_LB_velocity_based_D2Q9, \
+    hardcoded_F_cm_Guo_hydro_LB_incompressible_D2Q9, \
     hardcoded_F_cm_hydro_density_based_D2Q9, \
     hardcoded_cm_eq_compressible_D2Q9,    hardcoded_cm_eq_compressible_D3Q19, \
-    hardcoded_cm_eq_incompressible_D2Q9,\
-    hardcoded_cm_eq_compressible_D2Q9_thermal
+    hardcoded_cm_eq_incompressible_D2Q9, \
+    hardcoded_cm_eq_compressible_D2Q9_thermal, \
+    hardcoded_cm_eq_cht_D2Q9
 
-from SymbolicCollisions.core.ContinousCMTransforms import ContinousCMTransforms, get_mom_vector_from_continuous_def
+from SymbolicCollisions.core.ContinuousCMTransforms import ContinuousCMTransforms, get_mom_vector_from_continuous_def
 from SymbolicCollisions.core.cm_symbols import \
     F3D, dzeta3D, u3D, \
     rho, cs2_thermal
@@ -36,8 +37,8 @@ class TestContinousCMTransforms(unittest.TestCase):
         # k_mn = integrate(fun, (x, -oo, oo), (y, -oo, oo)) '
         # where fun = fM(rho,u,x,y) *(x-ux)^m *(y-uy)^n * (z-uz)^o ')
 
-        cm_i = ContinousCMTransforms(dzeta3D, u3D, F3D, rho)
-        cm_eq = get_mom_vector_from_continuous_def(cm_i.get_hydro_DF,
+        cm_i = ContinuousCMTransforms(dzeta3D, u3D, F3D, rho)
+        cm_eq = get_mom_vector_from_continuous_def(cm_i.get_incompressible_DF,
                                                    continuous_transformation=cm_i.get_cm,
                                                    moments_order=moments_dict['D2Q9'],
                                                    serial_run=True)
@@ -52,8 +53,8 @@ class TestContinousCMTransforms(unittest.TestCase):
         #  thank you sympy...
 
         expected_result = '\tcm_eq[0] = m00;\n' \
-                          '\tcm_eq[1] = u.x*(-m00 + 1);\n' \
-                          '\tcm_eq[2] = u.y*(-m00 + 1);\n' \
+                          '\tcm_eq[1] = u.x*(1 - m00);\n' \
+                          '\tcm_eq[2] = u.y*(1 - m00);\n' \
                           '\tcm_eq[3] = m00*ux2 + 1/3.*m00 - ux2;\n' \
                           '\tcm_eq[4] = m00*uy2 + 1/3.*m00 - uy2;\n' \
                           '\tcm_eq[5] = uxuy*(m00 - 1.);\n' \
@@ -62,8 +63,8 @@ class TestContinousCMTransforms(unittest.TestCase):
                           '\tcm_eq[8] = m00*ux2*uy2 + 1/3.*m00*ux2 + 1/3.*m00*uy2 + 1/9.*m00 - ux2*uy2 - 1/3.*ux2 - 1/3.*uy2;\n'  # noqa
 
         assert 'cm_eq[0] = m00;' in out
-        assert 'cm_eq[1] = u.x*(-m00 + 1)' in out
-        assert 'cm_eq[2] = u.y*(-m00 + 1);' in out
+        assert 'cm_eq[1] = u.x*(1 - m00)' in out
+        assert 'cm_eq[2] = u.y*(1 - m00);' in out
         assert 'cm_eq[3] = m00*ux2 + 1/3.*m00 - ux2;\n' in out
         assert 'cm_eq[4] = m00*uy2 + 1/3.*m00 - uy2;\n' in out
         assert 'cm_eq[5] = uxuy*(m00 - 1.);\n' in out
@@ -74,7 +75,7 @@ class TestContinousCMTransforms(unittest.TestCase):
         assert expected_result == out
 
     def test_get_F_cm_using_He_scheme_and_continuous_Maxwellian_DF(self):
-        cm_i = ContinousCMTransforms(dzeta3D, u3D, F3D, rho)
+        cm_i = ContinuousCMTransforms(dzeta3D, u3D, F3D, rho)
         F_cm = get_mom_vector_from_continuous_def(cm_i.get_force_He_hydro_DF,
                                                   continuous_transformation=cm_i.get_cm,
                                                   moments_order=moments_dict['D2Q9'],
@@ -103,7 +104,7 @@ class TestContinousCMTransforms(unittest.TestCase):
         assert expected_result == out
 
     def test_thermal_cm_eq_vector_from_continuous_def(self):
-        ccmt = ContinousCMTransforms(dzeta3D, u3D, F3D, rho, cs2=cs2_thermal)
+        ccmt = ContinuousCMTransforms(dzeta3D, u3D, F3D, rho, cs2=cs2_thermal)
         import warnings
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
@@ -128,7 +129,7 @@ class TestContinousCMTransforms(unittest.TestCase):
 
     def test_cm_vector_from_continuous_def(self):
         # this test runs long without output and CI may consider it as a timeout :/
-        ccmt = ContinousCMTransforms(dzeta3D, u3D, F3D, rho)
+        ccmt = ContinuousCMTransforms(dzeta3D, u3D, F3D, rho)
 
         lattices = [
             'D2Q9',
@@ -136,6 +137,7 @@ class TestContinousCMTransforms(unittest.TestCase):
             'D2Q9',
             'D2Q9',
             'D3Q19',
+            'D2Q9'
             ]
 
         functions = [
@@ -144,14 +146,16 @@ class TestContinousCMTransforms(unittest.TestCase):
             ccmt.get_force_Guo,
             ccmt.get_force_He_MB,
             ccmt.get_force_He_MB,
+            ccmt.get_cht_DF,
         ]
 
         expected_results = [
             hardcoded_cm_eq_compressible_D2Q9,
             hardcoded_cm_eq_compressible_D3Q19,
-            hardcoded_F_cm_Guo_hydro_LB_velocity_based_D2Q9,
+            hardcoded_F_cm_Guo_hydro_LB_incompressible_D2Q9,
             hardcoded_F_cm_hydro_density_based_D2Q9,
             hardcoded_F_cm_hydro_density_based_D3Q19,
+            hardcoded_cm_eq_cht_D2Q9,
         ]
 
         for fun, lattice, expected_result in zip(functions, lattices, expected_results):
