@@ -4,6 +4,7 @@ from Benchmarks.HotKarman_Correlations.HT_Nu_Correlations import get_Nu_cylinder
 import numpy as np
 import pwd
 import matplotlib.pyplot as plt
+import matplotlib.pylab as pylab
 import re
 
 #######################################################
@@ -47,18 +48,22 @@ def calc_Nu(q_conv, k, D, L):
 
 
 def make_plot(x, y, x2, y2, fig_name):
-    # -------------------- make dummy plot --------------------
-    plt.rcParams.update({'font.size': 14})
-    plt.figure(figsize=(14, 8))
+    params = {'legend.fontsize': 'xx-large',
+              'figure.figsize': (14, 8),
+              'axes.labelsize': 'xx-large',
+              'axes.titlesize': 'xx-large',
+              'xtick.labelsize': 'xx-large',
+              'ytick.labelsize': 'xx-large'}
+    pylab.rcParams.update(params)
 
     axes = plt.gca()
     plt.plot(x, y,
              color="black", marker="", markevery=25, markersize=7, linestyle="-", linewidth=2,
-             label='HeatSource')
+             label='Heater')
 
     plt.plot(x2, y2,
              color="black", marker=">", markevery=25, markersize=7, linestyle=":", linewidth=2,
-             label='HeatFluxX')
+             label='Outlet')
     # ------ format y axis ------ #
     yll = min(y.min(), y2.min())
     yhl = max(y.max(), y2.max())
@@ -77,7 +82,7 @@ def make_plot(x, y, x2, y2, fig_name):
     plt.ticklabel_format(style='sci', axis='x', scilimits=(0, 0))
     # plt.ticklabel_format(style='sci', axis='y', scilimits=(0, 0))  # scilimits=(-8, 8)
 
-    plt.title(f'Convergence Monitor - Moving Average')
+    plt.title(f'')
     plt.xlabel(r'$iterations$')
     plt.ylabel(r'$|\frac{\sigma}{\mu}|$')
     plt.legend()
@@ -90,7 +95,7 @@ def make_plot(x, y, x2, y2, fig_name):
     plt.close(fig)  # close the figure
 
 
-print("--- rsync complete, time for plotting ---")
+print("--- rsync complete, lets plot it! ---")
 
 for root, dirs, files in os.walk(local_logs_folder):
     for file in files:
@@ -143,6 +148,7 @@ for root, dirs, files in os.walk(local_logs_folder):
             x = log['Iteration'][skip_first_iterations + window - 1:]
 
             plot_name = "convergence_MA_" + re.sub(r".csv", r".png", file)
+            plot_name = re.sub(r"_Log_P00_00000000", r"", plot_name)
             make_plot(x, y1, x, y2, plot_name)
 
             print(f"processed {file}.")
