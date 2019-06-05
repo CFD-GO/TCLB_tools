@@ -26,7 +26,7 @@ cmd = "rsync -zarv  --prune-empty-dirs --include \"*/\"  --include=\"*.csv\" --e
       + f" \"{local_logs_folder}\""
 
 print(cmd)
-# os.system(cmd)
+os.system(cmd)
 
 
 # folders = os.listdir(local_logs_folder)
@@ -105,32 +105,32 @@ for root, dirs, files in os.walk(local_logs_folder):
             log = pd.read_csv(filepath, delimiter=",")
 
             # get Re, Pr numbers from LB log
-            # match = re.search('sizer_(\d+)', file, re.IGNORECASE)
-            # size = int(match.group(1))
-            #
-            # u = 0.01
-            # D = 30*size
-            # v = log['nu'][0]
-            # Re = u*D/v
-            #
-            # k = log['conductivity-DefaultZone'][0]
-            # rho = 1
-            # cp = 1
-            # Pr = v*rho*cp/k
-            #
-            # # calculate Nu in all possible ways
-            # q_conv_avg_source = log['HeatSource'][-100:].mean()
-            # q_conv_avg_outlet = log['HeatFluxX'][-100:].mean()
-            #
-            # L = 3
-            # Nu_conv_avg_source = calc_Nu(q_conv_avg_outlet, k, D, L)
-            # Nu_conv_avg_outlet = calc_Nu(q_conv_avg_outlet, k, D, L)
-            #
-            # Nu_corr = get_Nu_cylinder_by_Churchill_Bernstein(Re=Re, Pr=Pr)
+            match = re.search('sizer_(\d+)', file, re.IGNORECASE)
+            size = int(match.group(1))
 
-            # print(f"Re={Re:0.1f} Pr={Pr:0.1f} size={size} "
-            #       f"Nu_conv_avg_source={Nu_conv_avg_source:0.1f} Nu_conv_avg_outlet={Nu_conv_avg_outlet:0.1f} Nu_corr={Nu_corr:0.1f} "
-            #       f"--- Extracted from file {file}")
+            u = 0.01
+            D = 30*size
+            v = log['nu'][0]
+            Re = u*D/v
+
+            k = log['conductivity-DefaultZone'][0]
+            rho = 1
+            cp = 1
+            Pr = v*rho*cp/k
+
+            # calculate Nu in all possible ways
+            q_conv_avg_source = log['HeatSource'][-100:].mean()
+            q_conv_avg_outlet = log['HeatFluxX'][-100:].mean()
+
+            L = 3
+            Nu_conv_avg_source = calc_Nu(q_conv_avg_outlet, k, D, L)
+            Nu_conv_avg_outlet = calc_Nu(q_conv_avg_outlet, k, D, L)
+
+            Nu_corr = get_Nu_cylinder_by_Churchill_Bernstein(Re=Re, Pr=Pr)
+
+            print(f"\n\n Re={Re:0.1f} Pr={Pr:0.1f} size={size} "
+                  f"Nu_conv_avg_source={Nu_conv_avg_source:0.2f} Nu_conv_avg_outlet={Nu_conv_avg_outlet:0.2f} Nu_corr={Nu_corr:0.2f} "
+                  f"--- Extracted from file {file}")
 
             def calc_norm_std(x):
                 result = abs(np.std(x) / np.mean(x))
