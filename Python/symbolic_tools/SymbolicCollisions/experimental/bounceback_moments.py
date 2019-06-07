@@ -7,6 +7,7 @@ from SymbolicCollisions.core.cm_symbols import \
 from SymbolicCollisions.core.ContinuousCMTransforms import ContinuousCMTransforms, get_mom_vector_from_continuous_def
 
 from sympy import Symbol
+from sympy import Matrix
 from SymbolicCollisions.core.cm_symbols import dzeta2D, e_D2Q9, u2D, F2D, rho, moments_dict, NrawD2Q9, Mraw_D2Q9, M_ortho_GS
 from SymbolicCollisions.core.printers import print_as_vector
 
@@ -17,7 +18,7 @@ start = time.process_time()
 lattice = 'D2Q9'
 dcmt = DiscreteCMTransforms(e_D2Q9, u2D, F2D, rho)
 ccmt = ContinuousCMTransforms(dzeta2D, u2D, F2D, rho)
-
+ccmt = ContinuousCMTransforms(dzeta3D, u3D, F3D, rho)
 print('\n\n// === discrete moments === \n ')
 print('\n//moments from definition: k_mn = sum( (e_ix)^m (e_iy)^n * fun_i)')
 print('\n\n// === BOUNDARY CONDITIONS === \n ')
@@ -56,8 +57,18 @@ mom_bc = get_mom_vector_from_continuous_def(ccmt.get_force_He_MB,
 
 print_as_vector(mom_bc, 'He forcing scheme')
 
+
+kx = Symbol('k.x')
+ky = Symbol('k.y')
+kz = Symbol('k.z')
+#
+k2D = Matrix([kx, ky])
+k3D = Matrix([kx, ky, kz])
+# ccmt = ContinuousCMTransforms(dzeta3D, u3D, k3D, rho)
+
+ccmt = ContinuousCMTransforms(dzeta2D, u2D, k2D, rho)
 mom_bc = get_mom_vector_from_continuous_def(ccmt.get_bc_bb_heat_flux_cht,
                                             continuous_transformation=ccmt.get_cm,
                                             moments_order=moments_dict[lattice])
 
-print_as_vector(mom_bc, 'crm_heat_flux_cht_bc', raw_output=True)
+print_as_vector(mom_bc, 'cm_heat_flux_cht_bc', raw_output=False)
