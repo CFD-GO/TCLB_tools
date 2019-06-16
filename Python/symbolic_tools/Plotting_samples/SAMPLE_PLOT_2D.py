@@ -1,6 +1,7 @@
 import numpy as np
 import sympy as sp
 import matplotlib.pyplot as plt
+import matplotlib.pylab as pylab
 
 # -------------------- prepare dummy data --------------------
 
@@ -11,8 +12,19 @@ y = -4 * x * (x - x_range) / (x_range * x_range)
 fig_name = f'sample_plot2D_param_b={x_range}.png'
 
 # -------------------- make dummy plot --------------------
-plt.rcParams.update({'font.size': 14})
-plt.figure(figsize=(14, 8))
+# plt.figure(figsize=(14, 8))
+# plt.rcParams.update({'font.size': 14})
+
+# https://matplotlib.org/api/font_manager_api.html#matplotlib.font_manager.FontProperties.set_size
+params = {'legend.fontsize': 'xx-large',
+          'figure.figsize': (14, 8),
+         'axes.labelsize': 'xx-large',
+         'axes.titlesize':'xx-large',
+         'xtick.labelsize':'xx-large',
+         'ytick.labelsize':'xx-large'}
+pylab.rcParams.update(params)
+
+
 
 axes = plt.gca()
 plt.plot(x, y,
@@ -42,8 +54,8 @@ plt.title(f'Sample plot\n '
           r'$x_{range}$' + f'={x_range}'
           f'; \t'
           r'$x_{step}$' + f'={step:.4f}')
-plt.xlabel(r'$x_{label}$')
-plt.ylabel(r'$y_{label}$')
+plt.xlabel(r'$x_{label}$', fontsize=22)
+plt.ylabel(r'$y_{label}$', fontsize=22)
 plt.legend()
 plt.grid()
 
