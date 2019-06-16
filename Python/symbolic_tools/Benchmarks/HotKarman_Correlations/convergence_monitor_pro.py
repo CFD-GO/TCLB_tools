@@ -26,7 +26,7 @@ cmd = "rsync -zarv  --prune-empty-dirs --include \"*/\"  --include=\"*.csv\" --e
       + f" \"{local_logs_folder}\""
 
 print(cmd)
-os.system(cmd)
+# os.system(cmd)
 
 
 # folders = os.listdir(local_logs_folder)
@@ -77,8 +77,8 @@ def make_plot(x, y, x2, y2, fig_name):
     plt.yscale('log')
 
     # ------ format x axis ------ #
-    plt.xlim(0, x.max())
-
+    # plt.xlim(0, x.max())
+    plt.xlim(0, 4e6)
     plt.ticklabel_format(style='sci', axis='x', scilimits=(0, 0))
     # plt.ticklabel_format(style='sci', axis='y', scilimits=(0, 0))  # scilimits=(-8, 8)
 

@@ -12,9 +12,9 @@ from SymbolicCollisions.core.MatrixGenerator import get_raw_moments_matrix, get_
 # eqs 8-12 : (eye(q)-S)*cm + S*cm_eq + (eye(q)-S/2.)*force_in_cm_space
 
 # SETUP
-d = 3
-q = 19
-model = 'ade_with_f'  # choose from '['hydro', 'ade', 'ade_with_f']
+d = 2
+q = 9
+model = 'hydro_compressible'  # choose from '['hydro_compressible', 'hydro_incompressible', 'ade', 'ade_with_f']
 
 # DYNAMIC IMPORTS
 ex = dynamic_import("SymbolicCollisions.core.cm_symbols", f"ex_D{d}Q{q}")
@@ -27,7 +27,8 @@ else:
 
 def get_s_relax_switcher(choice):
     s_relax_switcher = {
-        'hydro': ("SymbolicCollisions.core.cm_symbols", f"S_relax_hydro_D{d}Q{q}"),
+        'hydro_compressible':   ("SymbolicCollisions.core.cm_symbols", f"S_relax_hydro_D{d}Q{q}"),
+        'hydro_incompressible': ("SymbolicCollisions.core.cm_symbols", f"S_relax_hydro_D{d}Q{q}"),
         'ade_with_f': ("SymbolicCollisions.core.cm_symbols", f"S_relax_ADE_D{d}Q{q}"),
         'ade': ("SymbolicCollisions.core.cm_symbols", f"S_relax_ADE_D{d}Q{q}"),
     }
@@ -40,7 +41,8 @@ S_Relax = get_s_relax_switcher(model)
 
 def get_cm_eq_and_F_cm_switcher(choice):
     cm_eq_switcher = {
-        'hydro': ("SymbolicCollisions.core.hardcoded_results", f"hardcoded_cm_eq_incompressible_D{d}Q{q}"),
+        'hydro_compressible': ("SymbolicCollisions.core.hardcoded_results", f"hardcoded_cm_eq_compressible_D{d}Q{q}"),
+        'hydro_incompressible': ("SymbolicCollisions.core.hardcoded_results", f"hardcoded_cm_eq_incompressible_D{d}Q{q}"),
         'ade_with_f': ("SymbolicCollisions.core.hardcoded_results", f"hardcoded_cm_eq_compressible_D{d}Q{q}"),
         'ade': ("SymbolicCollisions.core.hardcoded_results", f"hardcoded_cm_eq_compressible_D{d}Q{q}"),
     }
@@ -49,7 +51,8 @@ def get_cm_eq_and_F_cm_switcher(choice):
 
 
     F_cm_switcher = {
-        'hydro': ("SymbolicCollisions.core.hardcoded_results", f"hardcoded_cm_eq_incompressible_D{d}Q{q}"),
+        'hydro_compressible': ("SymbolicCollisions.core.hardcoded_results", f"hardcoded_F_cm_hydro_density_based_D{d}Q{q}"),
+        'hydro_incompressible': ("SymbolicCollisions.core.hardcoded_results", f"hardcoded_F_cm_hydro_velocity_based_D{d}Q{q}"),
         'ade_with_f': ("SymbolicCollisions.core.hardcoded_results", f"hardcoded_F_cm_pf_D{d}Q{q}"),
         'ade': None,
     }
@@ -82,7 +85,8 @@ cm_eq_pop_str = 'cm_eq'  # symbol defining populations
 # GENERATE CODE
 def make_header(choice):
     model_switcher = {
-        'hydro': f"CudaDeviceFunction void relax_and_collide_hydro_with_F(real_t {pop_in_str}[{q}], real_t {omega_v}, vector_t u, vector_t {F_str}) \n{{",
+        'hydro_compressible': f"CudaDeviceFunction void relax_and_collide_hydro_with_F(real_t {pop_in_str}[{q}], real_t {omega_v}, vector_t u, vector_t {F_str}) \n{{",
+        'hydro_incompressible': f"CudaDeviceFunction void relax_and_collide_hydro_with_F(real_t {pop_in_str}[{q}], real_t {omega_v}, vector_t u, vector_t {F_str}) \n{{",
         'ade_with_f': f"CudaDeviceFunction void relax_and_collide_ADE_with_F(real_t {pop_in_str}[{q}], real_t {omega_ade}, vector_t u, vector_t {F_str}) \n{{",
         'ade': f"CudaDeviceFunction void relax_and_collide_ADE(real_t {pop_in_str}[{q}], real_t {omega_ade}, vector_t u) \n{{",
     }
@@ -103,7 +107,8 @@ print_ccode(get_m00(q, pop_in_str), assign_to=f'\treal_t {m00}')
 
 def make_variables(choice):
     model_switcher = {
-        'hydro': f"\n\treal_t {temp_pop_str}[{q}];\n",
+        'hydro_compressible': f"\n\treal_t {temp_pop_str}[{q}];\n",
+        'hydro_incompressible': f"\n\treal_t {temp_pop_str}[{q}];\n",
         'ade_with_f': f"\n\treal_t {temp_pop_str}[{q}];\n",
         'ade': f"\n\treal_t {temp_pop_str}[{q}];\n",
     }
@@ -144,10 +149,13 @@ print("\t//collide")
 def make_collision(choice):
     model_switcher = {
         # Relax 2nd moments for hydro, SOI
-        'hydro': (eye(q) - S_Relax) * temp_populations
+        'hydro_compressible': (eye(q) - S_Relax) * temp_populations
                  + S_Relax * hardcoded_cm_eq
                  + (eye(q) - S_Relax / 2) * hardcoded_F_cm,
 
+        'hydro_incompressible': (eye(q) - S_Relax) * temp_populations
+                              + S_Relax * hardcoded_cm_eq
+                              + (eye(q) - S_Relax / 2) * hardcoded_F_cm,
         # Relax 1st moments for ADE, SOI
         'ade_with_f': (eye(q) - S_Relax) * temp_populations
                       + S_Relax * hardcoded_cm_eq

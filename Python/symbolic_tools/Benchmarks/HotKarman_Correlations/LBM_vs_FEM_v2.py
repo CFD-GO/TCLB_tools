@@ -67,11 +67,16 @@ scaling_type = "keep_nu_and_k"
 
 T_lb_slice1, ux_lb1, y_lb1 = read_data_from_LBM(
     os.path.join(main_folder, f'{scaling_type}_sizer_{1}_Re{Re}_Pr{Pr}',
-                 f'HotKarman3D_template_sizer_{1}_Re{Re}_Pr{Pr}_VTK_P00_00980000.pvti'))
+                 f'HotKarman3D_template_sizer_{1}_Re{Re}_Pr{Pr}_VTK_P00_04000000.pvti'))
 
 T_lb_slice2, ux_lb2, y_lb2 = read_data_from_LBM(
     os.path.join(main_folder, f'{scaling_type}_sizer_{2}_Re{Re}_Pr{Pr}',
-                 f'HotKarman3D_template_sizer_{2}_Re{Re}_Pr{Pr}_VTK_P00_00980000.pvti'))
+                 f'HotKarman3D_template_sizer_{2}_Re{Re}_Pr{Pr}_VTK_P00_05600000.pvti'))  # Pr10
+
+# T_lb_slice2, ux_lb2, y_lb2 = read_data_from_LBM(
+#     os.path.join(main_folder, f'{scaling_type}_sizer_{2}_Re{Re}_Pr{Pr}',
+#                  f'HotKarman3D_template_sizer_{2}_Re{Re}_Pr{Pr}_VTK_P00_06400000.pvti')) # Pr100 Pr1000
+#
 
 # T_lb_slice3, ux_lb3, y_lb3 = read_data_from_LBM(
 #     os.path.join(main_folder, f'{scaling_type}_sizer_{4}_Re{Re}_Pr{Pr}',
@@ -79,7 +84,7 @@ T_lb_slice2, ux_lb2, y_lb2 = read_data_from_LBM(
 
 T_lb_slice3, ux_lb3, y_lb3 = read_data_from_LBM(
     os.path.join(main_folder, f'{scaling_type}_sizer_{4}_Re{Re}_Pr{Pr}',
-                 f'HotKarman3D_template_sizer_{4}_Re{Re}_Pr{Pr}_VTK_P00_01900000.pvti'))
+                 f'HotKarman3D_template_sizer_{4}_Re{Re}_Pr{Pr}_VTK_P00_04000000.pvti'))
 
 
 for cross_section, x_cut in cross_sections.items():
