@@ -5,7 +5,9 @@ import pandas as pd
 import pwd
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.pylab as pylab
 import collections
+
 
 home = pwd.getpwuid(os.getuid()).pw_dir
 main_folder = os.path.join(home, 'DATA_FOR_PLOTS', 'HotBarman3D')
@@ -65,11 +67,16 @@ scaling_type = "keep_nu_and_k"
 
 T_lb_slice1, ux_lb1, y_lb1 = read_data_from_LBM(
     os.path.join(main_folder, f'{scaling_type}_sizer_{1}_Re{Re}_Pr{Pr}',
-                 f'HotKarman3D_template_sizer_{1}_Re{Re}_Pr{Pr}_VTK_P00_00980000.pvti'))
+                 f'HotKarman3D_template_sizer_{1}_Re{Re}_Pr{Pr}_VTK_P00_04000000.pvti'))
 
 T_lb_slice2, ux_lb2, y_lb2 = read_data_from_LBM(
     os.path.join(main_folder, f'{scaling_type}_sizer_{2}_Re{Re}_Pr{Pr}',
-                 f'HotKarman3D_template_sizer_{2}_Re{Re}_Pr{Pr}_VTK_P00_00980000.pvti'))
+                 f'HotKarman3D_template_sizer_{2}_Re{Re}_Pr{Pr}_VTK_P00_05600000.pvti'))  # Pr10
+
+# T_lb_slice2, ux_lb2, y_lb2 = read_data_from_LBM(
+#     os.path.join(main_folder, f'{scaling_type}_sizer_{2}_Re{Re}_Pr{Pr}',
+#                  f'HotKarman3D_template_sizer_{2}_Re{Re}_Pr{Pr}_VTK_P00_06400000.pvti')) # Pr100 Pr1000
+#
 
 # T_lb_slice3, ux_lb3, y_lb3 = read_data_from_LBM(
 #     os.path.join(main_folder, f'{scaling_type}_sizer_{4}_Re{Re}_Pr{Pr}',
@@ -77,16 +84,22 @@ T_lb_slice2, ux_lb2, y_lb2 = read_data_from_LBM(
 
 T_lb_slice3, ux_lb3, y_lb3 = read_data_from_LBM(
     os.path.join(main_folder, f'{scaling_type}_sizer_{4}_Re{Re}_Pr{Pr}',
-                 f'HotKarman3D_template_sizer_{4}_Re{Re}_Pr{Pr}_VTK_P00_01900000.pvti'))
+                 f'HotKarman3D_template_sizer_{4}_Re{Re}_Pr{Pr}_VTK_P00_04000000.pvti'))
 
 
 for cross_section, x_cut in cross_sections.items():
     title = f'Temperature LBM vs FEM \n cross-section {cross_section}'
     title = ''  # skip title for latex report
-    fig_name = f'T_LBM_vs_ToolBox_clmax{clmax}_Re{Re}_Pr{Pr}_cross_section_{cross_section}'
+    fig_name = f'T_LBM_vs_ToolBox_clmax{clmax}_Re{Re}_Pr{Pr}_cross_section_{cross_section}.pdf'
 
-    plt.rcParams.update({'font.size': 14})
-    plt.figure(figsize=(14, 8))
+    params = {'legend.fontsize': 'xx-large',
+              'figure.figsize': (14, 8),
+              'axes.labelsize': 'xx-large',
+              'axes.titlesize': 'xx-large',
+              'xtick.labelsize': 'xx-large',
+              'ytick.labelsize': 'xx-large'}
+    pylab.rcParams.update(params)
+
     axes = plt.gca()
 
     plt.plot(T_lb_slice1[:, x_cut*1], y_lb1,
@@ -137,10 +150,16 @@ for cross_section, x_cut in cross_sections.items():
 for cross_section, x_cut in cross_sections.items():
     # title = r'$U_x$' + f' LBM vs FEM cross-section {cross_section}'
     title = ''  # skip title for latex report
-    fig_name = f'ux_LBM_vs_ToolBox_clmax{clmax}_Re{Re}_Pr{Pr}_cross_section_{cross_section}'
+    fig_name = f'ux_LBM_vs_ToolBox_clmax{clmax}_Re{Re}_Pr{Pr}_cross_section_{cross_section}.pdf'
 
-    plt.rcParams.update({'font.size': 14})
-    plt.figure(figsize=(14, 8))
+    params = {'legend.fontsize': 'xx-large',
+              'figure.figsize': (14, 8),
+              'axes.labelsize': 'xx-large',
+              'axes.titlesize': 'xx-large',
+              'xtick.labelsize': 'xx-large',
+              'ytick.labelsize': 'xx-large'}
+    pylab.rcParams.update(params)
+
     axes = plt.gca()
 
     plt.plot(ux_lb1[:, x_cut*1]*1, y_lb1,
@@ -187,3 +206,5 @@ for cross_section, x_cut in cross_sections.items():
     plt.show()
 
     plt.close(fig)  # close the figure
+
+print('bye')

@@ -13,7 +13,7 @@ from SymbolicCollisions.core.MatrixGenerator import get_raw_moments_matrix, get_
 
 # SETUP
 d = 3
-q = 19
+q = 15
 
 # DYNAMIC IMPORTS
 ex = dynamic_import("SymbolicCollisions.core.cm_symbols", f"ex_D{d}Q{q}")
@@ -42,19 +42,21 @@ pprint(Nraw)
 # pprint(x)
 
 
-print("\n\t//back to raw moments")
-m = Nraw.inv() * populations
-print_as_vector(m, print_symbol=temp_pop_str, raw_output=True)
-#
-print("\n\t//back to density-probability functions")
-populations = Mraw.inv() * temp_populations
-print_as_vector(populations, print_symbol=pop_in_str, raw_output=True)
+print("\n\t//raw moments from density-probability functions")
+m = Mraw * temp_populations
+# print("\t//[m00, m10, m01, m20, m02, m11, m21, m12, m22]")
+print_as_vector(m, print_symbol=pop_in_str)
+
+print("\n\t//central moments from raw moments")
+cm = Nraw * populations
+print_as_vector(cm, print_symbol=temp_pop_str)
 
 
 print("\n\t//back to raw moments")
 m = Nraw.inv() * populations
-print_as_vector(m, print_symbol=temp_pop_str, raw_output=True)
+print_as_vector(m, print_symbol=temp_pop_str, raw_output=False)
 #
 print("\n\t//back to density-probability functions")
 populations = Mraw.inv() * temp_populations
-print_as_vector(populations, print_symbol=pop_in_str, raw_output=True)
+print_as_vector(populations, print_symbol=pop_in_str, raw_output=False)
+
