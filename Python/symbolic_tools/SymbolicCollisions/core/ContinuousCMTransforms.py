@@ -141,6 +141,7 @@ class ContinuousCMTransforms:
     def get_cht_DF(self):
         H = self.T * self.cp * self.rho
         Sigma2 = self.gamma * self.cs2 / (self.cp * self.rho)
+        # Sigma2 = Symbol('Sigma', positive=True)
         df_H = self.get_Maxwellian_DF(psi=H, u=self.u, sigma2=Sigma2)
         return df_H
 
@@ -177,6 +178,7 @@ class ContinuousCMTransforms:
         """
         eu_dot_f = (self.dzeta - self.u).dot(self.F)
         Sigma2 = self.gamma * self.cs2 / (self.cp * self.rho)
+        # Sigma2 = Symbol('Sigma', positive=True)
         H = self.T * self.cp * self.rho
         result = -2*self.get_Maxwellian_DF(psi=H, u=self.u, sigma2=Sigma2) * eu_dot_f / self.cs2
         return result

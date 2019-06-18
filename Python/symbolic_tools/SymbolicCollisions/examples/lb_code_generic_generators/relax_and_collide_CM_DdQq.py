@@ -6,15 +6,17 @@ from SymbolicCollisions.core.cm_symbols import dynamic_import
 from SymbolicCollisions.core.DiscreteCMTransforms import get_DF, get_m00
 from SymbolicCollisions.core.printers import print_u2, print_as_vector
 from SymbolicCollisions.core.MatrixGenerator import get_raw_moments_matrix, get_shift_matrix
+from sympy.matrices import Matrix
+import numpy as np
 
 # inspired by:
 # "Consistent Forcing Scheme in the cascaded LBM" L. Fei et al. 2017
 # eqs 8-12 : (eye(q)-S)*cm + S*cm_eq + (eye(q)-S/2.)*force_in_cm_space
 
 # SETUP
-d = 2
-q = 9
-model = 'hydro_compressible'  # choose from '['hydro_compressible', 'hydro_incompressible', 'ade', 'ade_with_f']
+d = 3
+q = 27
+model = 'ade_with_f'  # choose from '['hydro_compressible', 'hydro_incompressible', 'ade', 'ade_with_f']
 
 # DYNAMIC IMPORTS
 ex = dynamic_import("SymbolicCollisions.core.cm_symbols", f"ex_D{d}Q{q}")
@@ -57,7 +59,12 @@ def get_cm_eq_and_F_cm_switcher(choice):
         'ade': None,
     }
     which_F_cm = F_cm_switcher.get(choice, lambda: "Invalid argument")
-    hardcoded_F_cm = dynamic_import(*which_F_cm)
+    hardcoded_F_cm = \
+        dynamic_import(*which_F_cm) if which_F_cm is not None \
+        else Matrix(np.full((q, 1), 1, dtype=int))  # make dummy F
+
+
+    # hardcoded_F_cm = dynamic_import(*which_F_cm)
     return hardcoded_cm_eq, hardcoded_F_cm
 
 

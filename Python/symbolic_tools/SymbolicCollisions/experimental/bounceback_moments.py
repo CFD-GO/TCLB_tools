@@ -50,23 +50,45 @@ mom_bc = get_mom_vector_from_continuous_def(ccmt.get_bc_bb_concentration_cht,
 
 print_as_vector(mom_bc, 'crm_concentration_cht_bc')
 
-print("\n\n continuous raw moments: heat flux cht bc")
+
+print("\n\n continuous raw moments: momentum flux bc")
+mom_bc = get_mom_vector_from_continuous_def(ccmt.get_force_He_MB,
+                                          continuous_transformation=ccmt.get_m,
+                                          moments_order=moments_dict[lattice])
+
+print_as_vector(mom_bc, 'He forcing scheme - m')
+
+
+print("\n\n continuous central moments: momentum flux bc")
 mom_bc = get_mom_vector_from_continuous_def(ccmt.get_force_He_MB,
                                           continuous_transformation=ccmt.get_cm,
                                           moments_order=moments_dict[lattice])
 
-print_as_vector(mom_bc, 'He forcing scheme')
+print_as_vector(mom_bc, 'He forcing scheme - cm')
 
-
+print("\n\n continuous raw moments: heat flux bc")
 kx = Symbol('k.x')
 ky = Symbol('k.y')
-kz = Symbol('k.z')
-#
-k2D = Matrix([kx, ky])
-k3D = Matrix([kx, ky, kz])
-# ccmt = ContinuousCMTransforms(dzeta3D, u3D, k3D, rho)
+# k2D = Matrix([kx, ky])
+# ccmt = ContinuousCMTransforms(dzeta2D, u2D, k2D, rho)
 
-ccmt = ContinuousCMTransforms(dzeta2D, u2D, k2D, rho)
+kz = Symbol('k.z')
+k3D = Matrix([kx, ky, kz])
+ccmt = ContinuousCMTransforms(dzeta3D, u3D, k3D, rho)
+
+mom_bc = get_mom_vector_from_continuous_def(ccmt.get_bc_bb_heat_flux_cht,
+                                            continuous_transformation=ccmt.get_m,
+                                            moments_order=moments_dict[lattice])
+
+print_as_vector(mom_bc, 'm_heat_flux_cht_bc', raw_output=False)
+
+mom_bc = get_mom_vector_from_continuous_def(ccmt.get_bc_bb_heat_flux_cht,
+                                            continuous_transformation=ccmt.get_cm,
+                                            moments_order=moments_dict[lattice])
+
+print_as_vector(mom_bc, 'cm_heat_flux_cht_bc', raw_output=False)
+
+lattice = 'D3Q19'
 mom_bc = get_mom_vector_from_continuous_def(ccmt.get_bc_bb_heat_flux_cht,
                                             continuous_transformation=ccmt.get_cm,
                                             moments_order=moments_dict[lattice])

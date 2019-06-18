@@ -258,13 +258,13 @@ S_relax_hydro_D2Q9[4, 3] = s_minus_D2Q9
 
 S_relax_ADE_D2Q9 = diag(1, omega_ade, omega_ade, 1, 1, 1, 1, 1, 1)
 
-# Both S_relax_D3Q27 andorder of 3D (central) moments as in
+# Both S_relax_D3Q27 and order of 3D (central) moments as in
 # `Three-dimensional cascaded lattice Boltzmann method:
 # Improved implementation and consistent forcing scheme`
 # by Linlin Fei, Kai H.  Luo,  Qing Li. 2018
 
 # bulk_visc_3D = cs2*(2/3)*(1/sb -0.5)  # this is different than in 2D for some reason...
-#  kin_visc_3D = cs2(1/s_v -0.5)
+#  kin_visc_3D = cs2(1/s_v - 0.5)
 
 s_plus_D3Q27 = (omega_b + 2*omega_v)/3
 s_minus_D3Q27 = (omega_b - omega_v)/3
@@ -276,6 +276,7 @@ S_relax_hydro_D3Q27[8, 9] = s_minus_D3Q27
 S_relax_hydro_D3Q27[9, 7] = s_minus_D3Q27
 S_relax_hydro_D3Q27[9, 8] = s_minus_D3Q27
 
+S_relax_ADE_D3Q27 = diag(1, omega_ade, omega_ade, omega_ade, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
 
 
 S_relax_MRT_GS = diag(1, 1, 1, 1, 1, 1, 1, omega_v, omega_v)  #
