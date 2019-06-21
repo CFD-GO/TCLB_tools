@@ -55,7 +55,7 @@ class TestVtiReader(unittest.TestCase):
         assert pdT.size > 0
         assert pdT2.size > 0
 
-    def test_vtk_reader_3D_and_plotter(self):
+    def test_vtk_parallel_reader_3D(self):
         filename = 'HotKarman3D_template_sizer_1_nu_0.03_k_0.003_VTK_P00_00600000.pvti'
         wd = os.getcwd()
         # wd = os.path.dirname(wd)  # go level up

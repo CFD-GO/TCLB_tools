@@ -1,7 +1,7 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-from Benchmarks.ADE.steady_two_layer_cylinder_analytical_2D import InputForMultiLayeredPipe, PipeWithinPipe
+from Benchmarks.ADE.steady_two_layer_cylinder_analytical_2D import PipeWithinPipeDirichlet
 gauge = 1
 
 r0 = gauge * (8 / 2)  # inner radius
@@ -14,8 +14,8 @@ k2 = 0.01  # outer layer - heat conductivity for r1 < r < r2
 T0 = 0  # temperature for r = r0
 T2 = 1  # temperature for r = r2
 
-anal_input = InputForMultiLayeredPipe(r0, r1, r2, k1, k2, T0, T2)
-pwp = PipeWithinPipe(anal_input)
+
+pwp = PipeWithinPipeDirichlet(r0, r1, r2, k1, k2, T0, T2)
 
 step = 0.01
 

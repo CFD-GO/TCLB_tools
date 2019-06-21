@@ -1,4 +1,4 @@
-from Benchmarks.ADE.steady_two_layer_cylinder_analytical_2D import InputForMultiLayeredPipe, PipeWithinPipe
+from Benchmarks.ADE.steady_two_layer_cylinder_analytical_2D import PipeWithinPipeDirichlet
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib import cm as colormap
@@ -57,8 +57,8 @@ x0 = gauge * (lattice_size / 2)  # center of the pipe
 y0 = gauge * (lattice_size / 2)
 
 # ----------------------- compute anal solution ---------------------------
-anal_input = InputForMultiLayeredPipe(r0, r1, r2, k1, k2, T0, T2)
-pwp = PipeWithinPipe(anal_input)
+
+pwp = PipeWithinPipeDirichlet(r0, r1, r2, k1, k2, T0, T2)
 
 x_grid = np.linspace(0, xSIZE, xSIZE, endpoint=False) + 0.5
 y_grid = np.linspace(0, ySIZE, ySIZE, endpoint=False) + 0.5
