@@ -20,11 +20,9 @@ lattice_size = int(gauge * reference_lattice_size)
 k=f"0.1666666"
 home = pwd.getpwuid(os.getuid()).pw_dir
 # k_0.1666666_size_128lu
-# batch_ruraWrurze_NeumannBC
-#
-# k_0.1666666_size_128lu_VTK_P00_00010000
-filename_vtk = f'k_{k}_size_{int(gauge * reference_lattice_size)}lu_VTK_P00_00010000.vti'
-main_folder = os.path.join(home, 'DATA_FOR_PLOTS', 'batch_ruraWrurze_NeumannBC', f'k_{k}_size_{lattice_size}lu')
+
+filename_vtk = f'test_k_{k}_size_{int(gauge * reference_lattice_size)}lu_VTK_P00_00010000.vti'
+main_folder = os.path.join(home, 'DATA_FOR_PLOTS', 'batch_ruraWrurze_NeumannBC', f'k_{k}_size_{lattice_size}lu_abb')
 filepath_vtk = os.path.join(main_folder, filename_vtk)
 vti_reader = VTIFile(filepath_vtk)
 T_num = vti_reader.get("T")
@@ -38,16 +36,9 @@ assert ySIZE == xSIZE == int(gauge * reference_lattice_size)
 r0 = gauge * (8 / 2)  # inner radius
 r2 = gauge * (30 / 2)  # outer radius
 
+# J0 = 0.22  # heat flux (dT/dr) for r = r0
 J0 = 1  # heat flux (dT/dr) for r = r0
 T2 = 0  # temperature for r = r2
-
-# pwp = PipeWithinPipeNeumann(r0, r2, J0, T2)
-#
-# step = 0.01
-#
-# r = np.arange(r0, r2, step)
-# y = np.array([pwp.get_temperature_r(r_) for r_ in r])
-#
 
 # ----------------------- compute anal solution ---------------------------
 x0 = gauge * (reference_lattice_size / 2)  # center of the pipe
@@ -61,9 +52,7 @@ xx, yy = np.meshgrid(x_grid, y_grid)
 T_anal = np.zeros((ySIZE, xSIZE))
 
 for i in range(ySIZE):
-    # print(f"=== Doing i/ny: {i}/{ny}  ===")
     for j in range(xSIZE):
-        # print(f"Doing i/ny: {i}/{ny} \t j/nx: {j}/{nx}")
         r = pwp.get_r_from_xy(xx[i][j], yy[i][j], x0, y0)
         T_anal[i][j] = pwp.get_temperature_r(r)
 
@@ -78,13 +67,25 @@ T_err_field_eq = T_anal - T_num_slice
 # T_err_field = np.clip(T_err_field, -1, 1)
 # np.isnat()
 
-# 2d clip
-T_anal = T_anal[:, int(xSIZE / 2)]
-T_num_slice = T_num_slice[:, int(xSIZE / 2)]
 T_mse_eq = np.sum((T_anal - T_num_slice) * (T_anal - T_num_slice)) / len(T_anal)
 T_L2_eq = np.sqrt(
     np.sum((T_anal - T_num_slice) * (T_anal - T_num_slice))
     / np.sum(T_anal * T_anal))  # Eq. 4.57
+
+x_slice = np.arange(0, int(xSIZE / 2), 1) + 0.5
+T_num_slice = T_num_slice[:, int(xSIZE / 2)]  # take Y slice
+T_num_slice = T_num_slice[int(xSIZE / 2):]  # half of it
+
+T_anal = T_anal[:, int(xSIZE / 2)]  # take Y slice
+T_anal = T_anal[int(xSIZE / 2):]  # half of it
+
+x = x_grid[:int(xSIZE / 2)]  # half of it
+
+# step = 0.01
+# r = np.arange(r0, r2, step) + 0.5
+mask = (x > r0) & (x < r2)
+r = x[mask]
+T_r_anal = np.array([pwp.get_temperature_r(r_) for r_ in r])
 
 ###################################################################################################################
 
@@ -95,19 +96,20 @@ plt.rcParams.update({'font.size': 14})
 plt.figure(figsize=(14, 8))
 
 axes = plt.gca()
-plt.plot(x_grid, T_anal,
-         color="black", marker="", markevery=1, markersize=15, linestyle="-", linewidth=2,
+
+plt.plot(r, T_r_anal,
+         color="black", marker="", markevery=5, markersize=5, linestyle="-", linewidth=2,
          label='analytical solution')
 
-plt.plot(x_grid, T_num_slice,
+plt.plot(x, T_num_slice,
          color="black", marker="", markevery=1, markersize=15, linestyle=":", linewidth=2,
          label='current model')
 
 
 # ------ format y axis ------ #
-yll = T_anal.min()
-yhl = T_anal.max()
-axes.set_ylim([yll, 1.05*yhl])
+yll = T_r_anal.min()
+# yhl = T_r_anal.max()
+axes.set_ylim([yll, 1.05*T2])
 # axes.set_yticks(np.linspace(yll, yhl, 5))
 # axes.set_yticks(np.arange(yll, yhl, 1E-2))
 # axes.set_yticks([1E-4, 1E-6, 1E-8, 1E-10, 1E-12])
@@ -116,6 +118,7 @@ axes.set_ylim([yll, 1.05*yhl])
 # plt.yscale('log')
 # ------ format x axis ------ #
 plt.xlim(0, int(xSIZE / 2))
+# plt.xlim(int(xSIZE / 2), xSIZE)
 
 # plt.ticklabel_format(style='sci', axis='x', scilimits=(0, 0))
 # plt.ticklabel_format(style='sci', axis='y', scilimits=(0, 0))  # scilimits=(-8, 8)
