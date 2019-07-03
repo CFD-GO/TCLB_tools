@@ -100,8 +100,11 @@ def print_as_vector(some_matrix, print_symbol='default_symbol1', raw_output=Fals
                 for square_pattern in square_patterns:
                     to_be_squared = re.findall(r"(\w+)" + square_pattern, row)
                     if len(to_be_squared) > 1:
-                        raise NotImplementedError('There is to much square patterns '
-                                                  'and I dont know not how to simplify them yet.')
+                        msg = 'There is to much square patterns and I dont know not how to simplify them yet.'
+                        # raise NotImplementedError(msg)
+                        print(msg)
+                        row = re.sub(square_pattern, "*" + to_be_squared[0], row)
+
                     elif len(to_be_squared) == 1:
                         row = re.sub(square_pattern, "*" + to_be_squared[0], row)
 

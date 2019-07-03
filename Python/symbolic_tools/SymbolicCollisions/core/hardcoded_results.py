@@ -192,6 +192,36 @@ hardcoded_cm_eq_cht_D2Q9 = Matrix([
     1 / 9. * T * cht_gamma * cht_gamma / (cp * rho),
 ])
 
+hardcoded_cm_eq_cht_D3Q27 = Matrix([
+    T*cp*rho,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1/3.*T*cht_gamma,
+    1/3.*T*cht_gamma,
+    1/3.*T*cht_gamma,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1/9.*T*cht_gamma*cht_gamma/(cp*rho),
+    1/9.*T*cht_gamma*cht_gamma/(cp*rho),
+    1/9.*T*cht_gamma*cht_gamma/(cp*rho),
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    T*(1/27.*cht_gamma*cht_gamma*cht_gamma)/(cp*cp*rho*rho),
+])
+
 hardcoded_cm_eq_compressible_D2Q9 = Matrix([
     m00,
     0,

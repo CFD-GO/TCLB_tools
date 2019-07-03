@@ -16,7 +16,7 @@ import numpy as np
 # SETUP
 d = 3
 q = 27
-model = 'ade_with_f'  # choose from '['hydro_compressible', 'hydro_incompressible', 'ade', 'ade_with_f']
+model = 'ade'  # choose from '['hydro_compressible', 'hydro_incompressible', 'ade', 'ade_with_f']
 
 # DYNAMIC IMPORTS
 ex = dynamic_import("SymbolicCollisions.core.cm_symbols", f"ex_D{d}Q{q}")

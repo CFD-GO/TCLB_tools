@@ -82,5 +82,6 @@ cm_cht_eq = get_mom_vector_from_continuous_def(ccmt.get_cht_DF,
                                                moments_order=moments_dict[lattice],
                                                serial_run=False)
 print_as_vector(cm_cht_eq, 'cm_cht_eq', raw_output=False)
-
+print("--------------------------------------------------")
+print_as_vector(cm_cht_eq, 'cm_cht_eq', raw_output=True)
 print(f'\n\n Done in {time.process_time() - start} [s].')
