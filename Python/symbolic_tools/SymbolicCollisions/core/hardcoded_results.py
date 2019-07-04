@@ -222,6 +222,36 @@ hardcoded_cm_eq_cht_D3Q27 = Matrix([
     T*(1/27.*cht_gamma*cht_gamma*cht_gamma)/(cp*cp*rho*rho),
 ])
 
+hardcoded_m_eq_cht_D3Q27 = Matrix([
+    T*cp*rho,
+    T*cp*rho*ux,
+    T*cp*rho*uy,
+    T*cp*rho*uz,
+    T*cp*rho*uxuy,
+    T*cp*rho*uxuz,
+    T*cp*rho*uyuz,
+    T*(cp*rho*ux2 + 1/3.*cht_gamma),
+    T*(cp*rho*uy2 + 1/3.*cht_gamma),
+    T*(cp*rho*uz2 + 1/3.*cht_gamma),
+    T*ux*(cp*rho*uy2 + 1/3.*cht_gamma),
+    T*ux*(cp*rho*uz2 + 1/3.*cht_gamma),
+    T*uy*(cp*rho*ux2 + 1/3.*cht_gamma),
+    T*uz*(cp*rho*ux2 + 1/3.*cht_gamma),
+    T*uy*(cp*rho*uz2 + 1/3.*cht_gamma),
+    T*uz*(cp*rho*uy2 + 1/3.*cht_gamma),
+    T*cp*rho*uxuy*uz,
+    T*(cp*rho*(cp*rho*ux2*uy2 + 1/3.*cht_gamma*ux2 + 1/3.*cht_gamma*uy2) + 1/9.*cht_gamma*cht_gamma)/(cp*rho),
+    T*(cp*rho*(cp*rho*ux2*uz2 + 1/3.*cht_gamma*ux2 + 1/3.*cht_gamma*uz2) + 1/9.*cht_gamma*cht_gamma)/(cp*rho),
+    T*(cp*rho*(cp*rho*uy2*uz2 + 1/3.*cht_gamma*uy2 + 1/3.*cht_gamma*uz2) + 1/9.*cht_gamma*cht_gamma)/(cp*rho),
+    T*uyuz*(cp*rho*ux2 + 1/3.*cht_gamma),
+    T*uxuz*(cp*rho*uy2 + 1/3.*cht_gamma),
+    T*uxuy*(cp*rho*uz2 + 1/3.*cht_gamma),
+    T*ux*(cp*rho*(cp*rho*uy2*uz2 + 1/3.*cht_gamma*uy2 + 1/3.*cht_gamma*uz2) + 1/9.*cht_gamma*cht_gamma)/(cp*rho),
+    T*uy*(cp*rho*(cp*rho*ux2*uz2 + 1/3.*cht_gamma*ux2 + 1/3.*cht_gamma*uz2) + 1/9.*cht_gamma*cht_gamma)/(cp*rho),
+    T*uz*(cp*rho*(cp*rho*ux2*uy2 + 1/3.*cht_gamma*ux2 + 1/3.*cht_gamma*uy2) + 1/9.*cht_gamma*cht_gamma)/(cp*rho),
+    T*(1/27.*cp*cht_gamma**3*rho + 1/9.*cp*cp*cht_gamma*cht_gamma*rho*cp*(ux2 + uy2 + uz2) + cp*cp*cp*rho*rho*rho*(cp*rho*ux2*uy2*uz2 + 1/3.*cht_gamma*ux2*uy2 + 1/3.*cht_gamma*ux2*uz2 + 1/3.*cht_gamma*uy2*uz2))/(cp*cp*cp*rho*rho*rho),
+])
+
 hardcoded_cm_eq_compressible_D2Q9 = Matrix([
     m00,
     0,
@@ -346,6 +376,36 @@ hardcoded_cm_eq_compressible_D3Q27 = Matrix([
     1 / 27. * m00,
 ])
 
+# D3Q27 - notation for hydrodynamics as in TCLB's d3q27_pf_velocity model
+hardcoded_m_eq_D3Q27 = Matrix([
+    m00,
+    m00*ux,
+    m00*uy,
+    m00*uz,
+    m00*uxuy,
+    m00*uxuz,
+    m00*uyuz,
+    m00*(ux2 + 1/3.),
+    m00*(uy2 + 1/3.),
+    m00*(uz2 + 1/3.),
+    m00*ux*(uy2 + 1/3.),
+    m00*ux*(uz2 + 1/3.),
+    m00*uy*(ux2 + 1/3.),
+    m00*uz*(ux2 + 1/3.),
+    m00*uy*(uz2 + 1/3.),
+    m00*uz*(uy2 + 1/3.),
+    m00*uxuy*uz,
+    m00*(ux2*uy2 + 1/3.*ux2 + 1/3.*uy2 + 1/9.),
+    m00*(ux2*uz2 + 1/3.*ux2 + 1/3.*uz2 + 1/9.),
+    m00*(uy2*uz2 + 1/3.*uy2 + 1/3.*uz2 + 1/9.),
+    m00*uyuz*(ux2 + 1/3.),
+    m00*uxuz*(uy2 + 1/3.),
+    m00*uxuy*(uz2 + 1/3.),
+    m00*ux*(uy2*uz2 + 1/3.*uy2 + 1/3.*uz2 + 1/9.),
+    m00*uy*(ux2*uz2 + 1/3.*ux2 + 1/3.*uz2 + 1/9.),
+    m00*uz*(ux2*uy2 + 1/3.*ux2 + 1/3.*uy2 + 1/9.),
+    m00*(ux2*uy2*uz2 + 1/3.*ux2*uy2 + 1/3.*ux2*uz2 + 1/9.*ux2 + 1/3.*uy2*uz2 + 1/9.*uy2 + 1/9.*uz2 + 1/27.),
+])
 
 # D3Q27 - notation for hydrodynamics as in TCLB's d3q27_pf_velocity model
 hardcoded_cm_eq_incompressible_D3Q27 = Matrix([

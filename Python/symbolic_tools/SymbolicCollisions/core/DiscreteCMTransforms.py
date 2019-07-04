@@ -89,7 +89,11 @@ class DiscreteCMTransforms:
         gamma = w_D2Q9[i] * (Matrix([1]) + eu / self.cs2 + eu * eu / (2 * self.cs2 * self.cs2) - u2 / (2 * self.cs2))
         return gamma[0]
 
-    def get_EDF_hydro(self, i):
+    def get_EDF(self, i):
+        gamma = self.get_gamma(i)
+        return m00 * gamma
+
+    def get_EDF_incompressible(self, i):
         gamma = self.get_gamma(i)
         g = m00 * w_D2Q9[i] + gamma - w_D2Q9[i]
         return g

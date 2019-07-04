@@ -21,8 +21,8 @@ k=f"0.1666666"
 home = pwd.getpwuid(os.getuid()).pw_dir
 # k_0.1666666_size_128lu
 
-filename_vtk = f'test_k_{k}_size_{int(gauge * reference_lattice_size)}lu_VTK_P00_00010000.vti'
-main_folder = os.path.join(home, 'DATA_FOR_PLOTS', 'batch_ruraWrurze_NeumannBC', f'k_{k}_size_{lattice_size}lu_abb')
+filename_vtk = f'neumann_bc_k_{k}_size_{int(gauge * reference_lattice_size)}lu_VTK_P00_00010000.vti'
+main_folder = os.path.join(home, 'DATA_FOR_PLOTS', 'batch_ruraWrurze_NeumannBC', f'k_{k}_size_{lattice_size}lu')
 filepath_vtk = os.path.join(main_folder, filename_vtk)
 vti_reader = VTIFile(filepath_vtk)
 T_num = vti_reader.get("T")
@@ -107,9 +107,9 @@ plt.plot(x, T_num_slice,
 
 
 # ------ format y axis ------ #
-yll = T_r_anal.min()
+yll = min(T_r_anal.min(), T_num_slice.min())
 # yhl = T_r_anal.max()
-axes.set_ylim([yll, 1.05*T2])
+axes.set_ylim([yll, 1.05])
 # axes.set_yticks(np.linspace(yll, yhl, 5))
 # axes.set_yticks(np.arange(yll, yhl, 1E-2))
 # axes.set_yticks([1E-4, 1E-6, 1E-8, 1E-10, 1E-12])

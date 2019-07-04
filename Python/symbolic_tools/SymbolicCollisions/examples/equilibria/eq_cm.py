@@ -45,7 +45,7 @@ print_as_vector(pop_eq, 'pop_cm')
 
 print('\n//velocity based hydrodynamic model: population_eq_pf -> cm_eq_pf - by definition: '
       '\n//k_mn = sum( (e_ix-ux)^m (e_iy-uy)^n * population_eq_pf_i)')
-pop_eq = get_mom_vector_from_discrete_def(dcmt.get_EDF_hydro,
+pop_eq = get_mom_vector_from_discrete_def(dcmt.get_EDF_incompressible,
                                           discrete_transform=dcmt.get_cm,
                                           moments_order=moments_dict[lattice])
 print_as_vector(pop_eq, 'cm_eq_pf')
