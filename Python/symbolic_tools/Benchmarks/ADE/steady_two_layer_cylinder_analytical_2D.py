@@ -48,6 +48,7 @@ class PipeWithinPipeNeumann(PipeWithinPipe):
         T = self.T2 + self.J0*self.r0*(np.log(r/self.r0)-np.log(self.r2/self.r0))
         return T
 
+
 class PipeWithinPipeDirichlet(PipeWithinPipe):
     def __init__(self, r0, r1, r2, k1, k2, T0, T2):
         """
