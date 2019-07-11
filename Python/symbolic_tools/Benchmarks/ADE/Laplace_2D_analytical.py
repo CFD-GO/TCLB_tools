@@ -19,7 +19,7 @@ import sympy as sp
 from sympy.abc import x, y, t
 from sympy import sin, pi, integrate
 from typing import Callable
-from dataclasses import dataclass
+
 import time
 
 import os

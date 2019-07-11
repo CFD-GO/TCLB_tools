@@ -28,24 +28,31 @@ class PipeWithinPipe:
 
 
 class PipeWithinPipeNeumann(PipeWithinPipe):
-    def __init__(self, r0, r2, J0, T2):
+    def __init__(self, r0, r2, dT_over_dr, T2):
         """
         2D, steady state case:
         Steady heat conduction in a two layered cylinder.
         Temperature at inner (r0) and outer (r2) radius is prescribed.
         r0: float  # inner radius
         r2: float  # outer radius
-        J0: float  # heat flux (dT/dr) for r = r0
+        J0: float  # temperature gradient (dT/dr) at r = r0. Don't confuse with heat flux, J = k * dT/dr
         T2: float  # temperature for r = r2
         """
 
         self.r0 = r0
         self.r2 = r2
-        self.J0 = J0
+        self.dT_over_dr = dT_over_dr
         self.T2 = T2
 
     def get_temperature_r(self, r):
-        T = self.T2 + self.J0*self.r0*(np.log(r/self.r0)-np.log(self.r2/self.r0))
+        if r < self.r0:
+            return np.nan
+
+        if r > self.r2:
+            return np.nan
+            # raise ValueError
+
+        T = self.T2 + self.dT_over_dr * self.r0 * (np.log(r / self.r0) - np.log(self.r2 / self.r0))
         return T
 
 

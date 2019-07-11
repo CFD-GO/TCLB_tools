@@ -1,6 +1,6 @@
 
 
-from Benchmarks.ADE.steady_two_layer_cylinder_analytical_2D import InputForMultiLayeredPipe, PipeWithinPipeDirichlet
+from Benchmarks.ADE.steady_two_layer_cylinder_analytical_2D import PipeWithinPipeDirichlet
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
 from DataIO.VTIFile import VTIFile
 import os
@@ -49,8 +49,8 @@ def get_t_mse(folder):
         y0 = lattices[g] / 2
 
         # ----------------------- compute anal solution ---------------------------
-        anal_input = InputForMultiLayeredPipe(r0, r1, r2, k_inner, k_outer, T0=0, T2=1)
-        pwp = PipeWithinPipeDirichlet(anal_input)
+
+        pwp = PipeWithinPipeDirichlet(r0, r1, r2, k_inner, k_outer, T0=0, T2=1)
 
         x_grid = np.linspace(0, xSIZE, xSIZE, endpoint=False) + 0.5
         y_grid = np.linspace(0, ySIZE, ySIZE, endpoint=False) + 0.5
