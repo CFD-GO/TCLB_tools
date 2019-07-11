@@ -1,7 +1,7 @@
 from DataIO.VTIFile import VTIFile
 import os
 import pandas as pd
-from Benchmarks.ADE.steady_two_layer_cylinder_analytical_2D import InputForMultiLayeredPipe, PipeWithinPipeDirichlet
+from Benchmarks.ADE.steady_two_layer_cylinder_analytical_2D import PipeWithinPipeDirichlet
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib import cm as colormap

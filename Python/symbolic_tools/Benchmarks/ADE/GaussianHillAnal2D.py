@@ -9,7 +9,7 @@ import sympy as sp
 import os
 
 class GaussianHillAnal2D:
-    def __init__(self, C0, X0, U, Sigma2_0, k):
+    def __init__(self, C0, X0, Sigma2_0, k, U=Matrix([0, 0])):
         """
         :param C0: initial concentration
         :param X0: initial position of the hill's centre = Matrix([x0, y0])
@@ -31,9 +31,7 @@ class GaussianHillAnal2D:
         return C
 
 
-def prepare_anal_data_ADE_Gaussion_Hill(gha, time_spot, ySIZE, xSIZE, dump_file_path):
-
-    shall_recalculate_results = False
+def prepare_anal_data_ADE_Gaussion_Hill(gha, ux, time_spot, ySIZE, xSIZE, dump_file_path, shall_recalculate_results=False):
 
     if os.path.isfile(dump_file_path) and not shall_recalculate_results:
         print(f'{dump_file_path} found, loading results from disc')
@@ -55,6 +53,13 @@ def prepare_anal_data_ADE_Gaussion_Hill(gha, time_spot, ySIZE, xSIZE, dump_file_
                 T_anal[i][j][0] = gha.get_concentration(Matrix([xx[i][j], yy[i][j]]), int(time_spot))  # lets cheat
 
         T_anal = T_anal[:, :, 0]  # take time slice
+
+        shift = ux * int(time_spot) % xSIZE
+        if float(shift).is_integer():
+            shift = int(shift)
+        else:
+            raise Exception('Choose such ux and time_step that the obtained shift will be an int')
+        T_anal = np.roll(T_anal, shift, axis=1)
 
         dump_folder = os.path.dirname(dump_file_path)
         if not os.path.exists(dump_folder):

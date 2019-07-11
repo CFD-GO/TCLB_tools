@@ -97,7 +97,7 @@ for k in conductivities:
 
 
     print("------------------------------------ PLOT ------------------------------------")
-    fig_name = f'pipe_within_pipe_grid_convergence_k_{k}_Neumann.png'
+    fig_name = f'pipe_within_pipe_grid_convergence_k_{k}_Neumann.pdf'
 
     initial_error_05st = 0.070
     y_05st = np.sqrt(lattices.min())*initial_error_05st/np.sqrt(lattices)
@@ -136,12 +136,8 @@ for k in conductivities:
 
 
     ax1.get_xaxis().set_major_formatter(matplotlib.ticker.ScalarFormatter())
-    plt.title(f'Pipe within pipe Benchmark - Grid Convergence Study\n '
-              r'$k$=' + f'{k} \t;\t'
-              # r'$x_{range}$' + f'={range}'
-              # f'; \t'
-              # r'$x_{step}$' + f'={step:.4f}'
-              )
+    # plt.title(f'Pipe within pipe Benchmark - Grid Convergence Study\n '
+    #           r'$k$=' + f'{k} \t')
     plt.xlabel(r'lattice size [lu]', fontsize=18)
     plt.ylabel(r'$T: \; L_2 \, error \, norm $', fontsize=18)
     plt.tick_params(axis='both', which='major', labelsize=14)
