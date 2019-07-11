@@ -11,7 +11,7 @@ from mpl_toolkits.mplot3d import Axes3D
 import os
 import pwd
 from DataIO.VTIFile import VTIFile
-from Benchmarks.ADE.GaussianHillAnal2D import GaussianHillAnal2D
+from Benchmarks.ADE.GaussianHillAnal2D import GaussianHillAnal2D, prepare_anal_data_ADE_Gaussion_Hill
 
 from sympy.matrices import Matrix, diag
 # -------- numerical solution ---------------
@@ -26,7 +26,7 @@ C0 = 1
 X0 = Matrix([lattice_size/2, lattice_size/2])
 U = Matrix([0, 0])
 conductivities = ['0.01', '0.001', '1e-04', '1e-05']
-Sigmas = [50, 75, 100]
+Sigmas = [100]
 
 
 for Sigma02 in Sigmas:
@@ -53,42 +53,11 @@ for Sigma02 in Sigmas:
             ySIZE, xSIZE = T_num_slice.shape
             assert ySIZE == xSIZE == lattice_size
 
-            def calc_anal_solution():
-                ySIZE = lattice_size
-                xSIZE = lattice_size
+            dump_file_path = os.path.join(main_folder, f'dumps',
+                                          f'ux_{U[0]}_k_{conductivities[g]}_sigma_{Sigma02}_size_{lattice_size}_time_spot_{oldest}.npy')
 
-                x_grid = np.linspace(0, xSIZE, xSIZE, endpoint=False) + 0.5
-                y_grid = np.linspace(0, ySIZE, ySIZE, endpoint=False) + 0.5
-                xx, yy = np.meshgrid(x_grid, y_grid)
-
-                total_time = 1
-
-                T_anal = np.zeros((ySIZE, xSIZE, total_time))
-
-                gha = GaussianHillAnal2D(C0, X0, U, Sigma02, float(conductivities[g]))
-                for i in range(ySIZE):
-                    print(f"running i/ySIZE = {i}/{ySIZE}...")
-                    for j in range(xSIZE):
-                        T_anal[i][j][0] = gha.get_concentration(Matrix([xx[i][j], yy[i][j]]), time_spot)  # lets cheat
-
-                T_anal = T_anal[:, :, 0]  # take time slice
-                return xx, yy, T_anal
-
-
-            shall_recalculate_results = False
-            dump_fname = os.path.join(main_folder, f'dumps',
-                                      f'ux_{U[0]}_k_{conductivities[g]}_sigma_{Sigma02}_size_{lattice_size}_time_spot_{oldest}.npy')
-
-            if os.path.isfile(dump_fname) and not shall_recalculate_results:
-                print(f'{dump_fname} found, loading results from disc')
-                (xx, yy, T_anal) = np.load(dump_fname)
-            else:
-                print(f'recalculating results for: {dump_fname}')
-                xx, yy, T_anal = calc_anal_solution()
-                dump_folder = os.path.dirname(dump_fname)
-                if not os.path.exists(dump_folder):
-                    os.makedirs(dump_folder)
-                np.save(dump_fname, (xx, yy, T_anal))
+            gha = GaussianHillAnal2D(C0, X0, U, Sigma02, float(conductivities[g]))
+            xx, yy, T_anal = prepare_anal_data_ADE_Gaussion_Hill(gha, oldest, lattice_size, lattice_size, dump_file_path)
 
             T_err_field = T_anal - T_num_slice
             T_L2[g] = calc_L2(T_anal, T_num_slice)
@@ -154,4 +123,4 @@ for Sigma02 in Sigmas:
     fig.savefig(fig_name, bbox_inches='tight')
     plt.show()
 
-    plt.close(fig)  # close the figure
+    # plt.close(fig)  # close the figure

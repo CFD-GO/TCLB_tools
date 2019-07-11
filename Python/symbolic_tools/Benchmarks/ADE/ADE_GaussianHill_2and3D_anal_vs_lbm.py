@@ -9,7 +9,7 @@ from mpl_toolkits.mplot3d import Axes3D
 import os
 import pwd
 from DataIO.VTIFile import VTIFile
-from Benchmarks.ADE.GaussianHillAnal2D import GaussianHillAnal2D
+from Benchmarks.ADE.GaussianHillAnal2D import GaussianHillAnal2D, prepare_anal_data_ADE_Gaussion_Hill
 
 from sympy.matrices import Matrix, diag
 # -------- numerical solution ---------------
@@ -30,20 +30,15 @@ Sigma02 = 100
 k = '0.001'
 # conductivities = ['0.01', '0.001', '1e-04', '1e-05']
 
-gha = GaussianHillAnal2D(C0, X0, U, Sigma02, float(k))
 
 home = pwd.getpwuid(os.getuid()).pw_dir
-
 CollisionType ="CM_HIGHER"
 
 
 main_folder = os.path.join(home, 'DATA_FOR_PLOTS', 'batch_GaussianHill_advection',
                            f"{CollisionType}_ux_{U[0]}_k_{k}_sigma_{Sigma02}_size_{lattice_size}lu")
-
 oldest = find_oldest_iteration(main_folder)
-# oldest = "00001000"
 filename_vtk = f'{CollisionType}_ux_{U[0]}_k_{k}_sigma_{Sigma02}_size_{lattice_size}lu_VTK_P00_{oldest}.vti'
-
 filepath_vtk = os.path.join(main_folder, filename_vtk)
 vti_reader = VTIFile(filepath_vtk)
 T_num = vti_reader.get("T")
@@ -53,25 +48,11 @@ T_num_slice = T_num[:, :, 1]
 ySIZE = lattice_size
 xSIZE = lattice_size
 
-x_grid = np.linspace(0, xSIZE, xSIZE, endpoint=False) + 0.5
-y_grid = np.linspace(0, ySIZE, ySIZE, endpoint=False) + 0.5
-xx, yy = np.meshgrid(x_grid, y_grid)
+dump_file_path = os.path.join(main_folder, f'dumps',
+                              f'ux_{U[0]}_k_{k}_sigma_{Sigma02}_size_{lattice_size}_time_spot_{oldest}.npy')
 
-total_time = 1
-time_spot = int(oldest)
-T_anal = np.zeros((ySIZE, xSIZE, total_time))
-
-
-for i in range(ySIZE):
-    print(f"running i/ySIZE = {i}/{ySIZE}...")
-    for j in range(xSIZE):
-
-        T_anal[i][j][0] = gha.get_concentration(Matrix([xx[i][j], yy[i][j]]), time_spot)  # lets cheat
-        # for t in range(total_time):
-            # T_anal[i][j][t] = gha.get_concentration(Matrix([xx[i][j], yy[i][j]]), t)
-
-
-T_anal = T_anal[:, :, 0]  # take time slice
+gha = GaussianHillAnal2D(C0, X0, U, Sigma02, float(k))
+xx, yy, T_anal = prepare_anal_data_ADE_Gaussion_Hill(gha, oldest, ySIZE, xSIZE, dump_file_path)
 
 T_err_field = T_anal - T_num_slice
 T_L2 = calc_L2(T_anal, T_num_slice)
@@ -84,8 +65,10 @@ if shall_clip_to_2D:
     T_anal = T_anal[:, int(ySIZE / 2)]  # half X slice
     T_num_slice = T_num_slice[:, int(ySIZE / 2)]  # half X slice
     T_err_field = T_err_field[:, int(ySIZE / 2)]
+
+    x_grid = xx[0, :]
     # -------------------- make dummy plot --------------------
-    fig_name = f'ADE_GaussianHill_lattice={lattice_size}[lu]_sig={Sigma02}_Ux={U[0]}_k={k}_time={time_spot}_2Dslice.png'
+    fig_name = f'ADE_GaussianHill_lattice={lattice_size}[lu]_sig={Sigma02}_Ux={U[0]}_k={k}_time={int(oldest)}_2Dslice.png'
     plt.rcParams.update({'font.size': 14})
     plt.figure(figsize=(14, 8))
 
@@ -125,7 +108,7 @@ if shall_clip_to_2D:
     # plt.ticklabel_format(style='sci', axis='y', scilimits=(0, 0))  # scilimits=(-8, 8)
 
 
-    plt.title(f'Advection - Diffusion of Gaussian Hill at t={time_spot}')
+    plt.title(f'Advection - Diffusion of Gaussian Hill at t={int(oldest)}')
 
     plt.xlabel(r'$x$')
     plt.ylabel(r'$Temperature$')
@@ -141,7 +124,7 @@ if shall_clip_to_2D:
 else:
     print("---------- PLOTTING -------------")
 
-    fig_name = f'ADE_GaussianHill_lattice={lattice_size}[lu]_sig={Sigma02}_Ux={U[0]}_k={k}_time={time_spot}_3D.png'
+    fig_name = f'ADE_GaussianHill_lattice={lattice_size}[lu]_sig={Sigma02}_Ux={U[0]}_k={k}_time={int(oldest)}_3D.png'
 
     fig = plt.figure(figsize=(12, 8))
     ax = fig.gca(projection='3d')
@@ -165,7 +148,7 @@ else:
     # Add a color bar which maps values to colors.
     # fig.colorbar(surf, shrink=0.5, aspect=5)
 
-    plt.title(f'Advection - Diffusion of Gaussian Hill at t={time_spot}'
+    plt.title(f'Advection - Diffusion of Gaussian Hill at t={int(oldest)}'
               f'\n' r'$T_{L2}$=' + f'{T_L2:.2e}')
 
     plt.grid(True)
