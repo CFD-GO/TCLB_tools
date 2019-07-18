@@ -27,7 +27,11 @@ mom_bc = get_mom_vector_from_discrete_def(lambda i: Symbol('m00') * dcmt.get_vel
                                           discrete_transform=dcmt.get_m,
                                           moments_order=moments_dict[lattice])
 print_as_vector(mom_bc, 'drm_velocity_bc')
-
+print("-------  ----------")
+mom_bc = get_mom_vector_from_discrete_def(lambda i: Symbol('m00') * dcmt.get_velocity_bc(i),
+                                          discrete_transform=dcmt.get_cm,
+                                          moments_order=moments_dict[lattice])
+print_as_vector(mom_bc, 'dcm_velocity_bc')
 print("\n\n discrete raw moments: pressure bc")
 mom_bc = get_mom_vector_from_discrete_def(lambda i: Symbol('m00') * dcmt.get_pressure_bc(i),
                                           discrete_transform=dcmt.get_m,
@@ -42,6 +46,20 @@ mom_bc = get_mom_vector_from_discrete_def(lambda i: Symbol('m00') * dcmt.get_pre
 
 print_as_vector(mom_bc, 'dcm_pressure_bc')
 
+
+print("\n\n continuous raw moments: concentration bc")
+mom_bc = get_mom_vector_from_continuous_def(ccmt.get_bc_bb_concentration_cht,
+                                          continuous_transformation=ccmt.get_m,
+                                          moments_order=moments_dict[lattice])
+
+print_as_vector(mom_bc, 'crm_concentration_cht_bc')
+
+print("\n\n continuous raw moments: heat flux cht bc")
+mom_bc = get_mom_vector_from_continuous_def(ccmt.get_force_He_MB,
+                                          continuous_transformation=ccmt.get_cm,
+                                          moments_order=moments_dict[lattice])
+
+print_as_vector(mom_bc, 'He forcing scheme')
 
 print("\n\n continuous raw moments: concentration bc")
 mom_bc = get_mom_vector_from_continuous_def(ccmt.get_bc_bb_concentration_cht,
@@ -74,7 +92,7 @@ ky = Symbol('k.y')
 
 kz = Symbol('k.z')
 k3D = Matrix([kx, ky, kz])
-lattice = 'D3Q27'
+lattice = 'D2Q9'
 ccmt = ContinuousCMTransforms(dzeta3D, u3D, k3D, rho)
 
 mom_bc = get_mom_vector_from_continuous_def(ccmt.get_bc_bb_heat_flux_cht,
