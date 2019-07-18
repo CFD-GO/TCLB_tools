@@ -33,7 +33,7 @@ def get_t_mse(folder, time, x_size):
             filepath_vtk = os.path.join(main_folder, folder, filename_vtk)
             vti_reader = VTIFile(filepath_vtk)
             T_num = vti_reader.get("T")
-            U = vti_reader.get("U", vector=True)
+            U = vti_reader.get("U", is_vector=True)
 
             filename_txt = f'laplace_template_nx_{x_size[i]}_ny_{x_size[i] + 2}_TXT_P00_{time[t]}_T.txt'
             filepath_txt = os.path.join(main_folder, folder, filename_txt)

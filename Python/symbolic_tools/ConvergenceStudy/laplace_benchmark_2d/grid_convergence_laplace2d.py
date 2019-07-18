@@ -33,7 +33,7 @@ def get_t_mse(folder, n=len(x_size)):
 
         T_num_txt = pd.read_csv(filepath_txt, delimiter=" ",  header=None)
         T_num = vti_reader.get("T")
-        U = vti_reader.get("U", vector=True)
+        U = vti_reader.get("U", is_vector=True)
 
         T_num = np.delete(T_num, 0, axis=0)  # delete first row - extra bc (stops periodicity)
 

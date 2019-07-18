@@ -40,19 +40,18 @@ class VTIFile:
 
         self.dtype = dtype
 
-    def get(self, name, vector=False, dtype=False):
-        if vector:
-            T = VN.vtk_to_numpy(self.data.GetCellData().GetArray(name))
-            ux = np.transpose(T[:, 0].reshape(self.s_vec), (1, 2, 0))
-            uy = np.transpose(T[:, 1].reshape(self.s_vec), (1, 2, 0))
-            uz = np.transpose(T[:, 2].reshape(self.s_vec), (1, 2, 0))
+    def get(self, name, is_vector=False, dtype=False):
+        if is_vector:
+            vector = VN.vtk_to_numpy(self.data.GetCellData().GetArray(name))
+            ux = np.transpose(vector[:, 0].reshape(self.s_vec), (1, 2, 0))
+            uy = np.transpose(vector[:, 1].reshape(self.s_vec), (1, 2, 0))
+            uz = np.transpose(vector[:, 2].reshape(self.s_vec), (1, 2, 0))
             return [ux, uy, uz]
         else:
-            T = VN.vtk_to_numpy(self.data.GetCellData().GetArray(name)).reshape(self.s_scal).T[tuple(self.subspace)]
-
+            scalar = VN.vtk_to_numpy(self.data.GetCellData().GetArray(name)).reshape(self.s_scal).T[tuple(self.subspace)]
         if dtype:
-            T = np.array(T, dtype=dtype)
-        return T
+            scalar = np.array(scalar, dtype=dtype)
+        return scalar
 
     def spacing(self, i=0):
         return self.data.GetSpacing()[i]

@@ -2,6 +2,7 @@ import os
 import sys
 import pandas as pd
 import unittest
+import unittest
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -38,7 +39,7 @@ class TestVtiReader(unittest.TestCase):
         vti_reader = VTIFile(filepath)
 
         T = vti_reader.get("T")
-        U = vti_reader.get("U", vector=True)
+        U = vti_reader.get("U", is_vector=True)
 
         # convert to pandas format
         data = T
@@ -54,6 +55,9 @@ class TestVtiReader(unittest.TestCase):
         assert U[2].size > 0
         assert pdT.size > 0
         assert pdT2.size > 0
+        filepath = os.path.join(wd, 'sample_data_for_vtk_reader', 'laplace_benchmark_d2q9_TXT_P00_00050010_T.txt')
+        T_read_by_pd = pd.read_csv(filepath, delimiter=" ", header=None)
+        np.testing.assert_allclose(pdT2 - T_read_by_pd, 0, rtol=1e-14, atol=1e-14)
 
     def test_vtk_parallel_reader_3D(self):
         filename = 'HotKarman3D_template_sizer_1_nu_0.03_k_0.003_VTK_P00_00600000.pvti'
@@ -66,7 +70,7 @@ class TestVtiReader(unittest.TestCase):
 
         vti_reader = VTIFile(filepath, parallel=True)
         T_num = vti_reader.get("T")
-        [ux_num, uy_num, uz_num] = vti_reader.get("U", vector=True)
+        [ux_num, uy_num, uz_num] = vti_reader.get("U", is_vector=True)
 
         expected_hashes = ['5849cd96453a0452c80e37d582fca19f',
                            '20f827ffad4ad10aa50839797316a0eb',

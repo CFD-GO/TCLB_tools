@@ -10,7 +10,7 @@ filepath = os.path.join(wd, 'tests', 'sample_data_for_vtk_reader', filename)
 vti_reader = VTIFile(filepath)
 
 T = vti_reader.get("T")
-U = vti_reader.get("U", vector=True)
+(Ux, Uy, Uz) = vti_reader.get("U", is_vector=True)
 
 # convert to pandas format
 data = T

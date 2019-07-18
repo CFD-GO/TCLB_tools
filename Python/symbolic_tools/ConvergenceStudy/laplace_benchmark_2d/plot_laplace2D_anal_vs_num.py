@@ -31,7 +31,7 @@ filepath_vtk = os.path.join(folder, filename_vtk)
 
 vti_reader = VTIFile(filepath_vtk)
 T_num = vti_reader.get("T")
-U = vti_reader.get("U", vector=True)
+U = vti_reader.get("U", is_vector=True)
 
 # ---------------------- clip buffer bc  --------------------
 T_num = np.delete(T_num, 0, axis=0)  # obligatory delete first row - wall bc (stops periodicity)

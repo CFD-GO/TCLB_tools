@@ -1,32 +1,65 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from numpy.linalg import norm
-
+import os
 from Benchmarks.TwoPhasePoiseuilleFlow.TwoPhasePoiseuilleAnal import TwoPhasePoiseuilleAnal, calc_gx
+from DataIO.helpers import find_oldest_iteration, calc_mse, calc_L2
+import pwd
+from DataIO.VTIFile import VTIFile
 
 
 rho_h = 1
 rho_l = 1
-kin_visc_h = 1
-kin_visc_l = 1
+kin_visc_h = 1/6
+kin_visc_l = 1/6
 
 mu_h = rho_h * kin_visc_h
 mu_l = rho_l * kin_visc_l
 mu_ratio = mu_l / mu_h
 
-h = 500
-y_ = np.linspace(-h, h, 1000)
+# -------- numerical solution ---------------
+wd = os.getcwd()
+wd = os.path.dirname(wd)  # go level up
+
+reference_lattice_size = 32
+gauge = 2
+lattice_size = int(gauge * reference_lattice_size)
+
+home = pwd.getpwuid(os.getuid()).pw_dir
+main_folder = os.path.join(home, 'DATA_FOR_PLOTS', 'IBB')
+
+# ibb_Poiseuille_config_P00_00000000
+
+case_folder = os.path.join(main_folder, f"Poiseuille")
+oldest = find_oldest_iteration(case_folder)
+# filename_vtk = f'{CollisionType}_ux_{ux}_k_{k}_sigma_{Sigma02}_size_{lattice_size}lu_VTK_P00_{oldest}.vti'
+filename_vtk = f'ibb_Poiseuille_VTK_P00_{oldest}.vti'
+filepath_vtk = os.path.join(case_folder, filename_vtk)
+vti_reader = VTIFile(filepath_vtk)
+T_num = vti_reader.get("T")
+T_num_slice = T_num[:, :, 1]
+
+(U_num_x, _, _) = vti_reader.get("U", is_vector=True)
+U_num_x_slice = U_num_x[:, int(reference_lattice_size/2), 1]
+
+ySIZE = lattice_size
+xSIZE = lattice_size
+y_grid = np.linspace(0, ySIZE, ySIZE, endpoint=False) + 0.5
+
+# -------- anal solution ---------------
+
+h = 31  # distance from the center to the channel walls
+y_anal = np.linspace(-h, h, 62, endpoint=False) + 0.5
 uc = 0.01
 
 # gx = 1
 gx = calc_gx(uc, mu_l, mu_h, rho_l, rho_h, h)
-pa = TwoPhasePoiseuilleAnal(gx=gx, mu_l=mu_l, mu_h=mu_h, rho_h=rho_h, rho_l=rho_l, h=h)
-u_a = np.array([pa.get_u_profile(y_[i]) for i in range(len(y_))])
-
+poiseuilleAnal = TwoPhasePoiseuilleAnal(gx=gx, mu_l=mu_l, mu_h=mu_h, rho_h=rho_h, rho_l=rho_l, h=h)
+u_anal = np.array([poiseuilleAnal.get_u_profile(y_anal[i]) for i in range(len(y_anal))])
 
 ###################################################################################################################
 
-fig_name = f'two_phase_Poiseuille_anal_vs_fd_rho{rho_h/rho_l}_v{kin_visc_h/kin_visc_l}.png'
+fig_name = f'Poiseuille_anal_vs_fd_rho{rho_h/rho_l}_v{kin_visc_h/kin_visc_l}.png'
 
 # -------------------- make dummy plot --------------------
 plt.rcParams.update({'font.size': 14})
@@ -34,18 +67,25 @@ plt.figure(figsize=(14, 8))
 
 axes = plt.gca()
 
-plt.plot(u_a, y_,
-         color="black", marker="", markevery=5, markersize=5, linestyle="-", linewidth=2,
+# plt.plot(u_anal, y_anal+len(y_anal)/2+1,
+plt.plot(u_anal, y_anal + len(y_grid)/2,
+         color="black", marker="o", markevery=1, markersize=5, linestyle="-", linewidth=2,
          label=r'$analytical \, solution$')
 
+plt.plot(U_num_x_slice, y_grid,
+# plt.plot(U_num_x_slice, y_grid,
+# plt.plot(U_num_x_slice, y_grid-len(y_grid)/2,
+         color="black", marker="x", markevery=1, markersize=5, linestyle="-.", linewidth=2,
+         label=r'$numerical \, solution$')
 
 # ------ format y axis ------ #
-yll = y_.min()
-yhl = y_.max()
-axes.set_ylim([yll, yhl])
-# axes.set_yticks(np.linspace(yll, yhl, 5))
+yll = y_grid.min()
+yhl = y_grid.max()
+# axes.set_ylim([yll, yhl])
+# axes.set_yticks(np.linspace(yll, yhl, 8))
 # axes.set_yticks(np.arange(yll, yhl, 1E-2))
 # axes.set_yticks([1E-4, 1E-6, 1E-8, 1E-10, 1E-12])
+axes.set_yticks([0.5, 1.5, 2.5, 31.5, 32, 32.5, 61.5, 62.5, 63.5])
 # axes.yaxis.set_major_formatter(xfmt)
 
 # plt.yscale('log')
