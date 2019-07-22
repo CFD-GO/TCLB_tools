@@ -15,8 +15,29 @@ def find_oldest_iteration(folder, extension='.pvti'):
     # int_iterations = [int(i) for i in iterations]
     # oldest = max(int_iterations)
     # idx = int_iterations.index(oldest)
+    if not iterations:
+        raise FileNotFoundError(f'Check the path: \n {folder}')
+
     oldest = max(iterations)
     return oldest
+
+
+def get_vti_from_iteration(folder, iteration, extension='.vti'):
+    pattern = f"VTK_P00_{iteration}{extension}"
+
+    matched_files = []
+    for root, dirs, files in os.walk(folder):
+        for file in files:
+            if file.endswith(pattern):
+                matched_files.append(file)
+
+    if not matched_files:
+        raise FileNotFoundError(f'Check the path: \n {folder}')
+
+    if len(matched_files) > 1:
+        raise Exception("More than 1 matching file")
+
+    return matched_files[0]
 
 
 def calc_mse(anal, num):

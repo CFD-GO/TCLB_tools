@@ -26,7 +26,7 @@ mu_l = rho_l * kin_visc_l
 mu_ratio = mu_l / mu_h
 
 h = 500
-y_ = np.linspace(-h, h, 1000)
+y_ = np.linspace(-h, h, 10000)
 
 uc = 0.01
 

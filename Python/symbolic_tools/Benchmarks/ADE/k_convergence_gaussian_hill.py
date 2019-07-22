@@ -26,7 +26,7 @@ C0 = 1
 X0 = Matrix([lattice_size/2, lattice_size/2])
 conductivities = ['0.01', '0.001', '1e-04', '1e-05']
 
-for ux in [0, 0.1, 0.01]:
+for ux in [0, 0.1]:
     for Sigma02 in [50, 75, 100]:
         def get_t_err(main_folder, collision_type):
             n = len(conductivities)
