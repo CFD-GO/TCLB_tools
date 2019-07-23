@@ -3,10 +3,11 @@ from SymbolicCollisions.core.cm_symbols import ux, uy, uz, \
     uxuy, uxuz, uyuz, \
     ux2, uy2, uz2,\
     ux3, uy3, uz3,\
-    uxuy3
+    uxuy3,\
+    Sigma2
 
 # from decimal import Decimal
-from sympy import simplify, Float, preorder_traversal
+from sympy import simplify, Float, preorder_traversal, Matrix
 from sympy.core.evalf import N as symbol_to_number
 from fractions import Fraction
 
@@ -29,6 +30,12 @@ def print_u3():
     print("\treal_t %s = %s*%s;" % (uy3, uy2, uy))
     print("\treal_t %s = %s*%s*%s;" % (uxuy3, uxuy, uxuy, uxuy))
     print("")
+
+
+def print_sigma_cht():
+    # print(f"{Sigma2}")
+    print_as_vector(Matrix([Sigma2]), print_symbol="Sigma2")
+    # print(f"real_t Sigma2 = (h_stability_enhancement*1./3.)/(cp*rho);")
 
 
 def round_and_simplify(stuff):
@@ -100,7 +107,8 @@ def print_as_vector(some_matrix, print_symbol='default_symbol1', raw_output=Fals
                 for square_pattern in square_patterns:
                     to_be_squared = re.findall(r"(\w+)" + square_pattern, row)
                     if len(to_be_squared) > 1:
-                        msg = 'There is to much square patterns and I dont know not how to simplify them yet.'
+                        msg = 'There is to much square patterns and I dont know not how to simplify them yet.\n ' \
+                              'Please generate and check the raw, unparsed output!'
                         # raise NotImplementedError(msg)
                         print(msg)
                         row = re.sub(square_pattern, "*" + to_be_squared[0], row)
@@ -108,7 +116,10 @@ def print_as_vector(some_matrix, print_symbol='default_symbol1', raw_output=Fals
                     elif len(to_be_squared) == 1:
                         row = re.sub(square_pattern, "*" + to_be_squared[0], row)
 
-        if withbrackets:
+        if len(rows) == 1:
+            print(f"\t{print_symbol} = {row};")
+            return
+        elif withbrackets:
             print(f"\t{print_symbol}[{i}] = {row};")
         else:
             print(f"\t{print_symbol}{i} = {row};")

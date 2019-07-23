@@ -19,6 +19,7 @@ def dynamic_import(abs_module_path, class_name):
 
 # SYMBOLS:
 cs2_thermal = Symbol('RT', positive=True)
+cs2 = 1/3.
 
 ux = Symbol('u.x')
 uy = Symbol('u.y')
@@ -59,6 +60,7 @@ ex_D3Q7 = Matrix([0, 1, -1, 0, 0, 0, 0])
 ey_D3Q7 = Matrix([0, 0, 0, 1, -1, 0, 0])
 ez_D3Q7 = Matrix([0, 0, 0, 0, 0, 1, -1])
 
+S_relax_ADE_D3Q7 = diag(1, omega_ade, omega_ade, omega_ade, 1, 1, 1)
 
 # D3Q15 - notation from 'LBM Principles and Practise' Book p. 89
 # ex_D3Q15 = Matrix([0, 1, -1, 0, 0, 0, 0, 1, -1, 1, -1, 1, -1, -1, 1])
@@ -133,7 +135,10 @@ m00 = Symbol('m00', positive=True)
 rho = Symbol('rho', positive=True)
 Temperature = Symbol('T', positive=True)
 cp = Symbol('cp', positive=True)
-cht_gamma = Symbol('gamma', positive=True)  # magic stability enhancement
+cht_gamma = Symbol('h_stability_enhancement', positive=True)  # magic stability enhancement
+# (h_stability_enhancement * 1. / 3.) / (cp * rho);
+
+Sigma2 = cs2*cht_gamma/(cp*rho)
 
 w_D2Q9 = Matrix([4. / 9, 1. / 9, 1. / 9, 1. / 9, 1. / 9, 1. / 36, 1. / 36, 1. / 36, 1. / 36])
 
@@ -276,8 +281,8 @@ S_relax_hydro_D3Q27[8, 9] = s_minus_D3Q27
 S_relax_hydro_D3Q27[9, 7] = s_minus_D3Q27
 S_relax_hydro_D3Q27[9, 8] = s_minus_D3Q27
 
-S_relax_ADE_D3Q27 = diag(1, omega_ade, omega_ade, omega_ade, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
-
+# S_relax_ADE_D3Q27 = diag(1, omega_ade, omega_ade, omega_ade, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+S_relax_ADE_D3Q27 = diag(1, omega_ade, omega_ade, omega_ade, 1, 1, 1, 1, 1, 1, omega_ade, omega_ade, omega_ade, omega_ade, omega_ade, omega_ade, 1, 1, 1, 1, 1, 1, 1, omega_ade, omega_ade, omega_ade, 1)
 
 S_relax_MRT_GS = diag(1, 1, 1, 1, 1, 1, 1, omega_v, omega_v)  #
 # S_relax_MRT_GS = diag(0, 0, 0, 0, 0, 0, 0, sv, sv)   #

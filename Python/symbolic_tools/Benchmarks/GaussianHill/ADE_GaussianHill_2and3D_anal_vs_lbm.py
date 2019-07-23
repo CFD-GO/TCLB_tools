@@ -1,17 +1,12 @@
-from Benchmarks.ADE.steady_two_layer_cylinder_analytical_2D import PipeWithinPipeNeumann
 from DataIO.helpers import find_oldest_iteration, calc_mse, calc_L2
-import matplotlib as mpl
 import matplotlib.pyplot as plt
-from matplotlib import cm as colormap
-from matplotlib.ticker import LinearLocator, FormatStrFormatter
-import numpy as np
-from mpl_toolkits.mplot3d import Axes3D
 import os
 import pwd
 from DataIO.VTIFile import VTIFile
-from Benchmarks.ADE.GaussianHillAnal2D import GaussianHillAnal2D, prepare_anal_data_ADE_Gaussion_Hill
+from Benchmarks.GaussianHill.GaussianHillAnal2D import GaussianHillAnal2D, prepare_anal_data_ADE_Gaussion_Hill
 
-from sympy.matrices import Matrix, diag
+from sympy.matrices import Matrix
+
 # -------- numerical solution ---------------
 wd = os.getcwd()
 wd = os.path.dirname(wd)  # go level up

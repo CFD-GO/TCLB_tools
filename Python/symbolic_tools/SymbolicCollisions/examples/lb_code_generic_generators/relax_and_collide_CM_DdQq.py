@@ -4,7 +4,7 @@ from SymbolicCollisions.core.cm_symbols import omega_ade, omega_b, omega_v, m00
 from SymbolicCollisions.core.cm_symbols import Force_str as F_str
 from SymbolicCollisions.core.cm_symbols import dynamic_import
 from SymbolicCollisions.core.DiscreteCMTransforms import get_DF, get_m00
-from SymbolicCollisions.core.printers import print_u2, print_as_vector
+from SymbolicCollisions.core.printers import print_u2, print_sigma_cht,print_as_vector
 from SymbolicCollisions.core.MatrixGenerator import get_raw_moments_matrix, get_shift_matrix
 from sympy.matrices import Matrix
 import numpy as np
@@ -15,8 +15,8 @@ import numpy as np
 
 # SETUP
 d = 3
-q = 27
-model = 'ade'  # choose from '['hydro_compressible', 'hydro_incompressible', 'ade', 'ade_with_f']
+q = 7
+model = 'cht'  # choose from '['hydro_compressible', 'hydro_incompressible', 'ade', 'ade_with_f', 'cht']
 
 # DYNAMIC IMPORTS
 ex = dynamic_import("SymbolicCollisions.core.cm_symbols", f"ex_D{d}Q{q}")
@@ -33,6 +33,7 @@ def get_s_relax_switcher(choice):
         'hydro_incompressible': ("SymbolicCollisions.core.cm_symbols", f"S_relax_hydro_D{d}Q{q}"),
         'ade_with_f': ("SymbolicCollisions.core.cm_symbols", f"S_relax_ADE_D{d}Q{q}"),
         'ade': ("SymbolicCollisions.core.cm_symbols", f"S_relax_ADE_D{d}Q{q}"),
+        'cht': ("SymbolicCollisions.core.cm_symbols", f"S_relax_ADE_D{d}Q{q}"),
     }
     which_model = s_relax_switcher.get(choice, lambda: "Invalid argument")
     return dynamic_import(*which_model)
@@ -47,6 +48,7 @@ def get_cm_eq_and_F_cm_switcher(choice):
         'hydro_incompressible': ("SymbolicCollisions.core.hardcoded_results", f"hardcoded_cm_eq_incompressible_D{d}Q{q}"),
         'ade_with_f': ("SymbolicCollisions.core.hardcoded_results", f"hardcoded_cm_eq_compressible_D{d}Q{q}"),
         'ade': ("SymbolicCollisions.core.hardcoded_results", f"hardcoded_cm_eq_compressible_D{d}Q{q}"),
+        'cht': ("SymbolicCollisions.core.hardcoded_results", f"hardcoded_cm_eq_cht_D{d}Q{q}"),
     }
     which_cm_eq = cm_eq_switcher.get(choice, lambda: "Invalid argument")
     hardcoded_cm_eq = dynamic_import(*which_cm_eq)
@@ -57,6 +59,7 @@ def get_cm_eq_and_F_cm_switcher(choice):
         'hydro_incompressible': ("SymbolicCollisions.core.hardcoded_results", f"hardcoded_F_cm_hydro_velocity_based_D{d}Q{q}"),
         'ade_with_f': ("SymbolicCollisions.core.hardcoded_results", f"hardcoded_F_cm_pf_D{d}Q{q}"),
         'ade': None,
+        'cht': None,
     }
     which_F_cm = F_cm_switcher.get(choice, lambda: "Invalid argument")
     hardcoded_F_cm = \
@@ -96,6 +99,7 @@ def make_header(choice):
         'hydro_incompressible': f"CudaDeviceFunction void relax_and_collide_hydro_with_F(real_t {pop_in_str}[{q}], real_t {omega_v}, vector_t u, vector_t {F_str}) \n{{",
         'ade_with_f': f"CudaDeviceFunction void relax_and_collide_ADE_with_F(real_t {pop_in_str}[{q}], real_t {omega_ade}, vector_t u, vector_t {F_str}) \n{{",
         'ade': f"CudaDeviceFunction void relax_and_collide_ADE(real_t {pop_in_str}[{q}], real_t {omega_ade}, vector_t u) \n{{",
+        'cht': f"CudaDeviceFunction void relax_and_collide_ADE(real_t {pop_in_str}[<?R C( h_pop_size) ?>], real_t rho, real_t {omega_ade}, vector_t u) \n{{",
     }
     result = model_switcher.get(choice, lambda: "Invalid argument")
     print(result)
@@ -109,6 +113,11 @@ print("\t//=== THIS IS AUTOMATICALLY GENERATED CODE ===")
 # print("real_t {sb} = 1./(3*bulk_visc + 0.5);")
 # print(f"real_t {sb} = omega_bulk;\n")  # s_b = 1./(3*bulk_visc + 0.5)
 print_u2(d)
+
+if 'cht' in model:
+    print_sigma_cht()
+
+
 print_ccode(get_m00(q, pop_in_str), assign_to=f'\treal_t {m00}')
 
 
@@ -118,6 +127,7 @@ def make_variables(choice):
         'hydro_incompressible': f"\n\treal_t {temp_pop_str}[{q}];\n",
         'ade_with_f': f"\n\treal_t {temp_pop_str}[{q}];\n",
         'ade': f"\n\treal_t {temp_pop_str}[{q}];\n",
+        'cht': f"\n\treal_t {temp_pop_str}[{q}];\n",
     }
     # Get the function from switcher dictionary
     result = model_switcher.get(choice, lambda: "Invalid argument")
@@ -169,6 +179,9 @@ def make_collision(choice):
                       + (eye(q) - S_Relax / 2) * hardcoded_F_cm,
         # Relax 1st moments for ADE, SOI without force
         'ade': (eye(q) - S_Relax) * temp_populations
+               + S_Relax * hardcoded_cm_eq,
+        # Relax 1,3,5 moments for ADE, SOI without force
+        'cht': (eye(q) - S_Relax) * temp_populations
                + S_Relax * hardcoded_cm_eq,
     }
     # Get the function from switcher dictionary

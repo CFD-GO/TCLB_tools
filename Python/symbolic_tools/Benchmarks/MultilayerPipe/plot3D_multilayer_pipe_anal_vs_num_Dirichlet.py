@@ -1,10 +1,8 @@
-from Benchmarks.ADE.steady_two_layer_cylinder_analytical_2D import PipeWithinPipeDirichlet
+from Benchmarks.MultilayerPipe.steady_two_layer_cylinder_analytical_2D import PipeWithinPipeDirichlet
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-from matplotlib import cm as colormap
-from matplotlib.ticker import LinearLocator, FormatStrFormatter
+from matplotlib.ticker import FormatStrFormatter
 import numpy as np
-from mpl_toolkits.mplot3d import Axes3D
 import os
 import pwd
 from DataIO.VTIFile import VTIFile

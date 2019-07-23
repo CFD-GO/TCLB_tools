@@ -68,6 +68,17 @@ class DiscreteCMTransforms:
         gamma = w_D2Q9[i] * (Matrix([1]) + eu * eu / (2 * self.cs2 * self.cs2) - u2 / (2 * self.cs2))
         return 2*gamma[0]
 
+    def get_heat_flux_bc(self, i):
+        # TODO: check it
+
+        # eu_dot_f = (self.e[i, :] - self.u.transpose()).dot(self.F)
+        # pop_eq = m00 * self.get_gamma(i)
+        # result = pop_eq * eu_dot_f / ( self.cs2)
+        # return
+        eu = self.e[i, :] * self.u
+        gamma = w_D2Q9[i] * (eu / self.cs2)
+        return -2*gamma[0]
+
     def get_gamma(self, i):
         """ 
          OMG, sympy...

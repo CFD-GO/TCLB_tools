@@ -6,7 +6,7 @@ from SymbolicCollisions.core.MatrixGenerator import get_raw_moments_matrix, get_
 
 # SETUP
 d = 3
-q = 19
+q = 7
 
 # DYNAMIC IMPORTS
 ex = dynamic_import("SymbolicCollisions.core.cm_symbols", f"ex_D{d}Q{q}")
@@ -17,6 +17,7 @@ else:
     ez = None
 
 hardcoded_cm_eq = dynamic_import("SymbolicCollisions.core.hardcoded_results", f"hardcoded_cm_eq_compressible_D{d}Q{q}")
+# hardcoded_cm_eq = dynamic_import("SymbolicCollisions.core.hardcoded_results", f"hardcoded_cm_eq_cht_D{d}Q{q}")
 
 # ARRANGE STUFF
 Mraw = get_raw_moments_matrix(ex, ey, ez)

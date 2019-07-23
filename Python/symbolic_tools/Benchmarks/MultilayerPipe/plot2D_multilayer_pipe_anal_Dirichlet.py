@@ -1,7 +1,7 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-from Benchmarks.ADE.steady_two_layer_cylinder_analytical_2D import PipeWithinPipeDirichlet
+from Benchmarks.MultilayerPipe.steady_two_layer_cylinder_analytical_2D import PipeWithinPipeDirichlet
 gauge = 1
 
 r0 = gauge * (8 / 2)  # inner radius

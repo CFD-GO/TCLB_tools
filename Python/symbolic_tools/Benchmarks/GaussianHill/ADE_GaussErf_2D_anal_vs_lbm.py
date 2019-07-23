@@ -1,18 +1,12 @@
-from Benchmarks.ADE.steady_two_layer_cylinder_analytical_2D import PipeWithinPipeNeumann
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-from matplotlib import cm as colormap
-from matplotlib.ticker import LinearLocator, FormatStrFormatter
+from matplotlib.ticker import FormatStrFormatter
 import numpy as np
-from mpl_toolkits.mplot3d import Axes3D
 import os
-import pwd
-from DataIO.VTIFile import VTIFile
-from Benchmarks.ADE.GaussianHillAnal2D import GaussianHillAnal2D
-from Benchmarks.ADE.GaussErf import GaussErfADE
+from Benchmarks.GaussianHill.GaussianHillAnal2D import GaussianHillAnal2D
 
+from sympy.matrices import Matrix
 
-from sympy.matrices import Matrix, diag
 # -------- numerical solution ---------------
 wd = os.getcwd()
 wd = os.path.dirname(wd)  # go level up
