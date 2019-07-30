@@ -12,6 +12,10 @@ from contextlib import redirect_stdout
 import sys
 import os
 
+from SymbolicCollisions.core.cm_symbols import dynamic_import
+from SymbolicCollisions.core.DiscreteCMTransforms import get_DF
+from SymbolicCollisions.core.MatrixGenerator import get_raw_moments_matrix
+
 sys.path.append(os.path.join('Python', 'symbolic_tools'))  # allow CI bot to see the stuff from the main repo dir
 sys.path.append(os.path.join('.'))  # allow CI bot to see the stuff from the main repo dir
 
@@ -32,12 +36,12 @@ class TestRegexPrinters(TestCase):
              ]
 
         expected_results = [
-            "\ttest[0] = rho;\n",
-            "\ttest[0] = T*cp*rho;\n",
-            "\ttest[0] = 1/9.*T*gamma*gamma/(cp*rho);\n",
-            "\ttest[0] = RT*RT*m00;\n",
-            "\ttest[0] = -RT*m00*uy2;\n",
-            "\ttest[0] = RT*RT*m00;\n",
+            "\ttest = rho;\n",
+            "\ttest = T*cp*rho;\n",
+            "\ttest = 1/9.*T*gamma*gamma/(cp*rho);\n",
+            "\ttest = RT*RT*m00;\n",
+            "\ttest = -RT*m00*uy2;\n",
+            "\ttest = RT*RT*m00;\n",
             ## "\ttest[0] = m00*(-RT*uy2 + RT*uy2 + RT*RT);\n",   # it seems that the order is sometimes swapped and the test fails Oo
         ]
 
@@ -49,5 +53,40 @@ class TestRegexPrinters(TestCase):
 
             assert out == expected_result
 
+    def test_df_to_m(self):
+        # SETUP
+        d = 2
+        q = 9
 
-    # print_as_vector(expected_result, 'cm_eq')
+        # DYNAMIC IMPORTS
+        ex = dynamic_import("SymbolicCollisions.core.cm_symbols", f"ex_D{d}Q{q}")
+        ey = dynamic_import("SymbolicCollisions.core.cm_symbols", f"ey_D{d}Q{q}")
+        if d == 3:
+            ez = dynamic_import("SymbolicCollisions.core.cm_symbols", f"ez_D{d}Q{q}")
+        else:
+            ez = None
+
+        pop_in_str = 'x_in'  # symbol defining populations
+        temp_pop_str = 'temp'  # symbol defining populations
+
+        temp_populations = get_DF(q, temp_pop_str)
+
+        Mraw = get_raw_moments_matrix(ex, ey, ez)
+        m = Mraw * temp_populations
+
+        expected_results = "\tx_in[0] = temp[0] + temp[1] + temp[2] + temp[3] + temp[4] + temp[5] + temp[6] + temp[7] + temp[8];\n" \
+                           "\tx_in[1] = temp[1] - temp[3] + temp[5] - temp[6] - temp[7] + temp[8];\n" \
+                           "\tx_in[2] = temp[2] - temp[4] + temp[5] + temp[6] - temp[7] - temp[8];\n" \
+                           "\tx_in[3] = temp[1] + temp[3] + temp[5] + temp[6] + temp[7] + temp[8];\n" \
+                           "\tx_in[4] = temp[2] + temp[4] + temp[5] + temp[6] + temp[7] + temp[8];\n" \
+                           "\tx_in[5] = temp[5] - temp[6] + temp[7] - temp[8];\n" \
+                           "\tx_in[6] = temp[5] + temp[6] - temp[7] - temp[8];\n" \
+                           "\tx_in[7] = temp[5] - temp[6] - temp[7] + temp[8];\n" \
+                           "\tx_in[8] = temp[5] + temp[6] + temp[7] + temp[8];\n"
+
+        f = io.StringIO()
+        with redirect_stdout(f):
+            print_as_vector(m, print_symbol=pop_in_str)
+        out = f.getvalue()
+
+        assert out == expected_results

@@ -14,8 +14,8 @@ rho_l = 1
 # kin_visc_h = 1/6
 # kin_visc_l = 1/6
 
-kin_visc_h = 1
-kin_visc_l = 1
+kin_visc_h = 0.1
+kin_visc_l = 0.1
 
 mu_h = rho_h * kin_visc_h
 mu_l = rho_l * kin_visc_l
@@ -62,12 +62,13 @@ y_grid = np.linspace(0, ySIZE, ySIZE, endpoint=False) + 0.5
 
 # -------- anal solution ---------------
 
-h = 49  # distance from the center to the channel walls
+h = 61.5  # distance from the center to the channel walls
 y_anal = np.linspace(-h, h, 2*h, endpoint=False) + 0.5
-uc = 0.001
+uc = 0.01
 
 # gx = 4.04e-06
 gx = calc_gx(uc, mu_l, mu_h, rho_l, rho_h, h)
+print(f"gx = {gx:0.6f}")
 poiseuilleAnal = TwoPhasePoiseuilleAnal(gx=gx, mu_l=mu_l, mu_h=mu_h, rho_h=rho_h, rho_l=rho_l, h=h)
 u_anal = np.array([poiseuilleAnal.get_u_profile(y_anal[i]) for i in range(len(y_anal))])
 

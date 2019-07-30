@@ -61,9 +61,9 @@ def make_plot(x, y, x2, y2, fig_name):
              color="black", marker="", markevery=25, markersize=7, linestyle="-", linewidth=2,
              label='Heater')
 
-    plt.plot(x2, y2,
-             color="black", marker=">", markevery=25, markersize=7, linestyle=":", linewidth=2,
-             label='Outlet')
+    # plt.plot(x2, y2,
+    #          color="black", marker=">", markevery=25, markersize=7, linestyle=":", linewidth=2,
+    #          label='Outlet')
     # ------ format y axis ------ #
     yll = min(y.min(), y2.min())
     yhl = max(y.max(), y2.max())
@@ -77,8 +77,8 @@ def make_plot(x, y, x2, y2, fig_name):
     plt.yscale('log')
 
     # ------ format x axis ------ #
-    # plt.xlim(0, x.max())
-    plt.xlim(0, 4e6)
+    plt.xlim(0, x.max())
+    # plt.xlim(0, 4e6)
     plt.ticklabel_format(style='sci', axis='x', scilimits=(0, 0))
     # plt.ticklabel_format(style='sci', axis='y', scilimits=(0, 0))  # scilimits=(-8, 8)
 
@@ -143,8 +143,8 @@ for root, dirs, files in os.walk(local_logs_folder):
             # x1 = np.linspace(start=window - 1, stop=len(y1) + 1, num=len(y1), endpoint=True)
 
             y2 = log['HeatFluxX'][skip_first_iterations:].rolling(window).apply(calc_norm_std).dropna()
-            # x2 = np.linspace(start=window - 1, stop=len(y2) + 1, num=len(y2), endpoint=True)
 
+            # x2 = np.linspace(start=window - 1, stop=len(y2) + 1, num=len(y2), endpoint=True)
             x = log['Iteration'][skip_first_iterations + window - 1:]
 
             plot_name = "convergence_MA_" + re.sub(r".csv", r".png", file)
