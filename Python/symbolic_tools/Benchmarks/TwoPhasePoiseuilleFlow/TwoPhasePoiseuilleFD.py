@@ -21,13 +21,13 @@ class TwoPhasePoiseuilleFD:
     """
     CFD lecture notes J. Rokicki, p23
     """
-    def __init__(self, gx, mu_l, mu_h, rho_l, rho_h, h):
+    def __init__(self, gx, mu_l, mu_h, rho_l, rho_h, r):
         self.mu_h = mu_h  # dynamic viscosity of upper fluid
         self.mu_l = mu_l  # dynamic viscosity of lower fluid
         self.rho_h = rho_h  # density of upper fluid
         self.rho_l = rho_l  # density of lower fluid
 
-        self.h = h  # distance from the center to the channel walls
+        self.r = r  # distance from the center to the channel walls
         self.gx = gx  # body force
 
     def get_u_profile(self, y, W=1):
@@ -38,12 +38,12 @@ class TwoPhasePoiseuilleFD:
         """
 
         N = len(y)
-        step = 2*self.h/N
+        step = 2 * self.r / N
         A = np.identity(N)
         b = np.zeros(shape=(N, 1))
 
-        mu = get_tanh_profile(y, self.h, self.mu_h, self.mu_l, W)
-        rho = get_tanh_profile(y, self.h, self.rho_h, self.rho_l, W)
+        mu = get_tanh_profile(y, self.r, self.mu_h, self.mu_l, W)
+        rho = get_tanh_profile(y, self.r, self.rho_h, self.rho_l, W)
 
         for i in range(1, N-1):
             b[i] = -self.gx * rho[i] * step * step  # RHS

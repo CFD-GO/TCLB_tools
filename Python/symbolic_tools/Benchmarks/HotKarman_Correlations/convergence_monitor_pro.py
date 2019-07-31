@@ -16,7 +16,7 @@ import re
 
 home = pwd.getpwuid(os.getuid()).pw_dir
 local_logs_folder = os.path.join(home, 'DATA_FOR_PLOTS', 'logs_pro')
-host_folder = os.path.join(f'$FROM_PRO', 'batch_HotKarman3D', 'keep_nu_and_k_sizer*')
+host_folder = os.path.join(f'$FROM_PRO', 'batch_HotKarman3D_CM_HIGHER', 'keep_nu_and_k_sizer*')
 
 if not os.path.exists(local_logs_folder):
     os.makedirs(local_logs_folder)
@@ -61,9 +61,9 @@ def make_plot(x, y, x2, y2, fig_name):
              color="black", marker="", markevery=25, markersize=7, linestyle="-", linewidth=2,
              label='Heater')
 
-    # plt.plot(x2, y2,
-    #          color="black", marker=">", markevery=25, markersize=7, linestyle=":", linewidth=2,
-    #          label='Outlet')
+    plt.plot(x2, y2,
+             color="black", marker=">", markevery=25, markersize=7, linestyle=":", linewidth=2,
+             label='Outlet')
     # ------ format y axis ------ #
     yll = min(y.min(), y2.min())
     yhl = max(y.max(), y2.max())
@@ -77,8 +77,8 @@ def make_plot(x, y, x2, y2, fig_name):
     plt.yscale('log')
 
     # ------ format x axis ------ #
-    plt.xlim(0, x.max())
-    # plt.xlim(0, 4e6)
+    # plt.xlim(0, x.max())
+    plt.xlim(0, 4e6)
     plt.ticklabel_format(style='sci', axis='x', scilimits=(0, 0))
     # plt.ticklabel_format(style='sci', axis='y', scilimits=(0, 0))  # scilimits=(-8, 8)
 
@@ -105,8 +105,8 @@ for root, dirs, files in os.walk(local_logs_folder):
             log = pd.read_csv(filepath, delimiter=",")
 
             # get Re, Pr numbers from LB log
-            match = re.search('sizer_(\d+)', file, re.IGNORECASE)
-            size = int(match.group(1))
+            match = re.search('sizer_(\d[\.\d]?\d?)_', file, re.IGNORECASE)
+            size = float(match.group(1))
 
             u = 0.01
             D = 30*size
@@ -130,7 +130,7 @@ for root, dirs, files in os.walk(local_logs_folder):
 
             print(f"\n\n Re={Re:0.1f} Pr={Pr:0.1f} size={size} "
                   f"Nu_conv_avg_source={Nu_conv_avg_source:0.2f} Nu_conv_avg_outlet={Nu_conv_avg_outlet:0.2f} Nu_corr={Nu_corr:0.2f} "
-                  f"--- Extracted from file {file}")
+                  )
 
             def calc_norm_std(x):
                 result = abs(np.std(x) / np.mean(x))
@@ -139,12 +139,12 @@ for root, dirs, files in os.walk(local_logs_folder):
             window = 50
             skip_first_iterations = 100
             # y1 = log['HeatSource'][100:].rolling(window).apply(lambda x: np.std(x) / np.mean(x)).dropna()
-            y1 = log['HeatSource'][skip_first_iterations:].rolling(window).apply(calc_norm_std).dropna()
+            y1 = log['HeatSource'][skip_first_iterations:].rolling(window).apply(calc_norm_std, raw=False).dropna()
             # x1 = np.linspace(start=window - 1, stop=len(y1) + 1, num=len(y1), endpoint=True)
 
-            y2 = log['HeatFluxX'][skip_first_iterations:].rolling(window).apply(calc_norm_std).dropna()
-
+            y2 = log['HeatFluxX'][skip_first_iterations:].rolling(window).apply(calc_norm_std, raw=True).dropna()
             # x2 = np.linspace(start=window - 1, stop=len(y2) + 1, num=len(y2), endpoint=True)
+
             x = log['Iteration'][skip_first_iterations + window - 1:]
 
             plot_name = "convergence_MA_" + re.sub(r".csv", r".png", file)

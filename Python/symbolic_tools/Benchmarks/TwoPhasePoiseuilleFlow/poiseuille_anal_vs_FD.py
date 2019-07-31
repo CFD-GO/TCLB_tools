@@ -33,14 +33,14 @@ uc = 0.01
 
 # gx = 1
 gx = calc_gx(uc, mu_l, mu_h, rho_l, rho_h, h)
-pa = TwoPhasePoiseuilleAnal(gx=gx, mu_l=mu_l, mu_h=mu_h, rho_h=rho_h, rho_l=rho_l, h=h)
+pa = TwoPhasePoiseuilleAnal(gx=gx, mu_l=mu_l, mu_h=mu_h, rho_h=rho_h, rho_l=rho_l, r=h)
 u_a = np.array([pa.get_u_profile(y_[i]) for i in range(len(y_))])
 
-p_fd = TwoPhasePoiseuilleFD(gx=gx, mu_l=mu_l, mu_h=mu_h, rho_h=rho_h, rho_l=rho_l, h=h)
+p_fd = TwoPhasePoiseuilleFD(gx=gx, mu_l=mu_l, mu_h=mu_h, rho_h=rho_h, rho_l=rho_l, r=h)
 u_fd = p_fd.get_u_profile(y_, W=5)
 
-gx_air_water = calc_gx(uc, mu_l=1.22*1.5E-05, mu_h=1000 * 1.0E-06, rho_h=1000, rho_l=1.22, h=h)
-pa_air_water = TwoPhasePoiseuilleAnal(gx=gx_air_water, mu_l=1.22*1.5E-05, mu_h=1000 * 1.0E-06, rho_h=1000, rho_l=1.22, h=h)
+gx_air_water = calc_gx(uc, mu_l=1.22*1.5E-05, mu_h=1000 * 1.0E-06, rho_h=1000, rho_l=1.22, r=h)
+pa_air_water = TwoPhasePoiseuilleAnal(gx=gx_air_water, mu_l=1.22*1.5E-05, mu_h=1000 * 1.0E-06, rho_h=1000, rho_l=1.22, r=h)
 u_air_water = np.array([pa_air_water.get_u_profile(y_[i]) for i in range(len(y_))])
 
 

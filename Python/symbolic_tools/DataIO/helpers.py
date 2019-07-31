@@ -24,7 +24,6 @@ def find_oldest_iteration(folder, extension='.pvti'):
 
 def get_vti_from_iteration(folder, iteration, extension='.vti'):
     pattern = f"VTK_P00_{iteration}{extension}"
-
     matched_files = []
     for root, dirs, files in os.walk(folder):
         for file in files:

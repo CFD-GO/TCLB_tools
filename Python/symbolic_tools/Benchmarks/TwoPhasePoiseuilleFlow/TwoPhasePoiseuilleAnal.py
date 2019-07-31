@@ -6,45 +6,61 @@ by Amir Banari 2014
 """
 
 
-def calc_gx(uc, mu_l, mu_h, rho_l, rho_h, h):
+class OnePhasePoiseuilleAnal:
+    def __init__(self, gx, nu, D):
+        """
+        :param gx: gravitation
+        :param nu: kinematic viscosity
+        :param D: effective diameter of the channel
+        """
+        self.gx = gx
+        self.nu = nu
+        self.D = D
+
+    def get_u_profile(self, y):
+        ux = 0.5*self.gx*y*(self.D - y)/self.nu
+        return ux
+
+
+def calc_gx(uc, mu_l, mu_h, rho_l, rho_h, r):
     """
     :param uc: velocity at the interface (center)
     :param mu_l: dynamic viscosity of lower fluid
     :param mu_h: dynamic viscosity of upper fluid
     :param rho_l: density of lower fluid
     :param rho_h: density of upper fluid
-    :param h: distance from the center to the channel walls
-    :return:
+    :param r: distance from the center to the channel walls
+    :return: gravitation
     """
-    gx = 2 * uc * (mu_l + mu_h) / ((rho_l + rho_h) * h * h)
+    gx = 2 * uc * (mu_l + mu_h) / ((rho_l + rho_h) * r * r)
     return gx
 
 
 class TwoPhasePoiseuilleAnal:
-    def __init__(self, gx, mu_l, mu_h, rho_l, rho_h, h):
+    def __init__(self, gx, mu_l, mu_h, rho_l, rho_h, r):
         self.mu_l = mu_l  # dynamic viscosity of lower fluid
         self.mu_h = mu_h  # dynamic viscosity of upper fluid
         self.rho_l = rho_l  # density of lower fluid
         self.rho_h = rho_h  # density of upper fluid
 
-        self.h = h  # distance from the center to the channel walls
+        self.r = r  # distance from the center to the channel walls
         self.gx = gx  # body force
 
     def get_u_profile(self, y):
         if y > 0:
-            result = -self.rho_h * (y / self.h) * (y / self.h)
-            result -= (y / self.h) * (self.mu_h * self.rho_l - self.mu_l * self.rho_h) / (self.mu_l + self.mu_h)
+            result = -self.rho_h * (y / self.r) * (y / self.r)
+            result -= (y / self.r) * (self.mu_h * self.rho_l - self.mu_l * self.rho_h) / (self.mu_l + self.mu_h)
             result += (self.rho_h + self.rho_l) * self.mu_h / (self.mu_l + self.mu_h)
 
-            result *= self.gx * self.h * self.h / (2 * self.mu_h)
+            result *= self.gx * self.r * self.r / (2 * self.mu_h)
 
             return result
         else:
-            result = -self.rho_l*(y / self.h) * (y / self.h)
-            result -= (y / self.h) * (self.mu_h * self.rho_l - self.mu_l * self.rho_h) / (self.mu_l + self.mu_h)
+            result = -self.rho_l * (y / self.r) * (y / self.r)
+            result -= (y / self.r) * (self.mu_h * self.rho_l - self.mu_l * self.rho_h) / (self.mu_l + self.mu_h)
             result += + (self.rho_h + self.rho_l) * self.mu_l / (self.mu_l + self.mu_h)
 
-            result *= self.gx * self.h * self.h / (2 * self.mu_l)
+            result *= self.gx * self.r * self.r / (2 * self.mu_l)
             return result
 
     def get_uc_from_gx(self, gx=None):
@@ -52,6 +68,6 @@ class TwoPhasePoiseuilleAnal:
         if gx is None:
             gx = self.gx
 
-        uc = gx * self.h * self.h / (self.mu_l + self.mu_h)
+        uc = gx * self.r * self.r / (self.mu_l + self.mu_h)
         return uc
 
