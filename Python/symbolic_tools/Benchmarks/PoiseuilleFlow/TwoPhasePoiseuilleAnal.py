@@ -18,6 +18,10 @@ class OnePhasePoiseuilleAnal:
         self.D = D
 
     def get_u_profile(self, y):
+        """
+        :param y: distance from the bottom wall
+        :return: ux
+        """
         ux = 0.5*self.gx*y*(self.D - y)/self.nu
         return ux
 
@@ -47,6 +51,10 @@ class TwoPhasePoiseuilleAnal:
         self.gx = gx  # body force
 
     def get_u_profile(self, y):
+        """
+        :param y: distance from the interface (center)
+        :return: ux
+        """
         if y > 0:
             result = -self.rho_h * (y / self.r) * (y / self.r)
             result -= (y / self.r) * (self.mu_h * self.rho_l - self.mu_l * self.rho_h) / (self.mu_l + self.mu_h)

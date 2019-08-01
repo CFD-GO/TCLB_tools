@@ -3,6 +3,12 @@ import re
 import numpy as np
 
 
+def strip_folder_name(some_folder):
+    some_folder = some_folder.rstrip('0')  # remove all trailing zeros
+    some_folder = some_folder.rstrip('.')
+    return some_folder
+
+
 def find_oldest_iteration(folder, extension='.pvti'):
     iterations = []
     for root, dirs, files in os.walk(folder):

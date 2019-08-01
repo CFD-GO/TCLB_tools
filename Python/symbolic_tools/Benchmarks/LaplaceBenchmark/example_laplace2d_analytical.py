@@ -1,7 +1,7 @@
 from sympy.abc import x
-from Benchmarks.ADE.Laplace_2D_analytical import analytical_laplace_2d
-from Benchmarks.ADE.Laplace_2D_analytical import InputForLaplace2DAnalytical
-from Benchmarks.ADE.Laplace_2D_analytical import make_anal_plot
+from Benchmarks.LaplaceBenchmark.Laplace_2D_analytical import analytical_laplace_2d
+from Benchmarks.LaplaceBenchmark.Laplace_2D_analytical import InputForLaplace2DAnalytical
+from Benchmarks.LaplaceBenchmark.Laplace_2D_analytical import make_anal_plot
 
 xSIZE = 64
 ySIZE = 64

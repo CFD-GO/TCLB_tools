@@ -1,11 +1,10 @@
 from sympy.abc import x
-from Benchmarks.ADE.Laplace_2D_analytical import analytical_laplace_2d, InputForLaplace2DAnalytical, make_anal_plot
+from Benchmarks.LaplaceBenchmark.Laplace_2D_analytical import analytical_laplace_2d, InputForLaplace2DAnalytical
 
 from DataIO.VTIFile import VTIFile
 import os
 import pwd
 import pandas as pd
-import matplotlib as mpl
 import matplotlib.pyplot as plt
 
 import numpy as np

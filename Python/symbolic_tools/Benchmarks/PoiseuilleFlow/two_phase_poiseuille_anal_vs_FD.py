@@ -2,8 +2,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from numpy.linalg import norm
 
-from Benchmarks.TwoPhasePoiseuilleFlow.TwoPhasePoiseuilleAnal import TwoPhasePoiseuilleAnal, calc_gx
-from Benchmarks.TwoPhasePoiseuilleFlow.TwoPhasePoiseuilleFD import TwoPhasePoiseuilleFD, get_tanh_profile
+from Benchmarks.PoiseuilleFlow.TwoPhasePoiseuilleAnal import TwoPhasePoiseuilleAnal, calc_gx
+from Benchmarks.PoiseuilleFlow.TwoPhasePoiseuilleFD import TwoPhasePoiseuilleFD, get_tanh_profile
 
 # magic_ratio = 1
 # rho_h = magic_ratio * 54.6

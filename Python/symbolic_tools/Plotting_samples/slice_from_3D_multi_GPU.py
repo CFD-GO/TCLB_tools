@@ -66,7 +66,10 @@ plt.grid(True)
 
 # fake2Dline = mpl.lines.Line2D([0], [0], linestyle="none", c='b', marker='o')
 # ax.legend([fake2Dline], [r'$Err_{T} = T_{anal} - T_{num}$'], numpoints=1)
-fig_name = f'Plot_from_3D_data.png'
+
+if not os.path.exists('plots'):
+    os.makedirs('plots')
+fig_name = f'plots/Plot_from_3D_data.png'
 
 fig.savefig(fig_name, bbox_inches='tight')
 plt.show()

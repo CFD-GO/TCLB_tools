@@ -26,7 +26,7 @@ cmd = "rsync -zarv  --prune-empty-dirs --include \"*/\"  --include=\"*.csv\" --e
       + f" \"{local_logs_folder}\""
 
 print(cmd)
-# os.system(cmd)
+os.system(cmd)
 
 
 # folders = os.listdir(local_logs_folder)
@@ -48,6 +48,9 @@ def calc_Nu(q_conv, k, D, L):
 
 
 def make_plot(x, y, x2, y2, fig_name):
+    if not os.path.exists('plots'):
+        os.makedirs('plots')
+
     params = {'legend.fontsize': 'xx-large',
               'figure.figsize': (14, 8),
               'axes.labelsize': 'xx-large',
@@ -108,7 +111,7 @@ for root, dirs, files in os.walk(local_logs_folder):
             match = re.search('sizer_(\d[\.\d]?\d?)_', file, re.IGNORECASE)
             size = float(match.group(1))
 
-            u = 0.01
+            u = 0.01/size
             D = 30*size
             v = log['nu'][0]
             Re = u*D/v
@@ -147,7 +150,7 @@ for root, dirs, files in os.walk(local_logs_folder):
 
             x = log['Iteration'][skip_first_iterations + window - 1:]
 
-            plot_name = "convergence_MA_" + re.sub(r".csv", r".png", file)
+            plot_name = "plots/convergence_MA_" + re.sub(r".csv", r".png", file)
             plot_name = re.sub(r"_Log_P00_00000000", r"", plot_name)
             make_plot(x, y1, x, y2, plot_name)
 

@@ -1,10 +1,8 @@
-from sympy.abc import x
-from Benchmarks.ADE.Laplace_2D_analytical import prepare_anal_data_new, peel_the_skin
+from Benchmarks.LaplaceBenchmark.Laplace_2D_analytical import prepare_anal_data_new, peel_the_skin
 
 from DataIO.VTIFile import VTIFile
 import os
 import pwd
-import pandas as pd
 # import matplotlib as mpl
 import matplotlib.pyplot as plt
 import matplotlib.ticker

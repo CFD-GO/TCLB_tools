@@ -2,14 +2,17 @@ import numpy as np
 import sympy as sp
 import matplotlib.pyplot as plt
 import matplotlib.pylab as pylab
-
+import os
 # -------------------- prepare dummy data --------------------
 
 x_range = 1
 step = 0.01
 x = np.arange(0., x_range, step)
 y = -4 * x * (x - x_range) / (x_range * x_range)
-fig_name = f'sample_plot2D_param_b={x_range}.png'
+
+if not os.path.exists('plots'):
+    os.makedirs('plots')
+fig_name = f'plots/sample_plot2D_param_b={x_range}.png'
 
 # -------------------- make dummy plot --------------------
 # plt.figure(figsize=(14, 8))
