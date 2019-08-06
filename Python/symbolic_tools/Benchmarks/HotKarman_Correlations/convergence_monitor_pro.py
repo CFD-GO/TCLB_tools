@@ -48,8 +48,8 @@ def calc_Nu(q_conv, k, D, L):
 
 
 def make_plot(x, y, x2, y2, fig_name):
-    if not os.path.exists('plots'):
-        os.makedirs('plots')
+    if not os.path.exists('convergence_plots'):
+        os.makedirs('convergence_plots')
 
     params = {'legend.fontsize': 'xx-large',
               'figure.figsize': (14, 8),
@@ -81,7 +81,7 @@ def make_plot(x, y, x2, y2, fig_name):
 
     # ------ format x axis ------ #
     # plt.xlim(0, x.max())
-    plt.xlim(0, 4e6)
+    # plt.xlim(0, 4e6)
     plt.ticklabel_format(style='sci', axis='x', scilimits=(0, 0))
     # plt.ticklabel_format(style='sci', axis='y', scilimits=(0, 0))  # scilimits=(-8, 8)
 
@@ -126,7 +126,7 @@ for root, dirs, files in os.walk(local_logs_folder):
             q_conv_avg_outlet = log['HeatFluxX'][-100:].mean()
 
             L = 3
-            Nu_conv_avg_source = calc_Nu(q_conv_avg_outlet, k, D, L)
+            Nu_conv_avg_source = calc_Nu(q_conv_avg_source, k, D, L)
             Nu_conv_avg_outlet = calc_Nu(q_conv_avg_outlet, k, D, L)
 
             Nu_corr = get_Nu_cylinder_by_Churchill_Bernstein(Re=Re, Pr=Pr)
@@ -150,7 +150,7 @@ for root, dirs, files in os.walk(local_logs_folder):
 
             x = log['Iteration'][skip_first_iterations + window - 1:]
 
-            plot_name = "plots/convergence_MA_" + re.sub(r".csv", r".png", file)
+            plot_name = "convergence_plots/convergence_MA_" + re.sub(r".csv", r".png", file)
             plot_name = re.sub(r"_Log_P00_00000000", r"", plot_name)
             make_plot(x, y1, x, y2, plot_name)
 

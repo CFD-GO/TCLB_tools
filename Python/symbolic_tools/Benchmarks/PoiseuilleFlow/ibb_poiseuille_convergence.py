@@ -2,7 +2,7 @@
 import numpy as np
 import os
 from Benchmarks.PoiseuilleFlow.TwoPhasePoiseuilleAnal import calc_gx, OnePhasePoiseuilleAnal
-from DataIO.helpers import find_oldest_iteration, get_vti_from_iteration, calc_mse, calc_L2, strip_folder_name
+from DataIO.helpers import find_oldest_iteration, get_vti_from_iteration, calc_mse, calc_L2, strip_folder_name, eat_dots_for_texmaker
 import pwd
 from DataIO.VTIFile import VTIFile
 
@@ -10,10 +10,10 @@ from matplotlib.ticker import LinearLocator, FormatStrFormatter
 from DataIO.VTIFile import VTIFile
 import matplotlib.pyplot as plt
 import matplotlib.ticker
-
+import matplotlib.pylab as pylab
 rho = 1
-kin_visc = 0.01
-mu = rho * kin_visc
+kin_visc = '0.01'
+mu = rho * float(kin_visc)
 
 diameters = np.array([15, 31, 63])
 qs = [0.25, 0.5, 0.75]
@@ -72,7 +72,7 @@ for q in qs:
         y_anal = np.arange(q, effdiam, 1)
         # y_anal = np.concatenate(([0], y_anal, [effdiam])) # unphysical wall nodes
         gx = calc_gx(uc, mu, mu, rho, rho, effdiam / 2)
-        poiseuilleAnal = OnePhasePoiseuilleAnal(gx=gx, nu=kin_visc, D=effdiam)
+        poiseuilleAnal = OnePhasePoiseuilleAnal(gx=gx, nu=float(kin_visc), D=effdiam)
         u_anal = np.array([poiseuilleAnal.get_u_profile(y_anal[i]) for i in range(len(y_anal))])
 
         ux_ibb_mse[d] = calc_mse(u_anal, ux_ibb_num_slice)
@@ -86,7 +86,15 @@ for q in qs:
     print("------------------------------------ Convergence  PLOT ------------------------------------")
     if not os.path.exists('plots'):
         os.makedirs('plots')
-    fig_name = f'plots/grid_convergence_Poiseuille_anal_vs_lbm_nu{kin_visc}_q{q}.png'
+    fig_name = f'plots/grid_convergence_Poiseuille_anal_vs_lbm_nu{eat_dots_for_texmaker(kin_visc)}_q{eat_dots_for_texmaker(q)}.png'
+
+    params = {'legend.fontsize': 'xx-large',
+              'figure.figsize': (14, 8),
+              'axes.labelsize': 'xx-large',
+              'axes.titlesize': 'xx-large',
+              'xtick.labelsize': 'xx-large',
+              'ytick.labelsize': 'xx-large'}
+    pylab.rcParams.update(params)
 
     initial_error_05st = 0.070
     y_05st = np.sqrt(diameters.min())*initial_error_05st/np.sqrt(diameters)

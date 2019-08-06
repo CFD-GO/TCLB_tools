@@ -3,6 +3,12 @@ import re
 import numpy as np
 
 
+def eat_dots_for_texmaker(value):
+    s_value = str(value)
+    s_value = re.sub(r"\.", 'o', s_value)
+    return s_value
+
+
 def strip_folder_name(some_folder):
     some_folder = some_folder.rstrip('0')  # remove all trailing zeros
     some_folder = some_folder.rstrip('.')

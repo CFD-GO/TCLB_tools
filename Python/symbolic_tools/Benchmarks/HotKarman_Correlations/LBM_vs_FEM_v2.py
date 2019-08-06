@@ -7,14 +7,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.pylab as pylab
 import collections
-
+from DataIO.helpers import find_oldest_iteration, get_vti_from_iteration, strip_folder_name
 
 home = pwd.getpwuid(os.getuid()).pw_dir
 main_folder = os.path.join(home, 'DATA_FOR_PLOTS', 'HotBarman3D')
 
 
 Re = 10
-Pr = 1000
+Pr = 10
 
 
 # README:
@@ -22,9 +22,12 @@ Pr = 1000
 # size 2 = LB mesh: 2000x300x6 -- sample 300 y points from toolbox
 # size 4 = LB mesh: 4000x600x12 -- sample 600 y points from toolbox
 
-def read_data_from_LBM(filepath_pvti):
-    vti_reader = VTIFile(filepath_pvti, parallel=True)
 
+def read_data_from_LBM(case_folder):
+    oldest = find_oldest_iteration(case_folder)
+    filename_vtk = get_vti_from_iteration(case_folder, oldest, extension='.pvti')
+    filepath_vtk = os.path.join(case_folder, filename_vtk)
+    vti_reader = VTIFile(filepath_vtk, parallel=True)
     T_num = vti_reader.get("T")
     [ux_num, uy_num, uz_num] = vti_reader.get("U", is_vector=True)
     ny, nx, nz = T_num.shape
@@ -69,18 +72,17 @@ T_qs_struct, ux_qs_struct, y_qs_struct = read_data_from_toolbox('nodes_787776', 
 
 # scaling_type = "keepU"
 scaling_type = "keep_nu_and_k"
+collision_kernel = 'CM_HIGHER'
 
 T_lb_slice1, ux_lb1, y_lb1 = read_data_from_LBM(
-    os.path.join(main_folder, f'{scaling_type}_sizer_{1}_Re{Re}_Pr{Pr}',
-                 f'HotKarman3D_template_sizer_{1}_Re{Re}_Pr{Pr}_VTK_P00_04000000.pvti'))
+    os.path.join(main_folder, f'batch_HotKarman3D_{collision_kernel}', f'{scaling_type}_sizer_{1}_Re{Re}_Pr{Pr}'))
 
 # T_lb_slice2, ux_lb2, y_lb2 = read_data_from_LBM(
 #     os.path.join(main_folder, f'{scaling_type}_sizer_{2}_Re{Re}_Pr{Pr}',
 #                  f'HotKarman3D_template_sizer_{2}_Re{Re}_Pr{Pr}_VTK_P00_05600000.pvti'))  # Pr10
 
 T_lb_slice2, ux_lb2, y_lb2 = read_data_from_LBM(
-    os.path.join(main_folder, f'{scaling_type}_sizer_{2}_Re{Re}_Pr{Pr}',
-                 f'HotKarman3D_template_sizer_{2}_Re{Re}_Pr{Pr}_VTK_P00_06400000.pvti'))  # Pr100 Pr1000
+    os.path.join(main_folder, f'batch_HotKarman3D_{collision_kernel}', f'{scaling_type}_sizer_{2}_Re{Re}_Pr{Pr}'))  # Pr100 Pr1000
 
 
 # T_lb_slice3, ux_lb3, y_lb3 = read_data_from_LBM(
@@ -88,14 +90,12 @@ T_lb_slice2, ux_lb2, y_lb2 = read_data_from_LBM(
 #                  f'HotKarman3D_template_sizer_{4}_Re{Re}_Pr{Pr}_VTK_P00_00980000.pvti'))
 
 T_lb_slice3, ux_lb3, y_lb3 = read_data_from_LBM(
-    os.path.join(main_folder, f'{scaling_type}_sizer_{4}_Re{Re}_Pr{Pr}',
-                 f'HotKarman3D_template_sizer_{4}_Re{Re}_Pr{Pr}_VTK_P00_04000000.pvti'))
-
+    os.path.join(main_folder, f'batch_HotKarman3D_{collision_kernel}', f'{scaling_type}_sizer_{4}_Re{Re}_Pr{Pr}'))
 
 for cross_section, x_cut in cross_sections.items():
     title = f'Temperature LBM vs FEM \n cross-section {cross_section}'
     title = ''  # skip title for latex report
-    fig_name = f'T_LBM_vs_ToolBox_{mesh}_Re{Re}_Pr{Pr}_cross_section_{cross_section}.pdf'
+    fig_name = f'plots/T_LBM_vs_ToolBox_{mesh}_Re{Re}_Pr{Pr}_cross_section_{cross_section}.pdf'
 
     params = {'legend.fontsize': 'xx-large',
               'figure.figsize': (14, 8),
@@ -120,13 +120,14 @@ for cross_section, x_cut in cross_sections.items():
              label='LBM - lattice III')
 
     idx = list(cross_sections.keys()).index(cross_section)
-    plt.plot(T_qs[:, idx], y_qs,
-             color="black", marker=">", markevery=5, markersize=5, linestyle="-", linewidth=2,
-             label=r'FEM$_u$')
+    # plt.plot(T_qs[:, idx], y_qs,
+    #          color="black", marker=">", markevery=5, markersize=5, linestyle="-", linewidth=2,
+    #          label=r'FEM$_u$')
 
     plt.plot(T_qs_struct[:, idx], y_qs_struct,
              color="black", marker="<", markevery=5, markersize=5, linestyle="-", linewidth=2,
-             label=r'FEM$_s$')
+             label=r'FEM')
+
     # ------ format y axis ------ #
     # yll = y.min()
     # yhl = y.max()
@@ -158,7 +159,7 @@ for cross_section, x_cut in cross_sections.items():
 for cross_section, x_cut in cross_sections.items():
     # title = r'$U_x$' + f' LBM vs FEM cross-section {cross_section}'
     title = ''  # skip title for latex report
-    fig_name = f'ux_LBM_vs_ToolBox_{mesh}_Re{Re}_Pr{Pr}_cross_section_{cross_section}.pdf'
+    fig_name = f'plots/ux_LBM_vs_ToolBox_{mesh}_Re{Re}_Pr{Pr}_cross_section_{cross_section}.pdf'
 
     params = {'legend.fontsize': 'xx-large',
               'figure.figsize': (14, 8),
@@ -183,13 +184,14 @@ for cross_section, x_cut in cross_sections.items():
              label='LBM - lattice III')
 
     idx = list(cross_sections.keys()).index(cross_section)
-    plt.plot(ux_qs[:, idx], y_qs,
-             color="black", marker=">", markevery=5, markersize=5, linestyle="-", linewidth=2,
-             label=r'FEM$_u$')
+    # plt.plot(ux_qs[:, idx], y_qs,
+    #          color="black", marker=">", markevery=5, markersize=5, linestyle="-", linewidth=2,
+    #          label=r'FEM$_u$')
 
     plt.plot(ux_qs_struct[:, idx], y_qs_struct,
              color="black", marker="<", markevery=5, markersize=5, linestyle="-", linewidth=2,
-             label=r'FEM$_s$')
+             label=r'FEM')
+
     # ------ format y axis ------ #
     # yll = y.min()
     # yhl = y.max()

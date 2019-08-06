@@ -2,17 +2,17 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 from Benchmarks.PoiseuilleFlow.TwoPhasePoiseuilleAnal import calc_gx, OnePhasePoiseuilleAnal
-from DataIO.helpers import find_oldest_iteration, get_vti_from_iteration, strip_folder_name
+from DataIO.helpers import find_oldest_iteration, get_vti_from_iteration, strip_folder_name, eat_dots_for_texmaker
 import pwd
 from DataIO.VTIFile import VTIFile
-
+import matplotlib.pylab as pylab
 
 rho = 1
 kin_visc = 0.1
 mu = rho * kin_visc
 
-diam = 7
-q = 0.25
+diam = 15
+q = 0.75
 expected_wall_location = 1.5 - q
 effdiam = diam - 2*expected_wall_location
 uc = 0.01
@@ -56,7 +56,15 @@ u_anal = np.array([poiseuilleAnal.get_u_profile(y_anal[i]) for i in range(len(y_
 ###################################################################################################################
 if not os.path.exists('plots'):
     os.makedirs('plots')
-fig_name = f'plots/Poiseuille_anal_vs_lbm_v{kin_visc}_q{q}_effdiam_{effdiam}.png'
+fig_name = f'plots/Poiseuille_anal_vs_lbm_v{eat_dots_for_texmaker(kin_visc)}_q{eat_dots_for_texmaker(q)}_effdiam_{eat_dots_for_texmaker(effdiam)}.pdf'
+
+params = {'legend.fontsize': 'xx-large',
+          'figure.figsize': (14, 8),
+          'axes.labelsize': 'xx-large',
+          'axes.titlesize': 'xx-large',
+          'xtick.labelsize': 'xx-large',
+          'ytick.labelsize': 'xx-large'}
+pylab.rcParams.update(params)
 
 # -------------------- make dummy plot --------------------
 plt.rcParams.update({'font.size': 14})
@@ -87,7 +95,7 @@ plt.plot(U_bb_num_x_slice, y_grid,
 # ------ format y axis ------ #
 yll = y_grid.min()
 yhl = y_grid.max()
-# axes.set_ylim([yll, yhl])
+axes.set_ylim([0, 15])
 # axes.set_yticks(np.linspace(yll, yhl, 8))
 # axes.set_yticks(np.arange(yll, yhl, 1E-2))
 # axes.set_yticks([1E-4, 1E-6, 1E-8, 1E-10, 1E-12])
@@ -96,15 +104,16 @@ yhl = y_grid.max()
 
 # plt.yscale('log')
 # ------ format x axis ------ #
-# plt.xlim(0, int(xSIZE / 2))
+plt.xlim(0, 0.011)
 # plt.xlim(int(xSIZE / 2), xSIZE)
 
 # plt.ticklabel_format(style='sci', axis='x', scilimits=(0, 0))
 # plt.ticklabel_format(style='sci', axis='y', scilimits=(0, 0))  # scilimits=(-8, 8)
 
+title = f'IBB Poiseuille flow:\n' + r'$ \nu = $' + f'{kin_visc:.2e} ' + r'$D_{eff}=$' + f'{effdiam:.2e}, q={q:.2e}'
+title = ''  # skip title for .tex
+plt.title(title)
 
-plt.title(f'IBB Poiseuille flow:\n' +
-          r'$ \nu = $' + f'{kin_visc} ' + r'$D_{eff}=$' + f'{effdiam}, q={q}')
 
 plt.xlabel(r'$u_x$')
 plt.ylabel(r'$y$')
@@ -113,6 +122,6 @@ plt.grid()
 
 fig = plt.gcf()  # get current figure
 fig.savefig(fig_name, bbox_inches='tight')
-plt.show()
+# plt.show()
 
-# plt.close(fig)  # close the figure
+plt.close(fig)  # close the figure
