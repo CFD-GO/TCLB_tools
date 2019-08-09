@@ -18,22 +18,30 @@ def dynamic_import(abs_module_path, class_name):
 
 
 # SYMBOLS:
-cs2_thermal = Symbol('RT', positive=True)
-cs2 = 1/3.
+cs2_thermal = Symbol('RT', positive=True)  # variance of the distribution
+cs2 = 1/3.  # variance of the distribution
+sigma2 = Symbol('Sigma2', positive=True)  # variance of the distribution
 
-ux = Symbol('u.x')
-uy = Symbol('u.y')
-uz = Symbol('u.z')
+ux = Symbol('u.x', real=True)
+uy = Symbol('u.y', real=True)
+uz = Symbol('u.z', real=True)
+u1D = Matrix([ux])
 u2D = Matrix([ux, uy])
 u3D = Matrix([ux, uy, uz])
 
-dzeta_x = Symbol('dzeta_x')
-dzeta_y = Symbol('dzeta_y')
-dzeta_z = Symbol('dzeta_z')
-
+dzeta_x = Symbol('dzeta_x', real=True)
+dzeta_y = Symbol('dzeta_y', real=True)
+dzeta_z = Symbol('dzeta_z', real=True)
+dzeta1D = Matrix([dzeta_x])
 dzeta2D = Matrix([dzeta_x, dzeta_y])
 dzeta3D = Matrix([dzeta_x, dzeta_y, dzeta_z])
 
+s_x = Symbol('s_x', real=False)
+s_y = Symbol('s_y', real=False)
+s_z = Symbol('s_z', real=False)
+s1D = Matrix([s_x])
+s2D = Matrix([s_x, s_y])
+s3D = Matrix([s_x, s_y, s_z])
 
 Fx = Symbol('Fhydro.x')
 Fy = Symbol('Fhydro.y')
@@ -117,6 +125,8 @@ S_relax_ADE_D3Q19 = diag(1, omega_ade, omega_ade, omega_ade, 1, 1, 1, 1, 1, 1, 1
 ex_D3Q27 = Matrix([0, 1, -1, 0, 0, 0, 0, 1, -1, 1, -1, 1, -1, 1, -1, 1, -1, 1, -1, 1, -1, 1, -1, 0, 0, 0, 0])
 ey_D3Q27 = Matrix([0, 0, 0, 1, -1, 0, 0, 1, 1, -1, -1, 1, 1, -1, -1, 1, 1, -1, -1, 0, 0, 0, 0, 1, -1, 1, -1])
 ez_D3Q27 = Matrix([0, 0, 0, 0, 0, 1, -1, 1, 1, 1, 1, -1, -1, -1, -1, 0, 0, 0, 0, 1, 1, -1, -1, 1, 1, -1, -1])
+e_D3Q27 = ex_D3Q27.col_insert(1, ey_D3Q27)
+e_D3Q27 = e_D3Q27.col_insert(2, ez_D3Q27)
 
 # D3Q27 - notation from "Three-dimensional cascaded lattice
 # % Boltzmann method: improved implementation and consistent forcing scheme" by Linlin Fei

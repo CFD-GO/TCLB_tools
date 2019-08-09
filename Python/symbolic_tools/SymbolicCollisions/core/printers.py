@@ -50,10 +50,29 @@ def round_and_simplify(stuff):
     return rounded_and_simplified_stuff
 
 
-def print_as_vector(some_matrix, print_symbol='default_symbol1', raw_output=False, withbrackets=True):
+def print_as_vector(some_matrix, print_symbol='default_symbol1', raw_output=False, withbrackets=True, e=None):
     rows = some_matrix._mat
+    q = len(rows)
+    # print_symbols = [("%s[%d]" % (print_symbol, i)) for i in range(0, q)]
+    # if len(print_symbol) == 1:
 
-    for i in range(len(rows)):
+    if e is not None:
+        print_symbols = []
+        for i in range(q):
+            direction = e[i, :]
+            direction = [str(d) for d in direction]
+            direction = ''.join(direction)
+            direction = re.sub(r'-1', '2', direction)
+            print_symbols.append(f"{print_symbol}{direction}")
+    else:
+        if q == 1:
+            print_symbols = ["%s" % print_symbol]
+        elif withbrackets:
+            print_symbols = [("%s[%d]" % (print_symbol, i)) for i in range(0, q)]
+        else:
+            print_symbols = [("%s%d" % (print_symbol, i)) for i in range(0, q)]
+
+    for i in range(q):
         row = rows[i]
 
         if raw_output:
@@ -116,10 +135,6 @@ def print_as_vector(some_matrix, print_symbol='default_symbol1', raw_output=Fals
                     elif len(to_be_squared) == 1:
                         row = re.sub(square_pattern, "*" + to_be_squared[0], row)
 
-        if len(rows) == 1:
-            print(f"\t{print_symbol} = {row};")
-            return
-        elif withbrackets:
-            print(f"\t{print_symbol}[{i}] = {row};")
-        else:
-            print(f"\t{print_symbol}{i} = {row};")
+
+        print(f"\t{print_symbols[i]} = {row};")
+        # print(f"stuff = re.sub(r'{print_symbols[i]}', '{row}', stuff)")

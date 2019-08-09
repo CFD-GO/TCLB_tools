@@ -6,13 +6,14 @@ from joblib import Parallel, delayed
 import multiprocessing
 from sympy import Symbol
 import warnings
-
+from sympy import Derivative, ln, simplify
 from sympy.matrices import Matrix
 from SymbolicCollisions.core.printers import round_and_simplify
-from SymbolicCollisions.core.cm_symbols import m00
+from SymbolicCollisions.core.cm_symbols import m00, s3D
 # from SymbolicCollisions.core.cm_symbols import rho
 from SymbolicCollisions.core.cm_symbols import Temperature, cht_gamma as cht_stability_enhancement
 from SymbolicCollisions.core.cm_symbols import cp as specific_heat_capacity
+
 
 
 class ContinuousCMTransforms:
@@ -127,17 +128,59 @@ class ContinuousCMTransforms:
 
         dim = len(self.dzeta)  # number od dimensions
         # df = psi / pow(2 * PI * self.cs2, dim / 2)  # this is to difficult for sympy :/
-
-        if dim == 2:
+        if dim == 1:
+            df = psi / sp.sqrt(2 * PI * sigma2)
+        elif dim == 2:
             df = psi / (2 * PI * sigma2)  # 2D version hack
-        else:
+        elif dim == 3:
             df = psi / pow(2 * PI * sigma2, dim / 2)  # this may be to difficult for sympy :/
             # if self.cs2 != 1. / 3.:
             #     warnings.warn("Sympy may have problem with 3D non isothermal version (cs2=RT) \n "
             #                   "It also can't simplify it, thus check the raw output", UserWarning)
+        else:
+            raise Exception(f"Wrong dimension: {dim}")
 
         df *= exp(-dzeta_u2 / (2 * sigma2))
         return df
+
+    def calc_laplace_transform_of_edf(self, DF, s=s3D):
+        # DF = self.get_Maxwellian_DF(psi=m00, u=self.u, sigma2=self.cs2)
+        lim = [(dim, -oo, oo) for dim in self.dzeta]
+        # lim = [(dim, 0, oo) for dim in _dzeta]  # TODO: sympy's transform is from 0 to inf
+        # lim = [(dzeta_x, -oo, oo), (dzeta_y, -oo, oo), (dzeta_z, -oo, oo)]  # oj, sympy w 3D tym razem nie scalkuje ;p
+
+        DF *= sp.exp(-s.dot(self.dzeta))
+        result = integrate(DF, *lim)
+        result = round_and_simplify(result)
+        return result
+
+    def calc_cumulant(self, _fun, direction, order):
+        cgf = ln(_fun)
+        deriv = Derivative(cgf, (direction, order))
+        all_terms = deriv.doit()
+        all_terms = simplify(all_terms)
+        return all_terms
+
+    def get_cumulants(self, mno, DF, *args, **kwargs):
+        fun = DF(*args, **kwargs)
+        l_fun = self.calc_laplace_transform_of_edf(fun, s=s3D)
+        cgf = ln(l_fun)
+
+        d = cgf
+        for s_i, mno_i in zip(s3D, mno):
+            d = Derivative(d, (s_i, mno_i), evaluate=True)
+        d_at_0 = simplify(d)
+
+        for s_i in s3D:
+            d_at_0 = d_at_0.subs(s_i, 0)
+
+        import re
+        s_mno = re.sub(r',', '', str(mno))
+        s_mno = re.sub(r' ', '', s_mno)
+        s_mno = re.sub(r'\(', '', s_mno)
+        s_mno = re.sub(r'\)', '', s_mno)
+
+        print(f"c{s_mno} =  {d_at_0}")  # cumulant is at s = 0
 
     def get_cht_DF(self):
         H = self.T * self.cp * self.rho
