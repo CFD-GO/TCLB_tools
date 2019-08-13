@@ -94,7 +94,7 @@ class Solver:
             mi1 = sqrt(self.delta[0] / self.delta[1]) * _lamba
             mi2 = sqrt(self.delta[0] / self.delta[2]) * _lamba
 
-            result = -tan(_lamba) - (self.Delta1*tan(mi1) + self.Delta2*tan(mi2))/(1.0 - (self.Delta2/self.Delta1) * tan(mi1)*tan(mi2))
+            result = - tan(_lamba) - (self.Delta1*tan(mi1) + self.Delta2*tan(mi2))/(1.0 - (self.Delta2/self.Delta1) * tan(mi1)*tan(mi2))
             return result
 
         lamba = newton(f, lamba0, fprime=None, tol=1.48e-08, maxiter=50, fprime2=None)
@@ -137,6 +137,18 @@ class Solver:
         result = psi[mask][0]  # take the first and only element from the array
         return result
 
+    def remove_duplicates(self, values):
+        output = []
+        seen = set()
+        for value in values:
+            # If value has not been encountered yet,
+            # add it to both list and set.
+            value_rounded = round(value, 8)
+            h = hash(value_rounded)
+            if h not in seen:
+                output.append(value_rounded)
+                seen.add(h)
+        return output
 
     def calc_transient_state(self, x, tau):
         dzeta = self._calc_dzeta(x)
@@ -147,13 +159,14 @@ class Solver:
 
         N = 10  # how to get N eigenvalues? guess unless you get ;p ?!
 
-        initial_guess = 1.
+        initial_guess = 1.4432
 
         if not self.eigenvalues:
             while len(self.eigenvalues) < N:
                 initial_guess += 0.1
-                eigenvalue = self._calc_eigenvalues(lamba0=initial_guess)  # TODO: list of initial guesses? skad mam wiedziec ze nie przeskocze?
+                eigenvalue = self._calc_eigenvalues(lamba0=initial_guess)  # TODO: list of initial guesses? skad mam wiedziec ze zadnej nie przeskocze?
                 self.eigenvalues.append(eigenvalue)
+                self.eigenvalues = self.remove_duplicates(self.eigenvalues)
 
 
         # eigenfunctions = []
@@ -162,7 +175,7 @@ class Solver:
         for i in range(N):
             # eigenfunction = self._calc_eigenfunctions(self.eigenvalues[i], dzeta)
             # eigenfunctions.append(eigenfunction)
-            X0 = sin(self.eigenvalues[i]* dzeta[0])
+            X0 = sin(self.eigenvalues[i] * dzeta[0])
             alfa = cos(self.eigenvalues[i])
             beta = sin(self.eigenvalues[i]) / self.Delta1
 
@@ -223,7 +236,7 @@ x = np.linspace(0., 3, num=30, endpoint=False)
 x_dimensionless = x
 ss = [solver.calc_steady_state(x_i) for x_i in x]
 
-tau = 0.1
+tau = 1.
 ts = [solver.calc_transient_state(x_i, tau=tau) for x_i in x]
 
 if not os.path.exists('plots'):
