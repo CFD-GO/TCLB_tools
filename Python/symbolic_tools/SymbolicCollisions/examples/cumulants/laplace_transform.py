@@ -129,7 +129,7 @@ print("bye")
 from SymbolicCollisions.core.ContinuousCMTransforms import ContinuousCMTransforms, get_mom_vector_from_continuous_def
 from SymbolicCollisions.core.cm_symbols import F2D, F3D, e_D2Q9, e_D3Q27
 from SymbolicCollisions.core.printers import print_as_vector
-ccmt = ContinuousCMTransforms(dzeta2D, u2D, F2D, rho, sigma2)
+ccmt = ContinuousCMTransforms(dzeta3D, u3D, F3D, rho, sigma2)
 lattice = 'D2Q9'
 cum_eq = get_mom_vector_from_continuous_def(ccmt.get_Maxwellian_DF,
                                            continuous_transformation=ccmt.get_cumulants,

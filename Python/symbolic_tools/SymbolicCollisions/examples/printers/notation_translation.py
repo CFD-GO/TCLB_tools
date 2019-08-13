@@ -2,7 +2,7 @@
 from SymbolicCollisions.core.cm_symbols import e_D3Q27
 from SymbolicCollisions.core.printers import print_as_vector
 from SymbolicCollisions.core.DiscreteCMTransforms import get_DF
-
+import re
 import os
 import pwd
 
@@ -13,9 +13,7 @@ populations = get_DF(q, print_symbol='h')
 print_as_vector(populations, print_symbol='f')
 print_as_vector(populations, print_symbol='f', e=e_D3Q27)
 
-print("DONE")
-
-import re
+print("Example: Parsing a file.")
 
 # home = pwd.getpwuid(os.getuid()).pw_dir
 # main_folder = os.path.join(home, 'DATA_FOR_PLOTS', 'HotBarman3D')
