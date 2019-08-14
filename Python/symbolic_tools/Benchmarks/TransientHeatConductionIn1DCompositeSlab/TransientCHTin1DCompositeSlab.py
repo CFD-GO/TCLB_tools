@@ -70,7 +70,10 @@ class Solver:
 
 
 
-
+    def _calc_mi(self, _lamba):
+        mi1 = sqrt(self.delta[0] / self.delta[1]) * _lamba
+        mi2 = sqrt(self.delta[0] / self.delta[2]) * _lamba
+        return mi1, mi2
 
     def _calc_eigenvalues(self, lamba0 = 1.):
         """
@@ -91,8 +94,10 @@ class Solver:
         # print("f(x0) = ", ((1.0 / 4.0) * x0 ** 3 + (3.0 / 4.0) * x0 ** 2 - (3.0 / 2.0) * x0 - 2))
 
         def f(_lamba):
-            mi1 = sqrt(self.delta[0] / self.delta[1]) * _lamba
-            mi2 = sqrt(self.delta[0] / self.delta[2]) * _lamba
+            # mi1 = sqrt(self.delta[0] / self.delta[1]) * _lamba
+            # mi2 = sqrt(self.delta[0] / self.delta[2]) * _lamba
+
+            mi1, mi2 = self._calc_mi(_lamba)
 
             result = - tan(_lamba) - (self.Delta1*tan(mi1) + self.Delta2*tan(mi2))/(1.0 - (self.Delta2/self.Delta1) * tan(mi1)*tan(mi2))
             return result
@@ -157,54 +162,45 @@ class Solver:
         if sum(mask) != 1:
             raise Exception(f"x beyond stab x={x}, dzeta{dzeta}")
 
-        N = 10  # how to get N eigenvalues? guess unless you get ;p ?!
+        N = 10
 
         initial_guess = 1.4432
 
         if not self.eigenvalues:
             while len(self.eigenvalues) < N:
                 initial_guess += 0.1
-                eigenvalue = self._calc_eigenvalues(lamba0=initial_guess)  # TODO: list of initial guesses? skad mam wiedziec ze zadnej nie przeskocze?
+                eigenvalue = self._calc_eigenvalues(lamba0=initial_guess)
                 self.eigenvalues.append(eigenvalue)
                 self.eigenvalues = self.remove_duplicates(self.eigenvalues)
 
-
-        # eigenfunctions = []
-
         phi = 0
-        for i in range(N):
-            # eigenfunction = self._calc_eigenfunctions(self.eigenvalues[i], dzeta)
-            # eigenfunctions.append(eigenfunction)
-            X0 = sin(self.eigenvalues[i] * dzeta[0])
-            alfa = cos(self.eigenvalues[i])
-            beta = sin(self.eigenvalues[i]) / self.Delta1
+        for eigenvalue in self.eigenvalues:
+            alfa = cos(eigenvalue)
+            beta = sin(eigenvalue) / self.Delta1
+            X0 = sin(eigenvalue) * dzeta[0]
 
-            mi1 = sqrt(self.delta[0] / self.delta[1]) * self.eigenvalues[i]
-            mi2 = sqrt(self.delta[0] / self.delta[2]) * self.eigenvalues[i]
-
+            mi1, mi2 = self._calc_mi(eigenvalue)
             X1 = alfa * sin(mi1 * dzeta[1]) + beta * cos(mi1 * dzeta[1])
 
-            alfa_dash = cos(self.eigenvalues[i]) * cos(mi1) - sin(self.eigenvalues[i]) * sin(mi1) / self.Delta1
-            beta_dash = cos(self.eigenvalues[i]) * sin(mi1) * self.Delta1 / self.Delta2 + sin(self.eigenvalues[i]) * cos(mi1) / self.Delta2
-
+            alfa_dash = cos(eigenvalue) * cos(mi1) - sin(eigenvalue) * sin(mi1) / self.Delta1
+            beta_dash = cos(eigenvalue) * sin(mi1) * self.Delta1 / self.Delta2 + sin(eigenvalue) * cos(mi1) / self.Delta2
             X2 = alfa_dash * sin(mi2 * dzeta[2]) + beta_dash * cos(mi2 * dzeta[2])
 
-            c2 = cos(self.eigenvalues[i]) * cos(self.eigenvalues[i])
-            s2 = sin(self.eigenvalues[i]) * sin(self.eigenvalues[i])
+            c2 = cos(eigenvalue) * cos(eigenvalue)
+            s2 = sin(eigenvalue) * sin(eigenvalue)
             s2 /= (self.DeltaPhi1*self.DeltaPhi1)
             M = self.k[1]*self.k[2]/2. \
                 + self.k[0]*self.k[2]*(c2 + s2)/2. \
                 + self.k[0]*self.k[1]*(alfa_dash*alfa_dash+beta_dash*beta_dash)/2
 
-            A = self.k[1]*self.k[2]/(self.eigenvalues[i]*M)
+            A = self.k[1]*self.k[2]/(eigenvalue*M)
 
             phi_i = array([X0,
                            self.Delta1*X1,
                            self.Delta2*X2])
             eigenfunction = phi_i[mask][0]  # pick the right one
 
-            eigenfunction *= A*exp(-self.eigenvalues[i]*self.eigenvalues[i]*self.delta[0]*tau)
-            # eigenfunctions.append(eigenfunction)
+            eigenfunction *= A*exp(-eigenvalue*eigenvalue*self.delta[0]*tau)
             phi += eigenfunction
 
         return phi
@@ -236,7 +232,7 @@ x = np.linspace(0., 3, num=30, endpoint=False)
 x_dimensionless = x
 ss = [solver.calc_steady_state(x_i) for x_i in x]
 
-tau = 1.
+tau = 0.5
 ts = [solver.calc_transient_state(x_i, tau=tau) for x_i in x]
 
 if not os.path.exists('plots'):
