@@ -2,8 +2,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from numpy.linalg import norm
 
-from Benchmarks.PoiseuilleFlow.TwoPhasePoiseuilleAnal import TwoPhasePoiseuilleAnal, calc_gx
-from Benchmarks.PoiseuilleFlow.TwoPhasePoiseuilleFD import TwoPhasePoiseuilleFD, get_tanh_profile
+from Benchmarks.PoiseuilleFlow.PoiseuilleAnal import TwoPhasePoiseuilleAnal, calc_gx_between_plates
+from Benchmarks.PoiseuilleFlow.TwoPhasePoiseuilleFD_between_plates import TwoPhasePoiseuilleFD_between_plates, get_tanh_profile
 
 # magic_ratio = 1
 # rho_h = magic_ratio * 54.6
@@ -32,15 +32,15 @@ uc = 0.01
 
 
 # gx = 1
-gx = calc_gx(uc, mu_l, mu_h, rho_l, rho_h, h)
-pa = TwoPhasePoiseuilleAnal(gx=gx, mu_l=mu_l, mu_h=mu_h, rho_h=rho_h, rho_l=rho_l, r=h)
+gx = calc_gx_between_plates(uc, mu_l, mu_h, rho_l, rho_h, h)
+pa = TwoPhasePoiseuilleAnal(gx=gx, mu_l=mu_l, mu_h=mu_h, rho_h=rho_h, rho_l=rho_l, h=h)
 u_a = np.array([pa.get_u_profile(y_[i]) for i in range(len(y_))])
 
-p_fd = TwoPhasePoiseuilleFD(gx=gx, mu_l=mu_l, mu_h=mu_h, rho_h=rho_h, rho_l=rho_l, r=h)
+p_fd = TwoPhasePoiseuilleFD_between_plates(gx=gx, mu_l=mu_l, mu_h=mu_h, rho_h=rho_h, rho_l=rho_l, r=h)
 u_fd = p_fd.get_u_profile(y_, W=5)
 
-gx_air_water = calc_gx(uc, mu_l=1.22*1.5E-05, mu_h=1000 * 1.0E-06, rho_h=1000, rho_l=1.22, r=h)
-pa_air_water = TwoPhasePoiseuilleAnal(gx=gx_air_water, mu_l=1.22*1.5E-05, mu_h=1000 * 1.0E-06, rho_h=1000, rho_l=1.22, r=h)
+gx_air_water = calc_gx_between_plates(uc, mu_l=1.22 * 1.5E-05, mu_h=1000 * 1.0E-06, rho_h=1000, rho_l=1.22, h=h)
+pa_air_water = TwoPhasePoiseuilleAnal(gx=gx_air_water, mu_l=1.22*1.5E-05, mu_h=1000 * 1.0E-06, rho_h=1000, rho_l=1.22, h=h)
 u_air_water = np.array([pa_air_water.get_u_profile(y_[i]) for i in range(len(y_))])
 
 

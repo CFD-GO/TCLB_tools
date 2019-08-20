@@ -68,6 +68,9 @@ ex_D3Q7 = Matrix([0, 1, -1, 0, 0, 0, 0])
 ey_D3Q7 = Matrix([0, 0, 0, 1, -1, 0, 0])
 ez_D3Q7 = Matrix([0, 0, 0, 0, 0, 1, -1])
 
+e_D3Q7 = ex_D3Q7.col_insert(1, ey_D3Q7)
+e_D3Q7 = e_D3Q7.col_insert(2, ez_D3Q7)
+
 S_relax_ADE_D3Q7 = diag(1, omega_ade, omega_ade, omega_ade, 1, 1, 1)
 
 # D3Q15 - notation from 'LBM Principles and Practise' Book p. 89

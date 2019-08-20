@@ -124,7 +124,7 @@ for mno in md:
     print(f"c{s_mno} =  {d_at_0}")  # the the cumulant is at s = 0
 
 
-print("bye")
+print("try another script")
 
 from SymbolicCollisions.core.ContinuousCMTransforms import ContinuousCMTransforms, get_mom_vector_from_continuous_def
 from SymbolicCollisions.core.cm_symbols import F2D, F3D, e_D2Q9, e_D3Q27
@@ -136,3 +136,4 @@ cum_eq = get_mom_vector_from_continuous_def(ccmt.get_Maxwellian_DF,
                                            moments_order=moments_dict[lattice],
                                            serial_run=False)
 print_as_vector(cum_eq, print_symbol='c', e=e_D2Q9)
+print("bye")

@@ -17,7 +17,7 @@ def get_tanh_profile(y, h, phi_h, phi_l, W=1):
     return phi
 
 
-class TwoPhasePoiseuilleFD:
+class TwoPhasePoiseuilleFD_between_plates:
     """
     CFD lecture notes J. Rokicki, p23
     """

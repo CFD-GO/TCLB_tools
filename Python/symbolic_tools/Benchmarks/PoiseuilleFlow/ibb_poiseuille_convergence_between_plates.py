@@ -1,7 +1,7 @@
 
 import numpy as np
 import os
-from Benchmarks.PoiseuilleFlow.TwoPhasePoiseuilleAnal import calc_gx, OnePhasePoiseuilleAnal
+from Benchmarks.PoiseuilleFlow.PoiseuilleAnal import calc_gx_between_plates, OnePhasePoiseuilleAnalBetweenPlates
 from DataIO.helpers import find_oldest_iteration, get_vti_from_iteration, calc_mse, calc_L2, strip_folder_name, eat_dots_for_texmaker
 import pwd
 from DataIO.VTIFile import VTIFile
@@ -71,8 +71,8 @@ for q in qs:
         # -------- anal solution ---------------
         y_anal = np.arange(q, effdiam, 1)
         # y_anal = np.concatenate(([0], y_anal, [effdiam])) # unphysical wall nodes
-        gx = calc_gx(uc, mu, mu, rho, rho, effdiam / 2)
-        poiseuilleAnal = OnePhasePoiseuilleAnal(gx=gx, nu=float(kin_visc), D=effdiam)
+        gx = calc_gx_between_plates(uc, mu, mu, rho, rho, effdiam / 2)
+        poiseuilleAnal = OnePhasePoiseuilleAnalBetweenPlates(gx=gx, nu=float(kin_visc), H=effdiam)
         u_anal = np.array([poiseuilleAnal.get_u_profile(y_anal[i]) for i in range(len(y_anal))])
 
         ux_ibb_mse[d] = calc_mse(u_anal, ux_ibb_num_slice)
