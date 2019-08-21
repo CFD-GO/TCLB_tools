@@ -36,48 +36,6 @@ class ContinuousCMTransforms:
         self.cp = cp
         self.gamma = cht_gamma
 
-    def get_Maxwellian_DF_old(self, psi=m00, _u=None):
-        """
-        :param _u: velocity (x,y,z)
-        :param psi: quantity of interest aka scaling function like density
-        :return: continuous, local Maxwell-Boltzmann distribution
-        'Incorporating forcing terms in cascaded lattice Boltzmann approach by method of central moments'
-        Kannan N. Premnath, Sanjoy Banerjee, 2009
-        eq 22
-        """
-        u = None
-        if _u:
-            u = _u
-        else:
-            u = self.u
-
-        PI = sp.pi
-        dzeta_minus_u = self.dzeta - u
-        dzeta_u2 = dzeta_minus_u.dot(dzeta_minus_u)
-
-        # thank you sympy...
-        # hacks:
-        # for 2D
-        # df = psi / pow(2 * PI * self.cs2, 2/2)
-        # LOL: 2/2 gives not simplified result for m22 on d2q9:
-        # 1.0 * m00 * (RT * u.y ** 2 - RT ** 1.0 * u.y ** 2 + RT ** 2.0);
-        # while 1 does ;p
-        # RT ** 2 * m00;
-
-        dim = len(self.dzeta)  # number od dimensions
-        # df = psi / pow(2 * PI * self.cs2, dim / 2)  # this is to difficult for sympy :/
-
-        if dim == 2:
-            df = psi / (2 * PI * self.cs2)  # 2D version hack
-        else:
-            df = psi / pow(2 * PI * self.cs2, dim / 2)  # this may be to difficult for sympy :/
-            if self.cs2 != 1. / 3.:
-                warnings.warn("Sympy may have problem with 3D non isothermal version (cs2=RT) \n "
-                              "It also can't simplify it, thus check the raw output", UserWarning)
-
-        df *= exp(-dzeta_u2 / (2 * self.cs2))
-        return df
-
     def get_internal_energy_Maxwellian_DF(self):
         df = self.get_Maxwellian_DF(psi=m00, u=self.u, sigma2=self.cs2)
         dzeta_minus_u = self.dzeta - self.u
@@ -96,7 +54,7 @@ class ContinuousCMTransforms:
 
     def get_Maxwellian_DF(self, psi=m00, u=None, sigma2=None):
         """
-        :param u: velocity (x,y,z)
+        :param u: velocity (x,y,z) i.e., mean of the distribution
         :param sigma2: variance of the distribution
         :param psi: quantity of interest aka scaling function like density
         :return: continuous, local Maxwell-Boltzmann distribution
@@ -127,17 +85,16 @@ class ContinuousCMTransforms:
 
         dim = len(self.dzeta)  # number od dimensions
         # df = psi / pow(2 * PI * self.cs2, dim / 2)  # this is to difficult for sympy :/
-        if dim == 1:
-            df = psi / sp.sqrt(2 * PI * sigma2)
-        elif dim == 2:
+
+        if dim == 2:
             df = psi / (2 * PI * sigma2)  # 2D version hack
         elif dim == 3:
             df = psi / pow(2 * PI * sigma2, dim / 2)  # this may be to difficult for sympy :/
             # if self.cs2 != 1. / 3.:
             #     warnings.warn("Sympy may have problem with 3D non isothermal version (cs2=RT) \n "
             #                   "It also can't simplify it, thus check the raw output", UserWarning)
-        else:
-            raise Exception(f"Wrong dimension: {dim}")
+        # else:
+        #     raise Exception(f"Wrong dimension: {dim}")
 
         df *= exp(-dzeta_u2 / (2 * sigma2))
         return df

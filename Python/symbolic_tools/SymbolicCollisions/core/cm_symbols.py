@@ -22,9 +22,9 @@ cs2_thermal = Symbol('RT', positive=True)  # variance of the distribution
 cs2 = 1/3.  # variance of the distribution
 sigma2 = Symbol('Sigma2', positive=True)  # variance of the distribution
 
-ux = Symbol('u.x', real=True)
-uy = Symbol('u.y', real=True)
-uz = Symbol('u.z', real=True)
+ux = Symbol('u.x')  # don't set real=True for velocity as it freezes the test suite :/
+uy = Symbol('u.y')
+uz = Symbol('u.z')
 u1D = Matrix([ux])
 u2D = Matrix([ux, uy])
 u3D = Matrix([ux, uy, uz])
