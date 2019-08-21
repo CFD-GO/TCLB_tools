@@ -62,7 +62,25 @@ ax.set_aspect('equal')
 fig.colorbar(cntr, shrink=0.5, aspect=5)
 
 plt.title(f'Laplace benchmark\n ')
-plt.grid(True)
+
+# # Major ticks every 20, minor ticks every 5
+# major_ticks = np.arange(0, nx, nx/5)
+# minor_ticks = np.arange(0, nx, nx/10)
+#
+# ax.set_xticks(major_ticks)
+# ax.set_xticks(minor_ticks, minor=True)
+# # ax.set_yticks(major_ticks)
+# # ax.set_yticks(minor_ticks, minor=True)
+#
+# # And a corresponding grid
+# ax.grid(which='both')
+#
+# # Or if you want different settings for the grids:
+# ax.grid(which='minor', alpha=0.2)
+# ax.grid(which='major', alpha=0.5)
+plt.grid(True)  # or use default grid
+
+
 
 # fake2Dline = mpl.lines.Line2D([0], [0], linestyle="none", c='b', marker='o')
 # ax.legend([fake2Dline], [r'$Err_{T} = T_{anal} - T_{num}$'], numpoints=1)

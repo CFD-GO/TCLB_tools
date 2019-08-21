@@ -17,7 +17,7 @@ def dynamic_import(abs_module_path, class_name):
     return target_class
 
 
-# SYMBOLS:
+####################################################### SYMBOLS #######################################################
 cs2_thermal = Symbol('RT', positive=True)  # variance of the distribution
 cs2 = 1/3.  # variance of the distribution
 sigma2 = Symbol('Sigma2', positive=True)  # variance of the distribution
@@ -28,6 +28,29 @@ uz = Symbol('u.z')
 u1D = Matrix([ux])
 u2D = Matrix([ux, uy])
 u3D = Matrix([ux, uy, uz])
+
+ux2 = Symbol('ux2')
+uy2 = Symbol('uy2')
+uz2 = Symbol('uz2')
+
+ux3 = Symbol('ux3')
+uy3 = Symbol('uy3')
+uz3 = Symbol('uy3')
+
+uxuy3 = Symbol('uxuy3')
+
+uxuy = Symbol('uxuy')
+uxuz = Symbol('uxuz')
+uyuz = Symbol('uyuz')
+
+m00 = Symbol('m00', positive=True)
+rho = Symbol('rho', positive=True)
+Temperature = Symbol('T', positive=True)
+cp = Symbol('cp', positive=True)
+cht_gamma = Symbol('h_stability_enhancement', positive=True)  # magic stability enhancement
+# (h_stability_enhancement * 1. / 3.) / (cp * rho);
+
+Sigma2 = cs2*cht_gamma/(cp*rho)
 
 dzeta_x = Symbol('dzeta_x', real=True)
 dzeta_y = Symbol('dzeta_y', real=True)
@@ -58,6 +81,8 @@ F_phi_z = Symbol(Force_str + '.z')
 omega_ade = Symbol('omega_ade')
 omega_v = Symbol('omega_nu')
 omega_b = Symbol('omega_bulk')  # omega_bulk='1.0/(3*bulk_visc+0.5)'
+
+####################################################### END OF SYMBOLS #######################################################
 
 ex_D2Q9 = Matrix([0, 1, 0, -1, 0, 1, -1, -1, 1])
 ey_D2Q9 = Matrix([0, 0, 1, 0, -1, 1, 1, -1, -1])
@@ -144,31 +169,12 @@ e_D3Q27 = e_D3Q27.col_insert(2, ez_D3Q27)
 #
 # F_phi_coeff = Symbol('F_phi_coeff')  # F_phi_coeff=(1.0 - 4.0*(myPhaseF - pfavg)*(myPhaseF - pfavg))/inteface_width;
 
-m00 = Symbol('m00', positive=True)
-rho = Symbol('rho', positive=True)
-Temperature = Symbol('T', positive=True)
-cp = Symbol('cp', positive=True)
-cht_gamma = Symbol('h_stability_enhancement', positive=True)  # magic stability enhancement
-# (h_stability_enhancement * 1. / 3.) / (cp * rho);
 
-Sigma2 = cs2*cht_gamma/(cp*rho)
 
 w_D2Q9 = Matrix([4. / 9, 1. / 9, 1. / 9, 1. / 9, 1. / 9, 1. / 36, 1. / 36, 1. / 36, 1. / 36])
 
 
-ux2 = Symbol('ux2')
-uy2 = Symbol('uy2')
-uz2 = Symbol('uz2')
 
-ux3 = Symbol('ux3')
-uy3 = Symbol('uy3')
-uz3 = Symbol('uy3')
-
-uxuy3 = Symbol('uxuy3')
-
-uxuy = Symbol('uxuy')
-uxuz = Symbol('uxuz')
-uyuz = Symbol('uyuz')
 
 # this matrix will produce raw moments (m=M*f) in the following order:
 # [m00, m10, m01, m20, m02, m11, m21, m12, m22]

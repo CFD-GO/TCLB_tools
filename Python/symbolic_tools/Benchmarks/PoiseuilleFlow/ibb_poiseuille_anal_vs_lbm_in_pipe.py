@@ -20,9 +20,6 @@ mu = rho * kin_visc
 effdiam = 28
 uc = 0.01
 
-
-
-
 wd = os.getcwd()
 wd = os.path.dirname(wd)  # go level up
 
@@ -66,14 +63,16 @@ y0 = 63.5
 x_grid = np.linspace(0, nx, ny, endpoint=False) + 0.5
 y_grid = np.linspace(0, nx, ny, endpoint=False) + 0.5
 xx, yy = np.meshgrid(x_grid, y_grid)
+
 u_anal = np.zeros((ny, nx))
 r_anal = np.zeros((ny, nx))
+cuttoff = effdiam / 2. - 1
 for i in range(ny):
     for j in range(nx):
         r = get_r_from_xy(xx[i][j], yy[i][j], x0, y0)
         r_anal[i, j] = r
         u_anal[i, j] = poiseuilleAnal.get_u_profile(r)
-        if r > effdiam/2. - 1:
+        if r > cuttoff:
             u_anal[i, j] = np.nan
 
 
@@ -136,9 +135,6 @@ def cntr_plot():
     title = ''  # skip title for .tex
     plt.title(title)
 
-
-
-
     # Major ticks every 20, minor ticks every 5
     major_ticks = np.arange(0, nx, 10)
     minor_ticks = np.arange(0, nx, 1)
@@ -168,12 +164,7 @@ def cntr_plot():
     # plt.close(fig)  # close the figure
 
 
-
-
-
 def slice_plot():
-
-    ###################################################################################################################
     if not os.path.exists('plots'):
         os.makedirs('plots')
     fig_name = f'plots/Poiseuille_pipe_anal_vs_lbm_v{eat_dots_for_texmaker(kin_visc)}_effdiam_{eat_dots_for_texmaker(effdiam)}.png'

@@ -62,6 +62,23 @@ plt.ylabel(r'$y_{label}$', fontsize=22)
 plt.legend()
 plt.grid()
 
+# Major ticks every 20, minor ticks every 5
+major_ticks = np.arange(0, x_range, 20*step)
+minor_ticks = np.arange(0, x_range, 5*step)
+
+axes.set_xticks(major_ticks)
+axes.set_xticks(minor_ticks, minor=True)
+axes.set_yticks(major_ticks)
+axes.set_yticks(minor_ticks, minor=True)
+
+# And a corresponding grid
+axes.grid(which='both')
+
+# Or if you want different settings for the grids:
+axes.grid(which='minor', alpha=0.2)
+axes.grid(which='major', alpha=0.5)
+# plt.grid(True)
+
 fig = plt.gcf()  # get current figure
 fig.savefig(fig_name, bbox_inches='tight')
 plt.show()
