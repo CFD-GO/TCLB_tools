@@ -1,6 +1,6 @@
 
 
-from Benchmarks.MultilayerPipe.steady_two_layer_cylinder_analytical_2D import PipeWithinPipeDirichlet
+from Benchmarks.HeatTransferInMultilayerPipe.steady_two_layer_cylinder_analytical_2D import PipeWithinPipeDirichlet
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
 from DataIO.VTIFile import VTIFile
 import os

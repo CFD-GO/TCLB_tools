@@ -1,5 +1,5 @@
 
-from Benchmarks.MultilayerPipe.steady_two_layer_cylinder_analytical_2D import PipeWithinPipeNeumann
+from Benchmarks.HeatTransferInMultilayerPipe.steady_two_layer_cylinder_analytical_2D import PipeWithinPipeNeumann
 from DataIO.helpers import find_oldest_iteration
 
 from matplotlib.ticker import LinearLocator, FormatStrFormatter

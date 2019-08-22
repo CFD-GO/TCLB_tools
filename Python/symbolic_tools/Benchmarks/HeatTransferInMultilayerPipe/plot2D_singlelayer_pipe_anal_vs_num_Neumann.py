@@ -1,4 +1,4 @@
-from Benchmarks.MultilayerPipe.steady_two_layer_cylinder_analytical_2D import PipeWithinPipeNeumann
+from Benchmarks.HeatTransferInMultilayerPipe.steady_two_layer_cylinder_analytical_2D import PipeWithinPipeNeumann
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib import cm as colormap
