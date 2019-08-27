@@ -3,8 +3,9 @@ from sympy.printing import print_ccode
 from SymbolicCollisions.core.cm_symbols import omega_ade, omega_b, omega_v, m00
 from SymbolicCollisions.core.cm_symbols import Force_str as F_str
 from SymbolicCollisions.core.cm_symbols import dynamic_import
-from SymbolicCollisions.core.DiscreteCMTransforms import get_DF, get_m00
-from SymbolicCollisions.core.printers import print_u2, print_sigma_cht,print_as_vector
+from SymbolicCollisions.core.DiscreteCMTransforms import get_m00
+from SymbolicCollisions.core.printers import print_as_vector, get_print_symbols_in_indx_notation, get_print_symbols_in_m_notation
+from SymbolicCollisions.core.printers import print_u2, print_sigma_cht
 from SymbolicCollisions.core.MatrixGenerator import get_raw_moments_matrix, get_shift_matrix
 from sympy.matrices import Matrix
 import numpy as np
@@ -15,7 +16,7 @@ import numpy as np
 
 # SETUP
 d = 3
-q = 7
+q = 27
 model = 'cht'  # choose from '['hydro_compressible', 'hydro_incompressible', 'ade', 'ade_with_f', 'cht']
 
 # DYNAMIC IMPORTS
@@ -26,6 +27,7 @@ if d == 3:
 else:
     ez = None
 
+e =  dynamic_import("SymbolicCollisions.core.cm_symbols", f"e_D{d}Q{q}")
 
 def get_s_relax_switcher(choice):
     s_relax_switcher = {
@@ -87,7 +89,7 @@ Nraw = get_shift_matrix(Mraw.inv(), ex, ey, ez)
 # pprint(Mraw)  # see what you have done
 # pprint(Nraw)
 
-pop_in_str = 'x_in'  # symbol defining populations
+pop_in_str = 'h'  # symbol defining populations
 temp_pop_str = 'temp'  # symbol defining populations
 cm_eq_pop_str = 'cm_eq'  # symbol defining populations
 
@@ -99,7 +101,8 @@ def make_header(choice):
         'hydro_incompressible': f"CudaDeviceFunction void relax_and_collide_hydro_with_F(real_t {pop_in_str}[{q}], real_t {omega_v}, vector_t u, vector_t {F_str}) \n{{",
         'ade_with_f': f"CudaDeviceFunction void relax_and_collide_ADE_with_F(real_t {pop_in_str}[{q}], real_t {omega_ade}, vector_t u, vector_t {F_str}) \n{{",
         'ade': f"CudaDeviceFunction void relax_and_collide_ADE(real_t {pop_in_str}[{q}], real_t {omega_ade}, vector_t u) \n{{",
-        'cht': f"CudaDeviceFunction void relax_and_collide_ADE(real_t {pop_in_str}[<?R C( h_pop_size) ?>], real_t rho, real_t {omega_ade}, vector_t u) \n{{",
+        # 'cht': f"CudaDeviceFunction void relax_and_collide_ADE(real_t {pop_in_str}[<?R C( h_pop_size) ?>], real_t rho, real_t {omega_ade}, vector_t u) \n{{",
+        'cht': f"CudaDeviceFunction void relax_and_collide_ADE(real_t rho, real_t {omega_ade}, vector_t u) \n{{",
     }
     result = model_switcher.get(choice, lambda: "Invalid argument")
     print(result)
@@ -112,13 +115,15 @@ print("\t//=== THIS IS AUTOMATICALLY GENERATED CODE ===")
 # print("real_t bulk_visc = 1./6. ;")
 # print("real_t {sb} = 1./(3*bulk_visc + 0.5);")
 # print(f"real_t {sb} = omega_bulk;\n")  # s_b = 1./(3*bulk_visc + 0.5)
-print_u2(d)
+
 
 if 'cht' in model:
     print_sigma_cht()
 
+print_u2(d)
 
-print_ccode(get_m00(q, pop_in_str), assign_to=f'\treal_t {m00}')
+
+# print_ccode(get_m00(q, pop_in_str), assign_to=f'\treal_t {m00}')
 
 
 def make_variables(choice):
@@ -134,24 +139,34 @@ def make_variables(choice):
     print(result)
 
 
-make_variables(model)
+# make_variables(model)
 
-print(f"\tfor (int i = 0; i < {q}; i++) {{\n\t"
-      f"\t{temp_pop_str}[i] = {pop_in_str}[i];}}")
+# populations = get_print_symbols_in_indx_notation(q, pop_in_str)
+# temp_populations = get_print_symbols_in_indx_notation(q, temp_pop_str)
+# cm_eq = get_print_symbols_in_indx_notation(q, cm_eq_pop_str)
+# F_cm = get_print_symbols_in_indx_notation(q, F_str)
 
-populations = get_DF(q, pop_in_str)
-temp_populations = get_DF(q, temp_pop_str)
-cm_eq = get_DF(q, cm_eq_pop_str)
-F_cm = get_DF(q, F_str)
+# print(f"\tfor (int i = 0; i < {q}; i++) {{\n\t"
+#       f"\t{temp_pop_str}[i] = {pop_in_str}[i];}}")
+
+
+
+populations = get_print_symbols_in_m_notation(e, pop_in_str)
+temp_populations = get_print_symbols_in_m_notation(e, temp_pop_str)
+cm_eq = get_print_symbols_in_m_notation(e, cm_eq_pop_str)
+F_cm = get_print_symbols_in_m_notation(e, F_str)
 m = Mraw * temp_populations
+
+for t, p in zip(temp_populations, populations):
+    print(f"\treal_t {t} = {p};")
 
 print("\n\t//raw moments from density-probability functions")
 # print("\t//[m00, m10, m01, m20, m02, m11, m21, m12, m22]")
-print_as_vector(m, print_symbol=pop_in_str)
+print_as_vector(m, outprint_symbol=pop_in_str, e=e)
 
 print("\n\t//central moments from raw moments")
 cm = Nraw * populations
-print_as_vector(cm, print_symbol=temp_pop_str)
+print_as_vector(cm, outprint_symbol=temp_pop_str, e=e)
 
 print("\n\t//collision in central moments space")
 # print("//calculate equilibrium distributions in cm space")
@@ -186,16 +201,16 @@ def make_collision(choice):
     }
     # Get the function from switcher dictionary
     cm_after_collision = model_switcher.get(choice, lambda: "Invalid argument")
-    print_as_vector(cm_after_collision, print_symbol=pop_in_str)
+    print_as_vector(cm_after_collision, outprint_symbol=pop_in_str, e=e)
 
 
 make_collision(model)
 print("\n\t//back to raw moments")
 m = Nraw.inv() * populations
-print_as_vector(m, print_symbol=temp_pop_str)
+print_as_vector(m, outprint_symbol=temp_pop_str, e=e)
 
 print("\n\t//back to density-probability functions")
 populations = Mraw.inv() * temp_populations
-print_as_vector(populations, print_symbol=pop_in_str)
+print_as_vector(populations, outprint_symbol=pop_in_str, e=e)
 
 print("\n}\n")

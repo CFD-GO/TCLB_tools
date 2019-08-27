@@ -1,7 +1,7 @@
 
 from SymbolicCollisions.core.cm_symbols import e_D3Q27
-from SymbolicCollisions.core.printers import print_as_vector
-from SymbolicCollisions.core.DiscreteCMTransforms import get_DF
+from SymbolicCollisions.core.printers import print_as_vector, get_print_symbols_in_indx_notation
+
 import re
 import os
 import pwd
@@ -9,9 +9,9 @@ import pwd
 # SETUP
 q = 27
 
-populations = get_DF(q, print_symbol='h')
-print_as_vector(populations, print_symbol='f')
-print_as_vector(populations, print_symbol='f', e=e_D3Q27)
+populations = get_print_symbols_in_indx_notation(q, print_symbol='h')
+print_as_vector(populations, outprint_symbol='f')
+print_as_vector(populations, outprint_symbol='f', e=e_D3Q27)
 
 print("Example: Parsing a file.")
 

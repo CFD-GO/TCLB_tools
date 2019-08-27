@@ -3,8 +3,8 @@ from sympy.printing import print_ccode
 from SymbolicCollisions.core.cm_symbols import omega_ade, omega_b, omega_v, m00
 from SymbolicCollisions.core.cm_symbols import Force_str as F_str
 from SymbolicCollisions.core.cm_symbols import dynamic_import
-from SymbolicCollisions.core.DiscreteCMTransforms import get_DF, get_m00
-from SymbolicCollisions.core.printers import print_u2, print_as_vector
+from SymbolicCollisions.core.DiscreteCMTransforms import get_m00
+from SymbolicCollisions.core.printers import print_u2, print_as_vector, get_print_symbols_in_indx_notation
 from SymbolicCollisions.core.MatrixGenerator import get_raw_moments_matrix, get_shift_matrix
 
 # inspired by:
@@ -29,8 +29,8 @@ Nraw = get_shift_matrix(Mraw.inv(), ex, ey, ez)
 pop_in_str = 'x_in'  # symbol defining populations
 temp_pop_str = 'temp'  # symbol defining populations
 
-populations = get_DF(q, pop_in_str)
-temp_populations = get_DF(q, temp_pop_str)
+populations = get_print_symbols_in_indx_notation(q, pop_in_str)
+temp_populations = get_print_symbols_in_indx_notation(q, temp_pop_str)
 
 from sympy import pprint
 pprint(Mraw)  # see what you have done
@@ -45,18 +45,18 @@ pprint(Nraw)
 print("\n\t//raw moments from density-probability functions")
 m = Mraw * temp_populations
 # print("\t//[m00, m10, m01, m20, m02, m11, m21, m12, m22]")
-print_as_vector(m, print_symbol=pop_in_str)
+print_as_vector(m, outprint_symbol=pop_in_str)
 
 print("\n\t//central moments from raw moments")
 cm = Nraw * populations
-print_as_vector(cm, print_symbol=temp_pop_str)
+print_as_vector(cm, outprint_symbol=temp_pop_str)
 
 
 print("\n\t//back to raw moments")
 m = Nraw.inv() * populations
-print_as_vector(m, print_symbol=temp_pop_str, raw_output=False)
+print_as_vector(m, outprint_symbol=temp_pop_str, raw_output=False)
 #
 print("\n\t//back to density-probability functions")
 populations = Mraw.inv() * temp_populations
-print_as_vector(populations, print_symbol=pop_in_str, raw_output=False)
+print_as_vector(populations, outprint_symbol=pop_in_str, raw_output=False)
 

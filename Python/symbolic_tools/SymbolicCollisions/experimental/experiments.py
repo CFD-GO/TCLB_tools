@@ -29,7 +29,7 @@ C_D2Q9 = Matrix([-1 / 9 * phi_x,
                  phi_x / 18,
                  phi_x / 18, ])
 
-print_as_vector(C_D2Q9.transpose() * Mraw_D2Q9, print_symbol="pop_in_str")
+print_as_vector(C_D2Q9.transpose() * Mraw_D2Q9, outprint_symbol="pop_in_str")
 
 #
 # print('\n//population_eq -> cm_eq - from continous definition: \n'

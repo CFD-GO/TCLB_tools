@@ -46,11 +46,13 @@ uyuz = Symbol('uyuz')
 m00 = Symbol('m00', positive=True)
 rho = Symbol('rho', positive=True)
 Temperature = Symbol('T', positive=True)
+Enthalpy = Symbol('H', positive=True) # consider it as enthalpy
 cp = Symbol('cp', positive=True)
 cht_gamma = Symbol('h_stability_enhancement', positive=True)  # magic stability enhancement
 # (h_stability_enhancement * 1. / 3.) / (cp * rho);
 
 Sigma2 = cs2*cht_gamma/(cp*rho)
+Sigma2asSymbol = Symbol('Sigma2', positive=True)
 
 dzeta_x = Symbol('dzeta_x', real=True)
 dzeta_y = Symbol('dzeta_y', real=True)

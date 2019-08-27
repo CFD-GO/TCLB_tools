@@ -3,8 +3,8 @@ from sympy.printing import print_ccode
 
 from SymbolicCollisions.core.cm_symbols import omega_v, omega_b, Mraw_D2Q9, NrawD2Q9, S_relax_hydro_D2Q9, \
     S_relax_ADE_D2Q9
-from SymbolicCollisions.core.DiscreteCMTransforms import get_DF, get_m00
-from SymbolicCollisions.core.printers import print_u2, print_as_vector
+from SymbolicCollisions.core.DiscreteCMTransforms import get_m00
+from SymbolicCollisions.core.printers import print_u2, print_as_vector, get_print_symbols_in_indx_notation
 from SymbolicCollisions.core.hardcoded_results import hardcoded_cm_eq_compressible_D2Q9, hardcoded_F_cm_pf_D2Q9
 
 
@@ -42,19 +42,19 @@ print("\nreal_t %s[9]; real_t %s[9]; real_t %s[9];\n" % (temp_pop_str, cm_eq_pop
 print("for (int i = 0; i < 9; i++) {\n\t"
       "%s[i] = %s[i];}" % (temp_pop_str, pop_in_str))
 
-populations = get_DF(q, pop_in_str)
-temp_populations = get_DF(q, temp_pop_str)
-cm_eq = get_DF(q, cm_eq_pop_str)
-F_cm = get_DF(q, F_cm_str)
+populations = get_print_symbols_in_indx_notation(q, pop_in_str)
+temp_populations = get_print_symbols_in_indx_notation(q, temp_pop_str)
+cm_eq = get_print_symbols_in_indx_notation(q, cm_eq_pop_str)
+F_cm = get_print_symbols_in_indx_notation(q, F_cm_str)
 m = Mraw_D2Q9 * temp_populations
 
 print("\n//raw moments from density-probability functions")
 print("//[m00, m10, m01, m20, m02, m11, m21, m12, m22]")
-print_as_vector(m, print_symbol=pop_in_str)
+print_as_vector(m, outprint_symbol=pop_in_str)
 
 print("\n//central moments from raw moments")
 cm = NrawD2Q9 * populations
-print_as_vector(cm, print_symbol=temp_pop_str)
+print_as_vector(cm, outprint_symbol=temp_pop_str)
 
 print("\n//collision in central moments space")
 print("//calculate equilibrium distributions in cm space")
@@ -78,14 +78,14 @@ cm_after_collision = (eye(
 # Relax 1st moments, SOI
 #cm_after_collision = (eye(9) - S_relax_phi) * temp_populations + S_relax_phi * hardcoded_cm_pf_eq + (eye(9) - S_relax_phi / 2) * hardcoded_F_cm_pf  # eq 8
 
-print_as_vector(cm_after_collision, print_symbol=pop_in_str)
+print_as_vector(cm_after_collision, outprint_symbol=pop_in_str)
 
 print("\n//back to raw moments")
 m = NrawD2Q9.inv() * populations
-print_as_vector(m, print_symbol=temp_pop_str)
+print_as_vector(m, outprint_symbol=temp_pop_str)
 
 print("\n//back to density-probability functions")
 populations = Mraw_D2Q9.inv() * temp_populations
-print_as_vector(populations, print_symbol=pop_in_str)
+print_as_vector(populations, outprint_symbol=pop_in_str)
 
 print("\n}\n")

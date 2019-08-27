@@ -212,10 +212,10 @@ def get_mom_vector_from_shift_mat(fun, mat):
     cm_ = round_and_simplify(cm_)
     return Matrix([cm_])
 
-
-def get_DF(q=9, print_symbol='default_symbol2'):
-    symbols_ = [Symbol("%s[%d]" % (print_symbol, i)) for i in range(0, q)]
-    return Matrix(symbols_)
+#
+# def get_DF(q=9, print_symbol='default_symbol2'):
+#     symbols_ = [Symbol("%s[%d]" % (print_symbol, i)) for i in range(0, q)]
+#     return Matrix(symbols_)
 
 
 def get_m00(q=9, print_symbol='default_symbol3'):
@@ -226,8 +226,3 @@ def get_m00(q=9, print_symbol='default_symbol3'):
 
     return m00_
 
-
-def get_e(ex, ey, ez):
-    q = len(ex)
-    symbols_ = [Matrix([ex[i], ey[i], ez[i]]) for i in range(q)]
-    return Matrix([symbols_])

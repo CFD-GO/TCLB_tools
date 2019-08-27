@@ -1,5 +1,5 @@
 from unittest import TestCase
-from SymbolicCollisions.core.printers import print_as_vector
+from SymbolicCollisions.core.printers import print_as_vector, get_print_symbols_in_indx_notation
 
 from sympy import Symbol
 from sympy.matrices import Matrix
@@ -14,7 +14,6 @@ import sys
 import os
 
 from SymbolicCollisions.core.cm_symbols import dynamic_import
-from SymbolicCollisions.core.DiscreteCMTransforms import get_DF
 from SymbolicCollisions.core.MatrixGenerator import get_raw_moments_matrix
 
 sys.path.append(os.path.join('Python', 'symbolic_tools'))  # allow CI bot to see the stuff from the main repo dir
@@ -25,7 +24,7 @@ class TestRegexPrinters(TestCase):
 
     def test_notation_i(self):
         q = 27
-        populations = get_DF(q, print_symbol='b')
+        populations = get_print_symbols_in_indx_notation(q, print_symbol='b')
         expected_results = "\ta[0] = b[0];\n" \
                            "\ta[1] = b[1];\n" \
                            "\ta[2] = b[2];\n" \
@@ -56,14 +55,14 @@ class TestRegexPrinters(TestCase):
 
         f = io.StringIO()
         with redirect_stdout(f):
-            print_as_vector(populations, print_symbol='a')
+            print_as_vector(populations, outprint_symbol='a')
         out = f.getvalue()
 
         assert out == expected_results
 
     def test_notation_ijk(self):
         q = 27
-        populations = get_DF(q, print_symbol='b')
+        populations = get_print_symbols_in_indx_notation(q, print_symbol='b')
         expected_results = "\ta000 = b[0];\n" \
                            "\ta100 = b[1];\n" \
                            "\ta200 = b[2];\n" \
@@ -94,7 +93,7 @@ class TestRegexPrinters(TestCase):
 
         f = io.StringIO()
         with redirect_stdout(f):
-            print_as_vector(populations, print_symbol='a', e=e_D3Q27)
+            print_as_vector(populations, outprint_symbol='a', e=e_D3Q27)
         out = f.getvalue()
 
         assert out == expected_results
@@ -147,7 +146,7 @@ class TestRegexPrinters(TestCase):
         pop_in_str = 'x_in'  # symbol defining populations
         temp_pop_str = 'temp'  # symbol defining populations
 
-        temp_populations = get_DF(q, temp_pop_str)
+        temp_populations = get_print_symbols_in_indx_notation(q, temp_pop_str)
 
         Mraw = get_raw_moments_matrix(ex, ey, ez)
         m = Mraw * temp_populations
@@ -164,7 +163,7 @@ class TestRegexPrinters(TestCase):
 
         f = io.StringIO()
         with redirect_stdout(f):
-            print_as_vector(m, print_symbol=pop_in_str)
+            print_as_vector(m, outprint_symbol=pop_in_str)
         out = f.getvalue()
 
         assert out == expected_results

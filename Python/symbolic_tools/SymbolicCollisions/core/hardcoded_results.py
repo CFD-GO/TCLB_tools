@@ -6,7 +6,8 @@ from SymbolicCollisions.core.cm_symbols import m00, rho, cp, cs2_thermal, \
     uz, uz2, uxuz, uyuz
 
 from SymbolicCollisions.core.cm_symbols import Temperature as T
-from SymbolicCollisions.core.cm_symbols import cht_gamma
+from SymbolicCollisions.core.cm_symbols import Enthalpy as H
+from SymbolicCollisions.core.cm_symbols import cht_gamma, Sigma2asSymbol
 # save time and hardcode some of the results
 hardcoded_F_cm_hydro_density_based_D2Q9 = Matrix([
     0,
@@ -181,39 +182,39 @@ hardcoded_F_cm_pf_D2Q9 = Matrix([
 ])
 
 hardcoded_cm_eq_cht_D2Q9 = Matrix([
-    T * cp * rho,
+    H,     # T*cp*rho,
     0,
     0,
-    1 / 3. * T * cht_gamma,
-    1 / 3. * T * cht_gamma,
+    Sigma2asSymbol * H,     # 1/3.*T*cht_gamma,
+    Sigma2asSymbol * H,     # 1/3.*T*cht_gamma,
     0,
     0,
     0,
-    1 / 9. * T * cht_gamma * cht_gamma / (cp * rho),
+    Sigma2asSymbol* Sigma2asSymbol * H,     # 1/9.*T*cht_gamma*cht_gamma/(cp*rho),
 ])
 
 
 hardcoded_cm_eq_cht_D3Q7 = Matrix([
-    T*cp*rho,
+    H,     # T*cp*rho,
     0,
     0,
     0,
-    1 / 3. * T * cht_gamma,
-    1 / 3. * T * cht_gamma,
-    1 / 3. * T * cht_gamma,
+    Sigma2asSymbol * H,     # 1/3.*T*cht_gamma,
+    Sigma2asSymbol * H,     # 1/3.*T*cht_gamma,
+    Sigma2asSymbol * H,     # 1/3.*T*cht_gamma,
     ])
 
 hardcoded_cm_eq_cht_D3Q27 = Matrix([
-    T*cp*rho,
+    H,     # T*cp*rho,
     0,
     0,
     0,
     0,
     0,
     0,
-    1/3.*T*cht_gamma,
-    1/3.*T*cht_gamma,
-    1/3.*T*cht_gamma,
+    Sigma2asSymbol * H,     # 1/3.*T*cht_gamma,
+    Sigma2asSymbol * H,     # 1/3.*T*cht_gamma,
+    Sigma2asSymbol * H,     # 1/3.*T*cht_gamma,
     0,
     0,
     0,
@@ -221,16 +222,16 @@ hardcoded_cm_eq_cht_D3Q27 = Matrix([
     0,
     0,
     0,
-    1/9.*T*cht_gamma*cht_gamma/(cp*rho),
-    1/9.*T*cht_gamma*cht_gamma/(cp*rho),
-    1/9.*T*cht_gamma*cht_gamma/(cp*rho),
+    Sigma2asSymbol* Sigma2asSymbol * H,     # 1/9.*T*cht_gamma*cht_gamma/(cp*rho),
+    Sigma2asSymbol* Sigma2asSymbol * H,     # 1/9.*T*cht_gamma*cht_gamma/(cp*rho),
+    Sigma2asSymbol * Sigma2asSymbol * H,    # 1/9.*T*cht_gamma*cht_gamma/(cp*rho),
     0,
     0,
     0,
     0,
     0,
     0,
-    T*(1/27.*cht_gamma*cht_gamma*cht_gamma)/(cp*cp*rho*rho),
+    Sigma2asSymbol* Sigma2asSymbol* Sigma2asSymbol * H,     # T*(1/27.*cht_gamma*cht_gamma*cht_gamma)/(cp*cp*rho*rho),
 ])
 
 hardcoded_m_eq_cht_D3Q27 = Matrix([

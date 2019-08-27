@@ -136,8 +136,8 @@ class TestDiscreteCMTransforms(unittest.TestCase):
         out = f.getvalue()
 
         expected_result = '\tcm_eq[0] = m00;\n' \
-                          '\tcm_eq[1] = u.x*(1 - m00);\n' \
-                          '\tcm_eq[2] = u.y*(1 - m00);\n' \
+                          '\tcm_eq[1] = u.x*(-m00 + 1);\n' \
+                          '\tcm_eq[2] = u.y*(-m00 + 1);\n' \
                           '\tcm_eq[3] = m00*ux2 + 1/3.*m00 - ux2;\n' \
                           '\tcm_eq[4] = m00*uy2 + 1/3.*m00 - uy2;\n' \
                           '\tcm_eq[5] = uxuy*(m00 - 1.);\n' \
@@ -146,8 +146,8 @@ class TestDiscreteCMTransforms(unittest.TestCase):
                           '\tcm_eq[8] = m00*ux2*uy2 + 1/3.*m00*ux2 + 1/3.*m00*uy2 + 1/9.*m00 + 2.*ux2*uy2 - 1/3.*ux2 - 1/3.*uy2;\n'  # noqa
 
         assert 'cm_eq[0] = m00;' in out
-        assert 'cm_eq[1] = u.x*(1 - m00);' in out
-        assert 'cm_eq[2] = u.y*(1 - m00);' in out
+        assert 'cm_eq[1] = u.x*(-m00 + 1);' in out
+        assert 'cm_eq[2] = u.y*(-m00 + 1);' in out
         assert 'cm_eq[3] = m00*ux2 + 1/3.*m00 - ux2;\n' in out
         assert 'cm_eq[4] = m00*uy2 + 1/3.*m00 - uy2;\n' in out
         assert 'cm_eq[5] = uxuy*(m00 - 1.);\n' in out

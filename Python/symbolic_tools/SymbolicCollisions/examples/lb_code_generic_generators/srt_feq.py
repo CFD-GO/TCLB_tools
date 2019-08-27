@@ -14,6 +14,6 @@ dcmt = DiscreteCMTransforms(e_D2Q9, u2D, F2D, rho)
 start = time.process_time()
 
 edf = [dcmt.get_EDF(i) for i in range(0, 9)]
-print_as_vector(Matrix([edf]), print_symbol=f"feq")
+print_as_vector(Matrix([edf]), outprint_symbol=f"feq")
 
 print(f'\n\n Done in {time.process_time() - start} [s].')
