@@ -93,7 +93,7 @@ class TestRegexPrinters(TestCase):
 
         f = io.StringIO()
         with redirect_stdout(f):
-            print_as_vector(populations, outprint_symbol='a', e=e_D3Q27)
+            print_as_vector(populations, outprint_symbol='a', moments_order=e_D3Q27)
         out = f.getvalue()
 
         assert out == expected_results

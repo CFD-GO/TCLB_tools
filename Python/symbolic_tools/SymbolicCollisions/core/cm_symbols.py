@@ -85,10 +85,12 @@ omega_v = Symbol('omega_nu')
 omega_b = Symbol('omega_bulk')  # omega_bulk='1.0/(3*bulk_visc+0.5)'
 
 ####################################################### END OF SYMBOLS #######################################################
-
+# D2Q9 notation from TCLB
 ex_D2Q9 = Matrix([0, 1, 0, -1, 0, 1, -1, -1, 1])
 ey_D2Q9 = Matrix([0, 0, 1, 0, -1, 1, 1, -1, -1])
+ez_D2Q9 = Matrix([0, 0, 0, 0, 0, 0, 0, 0, 0])
 e_D2Q9 = ex_D2Q9.col_insert(1, ey_D2Q9)
+e_D2Q9 = e_D2Q9.col_insert(2, ez_D2Q9)
 
 # D3Q7 notation from TCLB
 ex_D3Q7 = Matrix([0, 1, -1, 0, 0, 0, 0])

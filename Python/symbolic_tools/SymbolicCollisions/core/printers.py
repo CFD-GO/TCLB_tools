@@ -12,6 +12,7 @@ from sympy.core.evalf import N as symbol_to_number
 from fractions import Fraction
 from sympy import Symbol
 
+
 def print_u2(d=3):
     print(f"\treal_t {uxuy} = {ux}*{uy};")
     print(f"\treal_t {ux2} = {ux}*{ux};")
@@ -34,8 +35,9 @@ def print_u3():
 
 def print_sigma_cht():
     # print(f"{Sigma2}")
-    print_as_vector(Matrix([Sigma2]), outprint_symbol="Sigma2")
+    print_as_vector(Matrix([Sigma2]), outprint_symbol="real_t Sigma2")
     # print(f"real_t Sigma2 = (h_stability_enhancement*1./3.)/(cp*rho);")
+    # print(f"real_t Sigma2 = {Sigma2};")
 
 
 def round_and_simplify(stuff):
@@ -49,11 +51,16 @@ def round_and_simplify(stuff):
     rounded_and_simplified_stuff = simplify(rounded_stuff)
     return rounded_and_simplified_stuff
 
-def get_print_symbols_in_m_notation(e, print_symbol='m_',):
-    q = e.shape[0]
+
+def get_print_symbols_in_m_notation(moments_order, print_symbol='m_'):
+    if type(moments_order) != Matrix:
+        moments_order = Matrix(moments_order)
+
+    q = moments_order.shape[0]
+
     print_symbols = []
     for i in range(q):
-        direction = e[i, :]
+        direction = moments_order[i, :]
         direction = [str(d) for d in direction]
         direction = ''.join(direction)
         direction = re.sub(r'-1', '2', direction)
@@ -61,36 +68,28 @@ def get_print_symbols_in_m_notation(e, print_symbol='m_',):
 
     return Matrix(print_symbols)
 
-def get_print_symbols_in_indx_notation(q=9, print_symbol='default_symbol2', withbrackets=True):
 
+def get_print_symbols_in_indx_notation(q=9, print_symbol='default_symbol2', withbrackets=True):
     # symbols_ = [Symbol("%s[%d]" % (print_symbol, i)) for i in range(0, q)]
     # return Matrix(symbols_)
 
     if q == 1:
         print_symbols = [Symbol("%s" % print_symbol)]
     elif withbrackets:
-        # print_symbols = [("%s[%d]" % (print_symbol, i)) for i in range(0, q)]
         print_symbols = [Symbol("%s[%d]" % (print_symbol, i)) for i in range(0, q)]
     else:
         print_symbols = [Symbol("%s%d" % (print_symbol, i)) for i in range(0, q)]
     return Matrix(print_symbols)
 
-def print_as_vector(some_matrix, outprint_symbol='default_symbol1', raw_output=False, withbrackets=True, e=None):
+
+def print_as_vector(some_matrix, outprint_symbol='default_symbol1', raw_output=False, withbrackets=True, moments_order=None):
     rows = some_matrix._mat
     q = len(rows)
-    # print_symbols = [("%s[%d]" % (print_symbol, i)) for i in range(0, q)]
-    # if len(print_symbol) == 1:
 
-    if e is not None:
-        print_symbols = get_print_symbols_in_m_notation(e, outprint_symbol)
+    if moments_order is not None:
+        print_symbols = get_print_symbols_in_m_notation(moments_order, outprint_symbol)
     else:
         print_symbols = get_print_symbols_in_indx_notation(q, outprint_symbol, withbrackets)
-        # if q == 1:
-        #     print_symbols = ["%s" % outprint_symbol]
-        # elif withbrackets:
-        #     print_symbols = [("%s[%d]" % (outprint_symbol, i)) for i in range(0, q)]
-        # else:
-        #     print_symbols = [("%s%d" % (outprint_symbol, i)) for i in range(0, q)]
 
     for i in range(q):
         row = rows[i]
@@ -160,7 +159,7 @@ def print_as_vector(some_matrix, outprint_symbol='default_symbol1', raw_output=F
                 for cube_pattern in cube_patterns:
                     to_be_squared = re.findall(r"(\w+)" + cube_pattern, row)
                     if len(to_be_squared) > 1:
-                        msg = 'There is to much square patterns and I dont know not how to simplify them yet.\n ' \
+                        msg = 'There is to much cubic patterns and I dont know not how to simplify them yet.\n ' \
                               'Please generate and check the raw, unparsed output!'
                         # raise NotImplementedError(msg)
                         print(msg)
