@@ -13,17 +13,18 @@ from SymbolicCollisions.core.cm_symbols import m00, s3D
 # from SymbolicCollisions.core.cm_symbols import rho
 from SymbolicCollisions.core.cm_symbols import Temperature, cht_gamma as cht_stability_enhancement
 from SymbolicCollisions.core.cm_symbols import cp as specific_heat_capacity
-
+from SymbolicCollisions.core.cm_symbols import Enthalpy, Sigma2asSymbol
 
 class ContinuousCMTransforms:
     def __init__(self, dzeta, u, F, rho, cs2=1. / 3.,
-                 T=Temperature, cp=specific_heat_capacity, cht_gamma=cht_stability_enhancement):
+                 T=Temperature, cp=specific_heat_capacity, cht_gamma=cht_stability_enhancement, enthalpy=Enthalpy):
         """
         :param dzeta: direction (x,y,z)
         :param u: velocity (x,y,z)
         :param u: Force (x,y,z)
         :param rho: density (not necessarily m00, for instance in multiphase flows)
-        :param cs2: (speed of sound)^2, for isothermal LB cs2=1./3;
+        :param cs2: variance of the distribution = (speed of sound)^2,
+                    for isothermal LB cs2=1./3;
                     otherwise  cs2 = Symbol('RT', positive=True)  # positive, negative, real, nonpositive, integer, prime and commutative.
 
         """
@@ -35,6 +36,7 @@ class ContinuousCMTransforms:
         self.T = T
         self.cp = cp
         self.gamma = cht_gamma
+        self.enthalpy = enthalpy
 
     def get_internal_energy_Maxwellian_DF(self):
         df = self.get_Maxwellian_DF(psi=m00, u=self.u, sigma2=self.cs2)
@@ -140,10 +142,11 @@ class ContinuousCMTransforms:
         print(f"c{s_mno} =  {d_at_0}")  # cumulant is at s = 0
 
     def get_cht_DF(self):
-        H = self.T * self.cp * self.rho
-        Sigma2 = self.gamma * self.cs2 / (self.cp * self.rho)
-        # Sigma2 = Symbol('Sigma', positive=True)
-        df_H = self.get_Maxwellian_DF(psi=H, u=self.u, sigma2=Sigma2)
+        # from SymbolicCollisions.core.cm_symbols import Enthalpy as H
+        # from SymbolicCollisions.core.cm_symbols import Sigma2asSymbol
+        # H = self.T * self.cp * self.rho
+        # Sigma2 = self.gamma * self.cs2 / (self.cp * self.rho)
+        df_H = self.get_Maxwellian_DF(psi=self.enthalpy, u=self.u, sigma2=self.cs2)
         return df_H
 
     def get_force_He_hydro_DF(self):

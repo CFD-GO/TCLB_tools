@@ -3,7 +3,7 @@ from SymbolicCollisions.core.ContinuousCMTransforms import ContinuousCMTransform
 from SymbolicCollisions.core.cm_symbols import \
     F3D, dzeta3D, u3D, rho, \
     F2D, dzeta2D, u2D, rho,\
-    cs2_thermal
+    cs2_thermal, Sigma2asSymbol, Sigma2, cp, Temperature
 from SymbolicCollisions.core.cm_symbols import moments_dict
 from sympy.matrices import Matrix
 from sympy import Symbol
@@ -15,7 +15,7 @@ start = time.process_time()
 
 lattice = 'D2Q9'
 # ccmt = ContinuousCMTransforms(dzeta3D, u3D, F3D, rho, cs2=cs2_thermal)
-ccmt = ContinuousCMTransforms(dzeta3D, u3D, F3D, rho)
+
 # ccmt = ContinousCMTransforms(dzeta2D, u2D, F2D, rho, cs2=cs2_thermal)
 
 print('\n\n// === continous cm === \n ')
@@ -49,8 +49,10 @@ print("\n--- EQUILIBRIA ---")
 # print_as_vector(cm_eq_internal_e, 'cm_eq_internal_e')
 
 
+ccmt = ContinuousCMTransforms(dzeta3D, u3D, F3D, rho, cs2=Sigma2asSymbol)
+# ccmt = ContinuousCMTransforms(dzeta3D, u3D, F3D, rho, cs2=Sigma2, enthalpy=rho*cp*Temperature)
 cm_cht_eq = get_mom_vector_from_continuous_def(ccmt.get_cht_DF,
-                                               continuous_transformation=ccmt.get_m,
+                                               continuous_transformation=ccmt.get_cm,
                                                moments_order=moments_dict[lattice],
                                                serial_run=False)
 print_as_vector(cm_cht_eq, 'm_cht_eq', raw_output=False)
