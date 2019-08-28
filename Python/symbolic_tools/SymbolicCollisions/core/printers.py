@@ -12,6 +12,30 @@ from sympy.core.evalf import N as symbol_to_number
 from fractions import Fraction
 from sympy import Symbol
 
+import numpy as np
+import pandas as pd
+
+
+def expand_grid_as_in_r(x, y, z):
+    yG, zG, xG = np.meshgrid(x, y, z)  # create the actual grid
+    xG = xG.flatten()  # make the grid 1d
+    yG = yG.flatten()  # same
+    zG = zG.flatten()
+    return pd.DataFrame({'x': xG, 'y': yG, 'z': zG})  # return a dataframe
+
+
+def get_e_as_in_r(x, y, z):
+    yG, zG, xG = np.meshgrid(x, y, z)  # create the actual grid
+    xG = xG.flatten()  # make the grid 1d
+    yG = yG.flatten()  # same
+    zG = zG.flatten()
+    ex_D3Q27 = Matrix(xG)
+    ey_D3Q27 = Matrix(yG)
+    ez_D3Q27 = Matrix(zG)
+    e_D3Q27 = ex_D3Q27.col_insert(1, ey_D3Q27)
+    e_D3Q27 = e_D3Q27.col_insert(2, ez_D3Q27)
+    return ex_D3Q27, ey_D3Q27, ez_D3Q27, e_D3Q27
+
 
 def print_u2(d=3):
     print(f"\treal_t {uxuy} = {ux}*{uy};")
@@ -52,7 +76,7 @@ def round_and_simplify(stuff):
     return rounded_and_simplified_stuff
 
 
-def get_print_symbols_in_m_notation(moments_order, print_symbol='m_'):
+def get_print_symbols_in_m_notation(moments_order, print_symbol='m_', as_list=False):
     if type(moments_order) != Matrix:
         moments_order = Matrix(moments_order)
 
@@ -66,10 +90,13 @@ def get_print_symbols_in_m_notation(moments_order, print_symbol='m_'):
         direction = re.sub(r'-1', '2', direction)
         print_symbols.append(f"{print_symbol}{direction}")
 
-    return Matrix(print_symbols)
+    if as_list:
+        return print_symbols
+    else:
+        return Matrix(print_symbols)
 
 
-def get_print_symbols_in_indx_notation(q=9, print_symbol='default_symbol2', withbrackets=True):
+def get_print_symbols_in_indx_notation(q=9, print_symbol='default_symbol2', withbrackets=True, as_list=False):
     # symbols_ = [Symbol("%s[%d]" % (print_symbol, i)) for i in range(0, q)]
     # return Matrix(symbols_)
 
@@ -79,7 +106,11 @@ def get_print_symbols_in_indx_notation(q=9, print_symbol='default_symbol2', with
         print_symbols = [Symbol("%s[%d]" % (print_symbol, i)) for i in range(0, q)]
     else:
         print_symbols = [Symbol("%s%d" % (print_symbol, i)) for i in range(0, q)]
-    return Matrix(print_symbols)
+
+    if as_list:
+        return print_symbols
+    else:
+        return Matrix(print_symbols)
 
 
 def print_as_vector(some_matrix, outprint_symbol='default_symbol1', raw_output=False, withbrackets=True, moments_order=None):
@@ -87,9 +118,9 @@ def print_as_vector(some_matrix, outprint_symbol='default_symbol1', raw_output=F
     q = len(rows)
 
     if moments_order is not None:
-        print_symbols = get_print_symbols_in_m_notation(moments_order, outprint_symbol)
+        print_symbols = get_print_symbols_in_m_notation(moments_order, outprint_symbol, as_list=True)
     else:
-        print_symbols = get_print_symbols_in_indx_notation(q, outprint_symbol, withbrackets)
+        print_symbols = get_print_symbols_in_indx_notation(q, outprint_symbol, withbrackets, as_list=True)
 
     for i in range(q):
         row = rows[i]

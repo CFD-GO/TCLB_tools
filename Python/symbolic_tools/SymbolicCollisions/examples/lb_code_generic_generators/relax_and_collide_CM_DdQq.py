@@ -154,6 +154,7 @@ F_cm = get_print_symbols_in_m_notation(moments_dict[f'D{d}Q{q}'], F_str)
 m = Mraw * temp_populations
 
 print(f"\treal_t H = {sum(populations)};")
+
 for t, p in zip(temp_populations, populations):
     print(f"\treal_t {t} = {p};")
 

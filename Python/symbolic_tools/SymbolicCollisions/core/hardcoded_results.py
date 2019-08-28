@@ -8,6 +8,7 @@ from SymbolicCollisions.core.cm_symbols import m00, rho, cp, cs2_thermal, \
 from SymbolicCollisions.core.cm_symbols import Temperature as T
 from SymbolicCollisions.core.cm_symbols import Enthalpy as H
 from SymbolicCollisions.core.cm_symbols import cht_gamma, Sigma2asSymbol
+
 # save time and hardcode some of the results
 hardcoded_F_cm_hydro_density_based_D2Q9 = Matrix([
     0,

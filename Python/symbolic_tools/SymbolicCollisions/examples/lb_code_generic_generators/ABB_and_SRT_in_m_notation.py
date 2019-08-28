@@ -20,6 +20,3 @@ populations_eq = get_print_symbols_in_m_notation(moments_dict[f'D{d}Q{q}'], 'heq
 for p, p_eq in zip(populations, populations_eq):
     print(f"\t {p} = {-p} + 2 * {p_eq};")
 
-omega = Symbol("omega_k")
-for p, p_eq in zip(populations, populations_eq):
-    print(f"\t {p} = {p} + {omega}*({p_eq}-{p});")

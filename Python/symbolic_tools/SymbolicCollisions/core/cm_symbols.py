@@ -46,7 +46,7 @@ uyuz = Symbol('uyuz')
 m00 = Symbol('m00', positive=True)
 rho = Symbol('rho', positive=True)
 Temperature = Symbol('T', positive=True)
-Enthalpy = Symbol('H', positive=True) # consider it as enthalpy
+Enthalpy = Symbol('H', positive=True)  # consider it as enthalpy
 cp = Symbol('cp', positive=True)
 cht_gamma = Symbol('h_stability_enhancement', positive=True)  # magic stability enhancement
 # (h_stability_enhancement * 1. / 3.) / (cp * rho);
@@ -90,7 +90,6 @@ ex_D2Q9 = Matrix([0, 1, 0, -1, 0, 1, -1, -1, 1])
 ey_D2Q9 = Matrix([0, 0, 1, 0, -1, 1, 1, -1, -1])
 ez_D2Q9 = Matrix([0, 0, 0, 0, 0, 0, 0, 0, 0])
 e_D2Q9 = ex_D2Q9.col_insert(1, ey_D2Q9)
-e_D2Q9 = e_D2Q9.col_insert(2, ez_D2Q9)
 
 # D3Q7 notation from TCLB
 ex_D3Q7 = Matrix([0, 1, -1, 0, 0, 0, 0])
@@ -410,4 +409,34 @@ moments_dict = {
               (2, 2, 1),  # skipped in      D3Q19, D3Q7
               (2, 2, 2),  # skipped in      D3Q19, D3Q7
               ],
+
+    # beware that, R in tclb generates different order of moments and lattice vectors (e),
+    # 'D3Q27_r': [(0, 0, 0),
+    #           (1, 0, 0),
+    #           (2, 0, 0),
+    #           (0, 1, 0),
+    #           (1, 1, 0),
+    #           (2, 1, 0),
+    #           (0, 2, 0),
+    #           (1, 2, 0),
+    #           (2, 2, 0),
+    #           (0, 0, 1),
+    #           (1, 0, 1),
+    #           (2, 0, 1),
+    #           (0, 1, 1),
+    #           (1, 1, 1),
+    #           (2, 1, 1),
+    #           (0, 2, 1),
+    #           (1, 2, 1),
+    #           (2, 2, 1),
+    #           (0, 0, 2),
+    #           (1, 0, 2),
+    #           (2, 0, 2),
+    #           (0, 1, 2),
+    #           (1, 1, 2),
+    #           (2, 1, 2),
+    #           (0, 2, 2),
+    #           (1, 2, 2),
+    #           (2, 2, 2),
+    #           ],
 }
