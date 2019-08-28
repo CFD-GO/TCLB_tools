@@ -27,17 +27,34 @@ class VTIFile:
         
         self.dtype = dtype
 
+        self.names = list()
+
+    def getNames(self):
+        if len(self.names) < 1:
+            numberOfPointArrays = self.data.GetCellData().GetNumberOfArrays()
+            for i in range(numberOfPointArrays):
+                self.names.append(self.data.GetCellData().GetArrayName(i))
+        return self.names
+        
+    def hasField(self, name):
+
+        if len(self.names) < 1:
+            numberOfPointArrays = self.data.GetCellData().GetNumberOfArrays()
+            for i in range(numberOfPointArrays):
+                self.names.append(self.data.GetCellData().GetArrayName(i))
+        return name in self.names
+
     def get(self, name, vector=False, dtype=False):     
 
         if vector:
-            subspace = np.meshgrid(
+            subspace = (np.meshgrid(
                 range(self.trim_0[0],self.trim_1[0]),
                 range(self.trim_0[1],self.trim_1[1]),
                 range(3)
-            )            
+            )) 
             T = np.transpose(VN.vtk_to_numpy(self.data.GetCellData().GetArray(name)).reshape(self.s_vec), (1,0,2))[subspace]
         else:
-            subspace = np.meshgrid(*[range(self.trim_0[i],self.trim_1[i]) for i in range(2) ])
+            subspace = (np.meshgrid(*[range(self.trim_0[i],self.trim_1[i]) for i in range(2) ]))
             T =  VN.vtk_to_numpy(self.data.GetCellData().GetArray(name)).reshape(self.s_scal).T[subspace]
         if dtype:
             T = np.array(T,dtype=dtype)

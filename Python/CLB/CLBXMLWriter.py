@@ -164,7 +164,8 @@ def _set_by_kw(kw, name, default):
 [   
  'EvalIf',
  'CallPython',
- 'VTK'
+ 'VTK',
+ 'Andersen'
  ]        
 )
 class CLBConfigWriter:
@@ -247,10 +248,25 @@ class CLBConfigWriter:
 #        if vtk_what > 0:
 #            n.set('what', str(vtk_what))       
     
-    def addSave(self,iterations, fname):
-        n = ET.SubElement(self.root, 'SaveBinary')
-        n.set('Iterations', str(iterations))
+    def addSaveCheckpoint(self, fname,comp=False, iterations=0):
+        if not comp:
+            n = ET.SubElement(self.root, 'SaveMemoryDump')
+        else:
+            n = ET.SubElement(self.root, 'SaveBinary')
+            n.set('comp', comp)
+        if iterations > 0:
+            n.set('Iterations', str(iterations))
         n.set('filename', str(fname))
+
+    def addLoadCheckpoint(self, fname,comp=False):
+        if not comp:
+            n = ET.SubElement(self.root, 'LoadMemoryDump')
+        else:
+            n = ET.SubElement(self.root, 'LoadBinary')
+            n.set('comp', comp)
+
+        n.set('filename', str(fname))
+
 
     def addSolve(self, **kwargs):
         
