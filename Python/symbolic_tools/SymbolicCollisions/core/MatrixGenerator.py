@@ -1,6 +1,8 @@
 from SymbolicCollisions.core.cm_symbols import ux, uy, uz, moments_dict
 from SymbolicCollisions.core.printers import round_and_simplify
 from sympy.matrices import Matrix, diag
+import numpy as np
+import pandas as pd
 
 
 def get_cm_coeff_diag_matrix(m, n, ex_, ey_):
@@ -71,10 +73,31 @@ def get_shift_matrix(K, ex_, ey_, ez_=None):
     cm_ = __matrix_maker(f'D{d}Q{q}', get_row)
     return Matrix(cm_)
 
+def get_m_order_as_in_r(x, y, z):
+    yG, zG, xG = np.meshgrid(x, y, z)  # create the actual grid
+    xG = xG.flatten()  # make the grid 1d
+    yG = yG.flatten()  # same
+    zG = zG.flatten()
+    df = pd.DataFrame({'x': xG, 'y': yG, 'z': zG}) # prepare a dataframe
+    return df.to_numpy()
+
+
+def get_e_as_in_r(x, y, z):
+    yG, zG, xG = np.meshgrid(x, y, z)  # create the actual grid
+    xG = xG.flatten()  # make the grid 1d
+    yG = yG.flatten()  # same
+    zG = zG.flatten()
+    ex_D3Q27 = Matrix(xG)
+    ey_D3Q27 = Matrix(yG)
+    ez_D3Q27 = Matrix(zG)
+    e_D3Q27 = ex_D3Q27.col_insert(1, ey_D3Q27)
+    e_D3Q27 = e_D3Q27.col_insert(2, ez_D3Q27)
+    return ex_D3Q27, ey_D3Q27, ez_D3Q27, e_D3Q27
+
 
 class MatrixGenerator:
     def __init__(self, ex, ey, ez, order_of_moments):
-        self.ex=ex
+        self.ex = ex
         self.ey = ey
         self.ez = ez
         self.order_of_moments = order_of_moments
@@ -113,17 +136,17 @@ class MatrixGenerator:
         m_ = self.__matrix_maker(get_row)
         return Matrix(m_)
 
-    def get_shift_matrix(self, K):
+    def get_shift_matrix(self, K=None):
         """
         See 'Generalized local equilibrium in the cascaded lattice Boltzmann method' by P. Asinari, 2008
         or Incorporating forcing terms in cascaded lattice Boltzmann approach by method of central moments' by Kannan N. Premnath, Sanjoy Banerjee†, 2009
-        :param K: transformation matrix, from moments to physical DF
         :param ex_: lattice vector
         :param ey_:
         :param ez_:
         :return: the shift matrix for passing from the frame at rest to the moving frame
         """
-
+        if K is None:
+            K = self.get_raw_moments_matrix().inv()  # transformation matrix, from moments to physical DF
         d, q = self._check_dimensions()
 
         def get_row(m, n, o):

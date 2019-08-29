@@ -2,11 +2,11 @@
 import numpy as np
 import pandas as pd
 from SymbolicCollisions.core.cm_symbols import moments_dict, e_D3Q27, ex_D3Q27
-from SymbolicCollisions.core.printers import expand_grid_as_in_r, get_e_as_in_r
+from SymbolicCollisions.core.MatrixGenerator import get_m_order_as_in_r, get_e_as_in_r
 
 e_seed = [0, 1, -1]
 
-grid = expand_grid_as_in_r(e_seed, e_seed, e_seed)
+grid = get_m_order_as_in_r(e_seed, e_seed, e_seed)
 moments_order = grid.to_numpy()
 print(f"order of moments: \n {moments_order}")
 ex_D3Q27new, ey_D3Q27new, ez_D3Q27new, e_D3Q27new = get_e_as_in_r(e_seed, e_seed, e_seed)

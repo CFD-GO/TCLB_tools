@@ -14,9 +14,9 @@ q = 27
 populations = get_print_symbols_in_indx_notation(q, print_symbol='h')
 print_as_vector(populations, outprint_symbol='f')
 print()
-print_as_vector(populations, outprint_symbol='f', moments_order=e_D3Q27)
+print_as_vector(populations, outprint_symbol='f', output_order_of_moments=e_D3Q27)
 print()
-print_as_vector(populations, outprint_symbol='f', moments_order=moments_dict[f'D{d}Q{q}'])
+print_as_vector(populations, outprint_symbol='f', output_order_of_moments=moments_dict[f'D{d}Q{q}'])
 print("Example: Parsing a file.")
 
 # home = pwd.getpwuid(os.getuid()).pw_dir

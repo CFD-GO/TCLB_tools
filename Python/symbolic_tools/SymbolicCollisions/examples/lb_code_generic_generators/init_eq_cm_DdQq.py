@@ -1,7 +1,7 @@
 from SymbolicCollisions.core.cm_symbols import rho, Enthalpy
 from SymbolicCollisions.core.cm_symbols import dynamic_import, moments_dict
 from SymbolicCollisions.core.printers import print_u2, print_sigma_cht, print_as_vector, get_print_symbols_in_indx_notation
-from SymbolicCollisions.core.MatrixGenerator import get_raw_moments_matrix, get_shift_matrix
+from SymbolicCollisions.core.MatrixGenerator import MatrixGenerator
 
 # SETUP
 d = 3
@@ -22,8 +22,10 @@ e = dynamic_import("SymbolicCollisions.core.cm_symbols", f"e_D{d}Q{q}")
 hardcoded_cm_eq = dynamic_import("SymbolicCollisions.core.hardcoded_results", f"hardcoded_cm_eq_cht_D{d}Q{q}")
 
 # ARRANGE STUFF
-Mraw = get_raw_moments_matrix(ex, ey, ez)
-Nraw = get_shift_matrix(Mraw.inv(), ex, ey, ez)
+matrixGenerator = MatrixGenerator(ex, ey, ez, moments_dict[f'D{d}Q{q}'])
+Mraw = matrixGenerator.get_raw_moments_matrix()
+Nraw = matrixGenerator.get_shift_matrix()
+
 
 # from sympy import pprint
 # pprint(Mraw)
@@ -48,7 +50,6 @@ print_as_vector(hardcoded_cm_eq, outprint_symbol=pop_in_str)
 
 print("\n\t//back to raw moments")
 print_as_vector(Nraw.inv() * populations, outprint_symbol=temp_pop_str)
-# print_as_vector(Nraw.inv() * hardcoded_cm_eq, outprint_symbol=temp_pop_str)  # shortcut
 
 print("\n\t//back to density-probability functions")
 eq_populations = Mraw.inv() * temp_populations

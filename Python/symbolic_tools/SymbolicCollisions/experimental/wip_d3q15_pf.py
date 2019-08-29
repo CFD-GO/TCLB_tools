@@ -2,10 +2,10 @@ from sympy.matrices import eye
 from sympy.printing import print_ccode
 from SymbolicCollisions.core.cm_symbols import omega_ade, omega_b, omega_v, m00
 from SymbolicCollisions.core.cm_symbols import Force_str as F_str
-from SymbolicCollisions.core.cm_symbols import dynamic_import
+from SymbolicCollisions.core.cm_symbols import dynamic_import, moments_dict
 from SymbolicCollisions.core.DiscreteCMTransforms import get_m00
 from SymbolicCollisions.core.printers import print_u2, print_as_vector, get_print_symbols_in_indx_notation
-from SymbolicCollisions.core.MatrixGenerator import get_raw_moments_matrix, get_shift_matrix
+from SymbolicCollisions.core.MatrixGenerator import MatrixGenerator
 
 # inspired by:
 # "Consistent Forcing Scheme in the cascaded LBM" L. Fei et al. 2017
@@ -23,8 +23,9 @@ if d == 3:
 else:
     ez = None
 
-Mraw = get_raw_moments_matrix(ex, ey, ez)
-Nraw = get_shift_matrix(Mraw.inv(), ex, ey, ez)
+matrixGenerator = MatrixGenerator(ex, ey, ez, moments_dict[f'D{d}Q{q}'])
+Mraw = matrixGenerator.get_raw_moments_matrix()
+Nraw = matrixGenerator.get_shift_matrix()
 
 pop_in_str = 'x_in'  # symbol defining populations
 temp_pop_str = 'temp'  # symbol defining populations

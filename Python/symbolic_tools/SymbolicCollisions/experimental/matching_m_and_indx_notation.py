@@ -35,9 +35,9 @@ ed2 = get_print_symbols_in_m_notation(e_D2Q9, 'cantbempty')
 
 print_as_vector(populations_m, outprint_symbol='g')
 print()
-print_as_vector(populations_m, outprint_symbol='g', moments_order=e_D2Q9)  # this is wrong!
+print_as_vector(populations_m, outprint_symbol='g', output_order_of_moments=e_D2Q9)  # this is wrong!
 print()
-print_as_vector(populations_m, outprint_symbol='g', moments_order=mmd)
+print_as_vector(populations_m, outprint_symbol='g', output_order_of_moments=mmd)
 print('\n\n// ====== \n ')
 print_as_vector(populations_inx)
 
@@ -64,9 +64,9 @@ cm_eq = get_mom_vector_from_continuous_def(ccmt.get_Maxwellian_DF,
 
 print_as_vector(cm_eq, 'cm_eq')
 print("\n")
-print_as_vector(cm_eq, 'cm_eq', moments_order=e_D2Q9)
+print_as_vector(cm_eq, 'cm_eq', output_order_of_moments=e_D2Q9)
 print("\n")
-print_as_vector(cm_eq, 'cm_eq', moments_order=mmd)
+print_as_vector(cm_eq, 'cm_eq', output_order_of_moments=mmd)
 
 print(f'\n\n Done in {time.process_time() - start} [s].')
 

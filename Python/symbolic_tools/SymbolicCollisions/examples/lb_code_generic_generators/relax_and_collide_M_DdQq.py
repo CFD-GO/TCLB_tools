@@ -1,11 +1,11 @@
 from sympy.matrices import eye
 from sympy.printing import print_ccode
-from SymbolicCollisions.core.cm_symbols import omega_ade, omega_b, omega_v, m00
+from SymbolicCollisions.core.cm_symbols import omega_ade, omega_b, omega_v, m00, moments_dict
 from SymbolicCollisions.core.cm_symbols import Force_str as F_str
 from SymbolicCollisions.core.cm_symbols import dynamic_import
 from SymbolicCollisions.core.DiscreteCMTransforms import get_m00
 from SymbolicCollisions.core.printers import print_u2, print_as_vector, get_print_symbols_in_indx_notation
-from SymbolicCollisions.core.MatrixGenerator import get_raw_moments_matrix, get_shift_matrix
+from SymbolicCollisions.core.MatrixGenerator import MatrixGenerator
 from sympy.matrices import Matrix
 import numpy as np
 
@@ -77,8 +77,9 @@ hardcoded_m_eq, hardcoded_F_m = get_m_eq_and_F_m_switcher(model)
 
 
 # ARRANGE STUFF
-Mraw = get_raw_moments_matrix(ex, ey, ez)
-Nraw = get_shift_matrix(Mraw.inv(), ex, ey, ez)
+matrixGenerator = MatrixGenerator(ex, ey, ez, moments_dict[f'D{d}Q{q}'])
+Mraw = matrixGenerator.get_raw_moments_matrix()
+Nraw = matrixGenerator.get_shift_matrix()
 
 # from sympy import pprint
 # pprint(Mraw)  # see what you have done

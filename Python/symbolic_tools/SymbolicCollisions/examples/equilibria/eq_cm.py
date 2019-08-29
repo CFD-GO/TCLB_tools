@@ -68,7 +68,7 @@ cm_eq = get_mom_vector_from_continuous_def(ccmt.get_Maxwellian_DF,
                                            moments_order=moments_dict[lattice])
 
 print_as_vector(cm_eq, 'cm_eq')
-print_as_vector(cm_eq, 'cm_eq', moments_order=moments_dict[lattice])
+print_as_vector(cm_eq, 'cm_eq', output_order_of_moments=moments_dict[lattice])
 
 # print('\n//population_eq -> cm_eq - from continous definition: \n'
 #       'k_mn = integrate(fun, (x, -oo, oo), (y, -oo, oo)) \n'

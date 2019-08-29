@@ -135,5 +135,5 @@ cum_eq = get_mom_vector_from_continuous_def(ccmt.get_Maxwellian_DF,
                                            continuous_transformation=ccmt.get_cumulants,
                                            moments_order=moments_dict[lattice],
                                            serial_run=False)
-print_as_vector(cum_eq, outprint_symbol='c', moments_order=moments_dict[lattice])
+print_as_vector(cum_eq, outprint_symbol='c', output_order_of_moments=moments_dict[lattice])
 print("bye")

@@ -5,7 +5,8 @@ from sympy import Symbol
 from sympy.matrices import Matrix
 from SymbolicCollisions.core.cm_symbols import Temperature as T
 from SymbolicCollisions.core.cm_symbols import m00, rho, cp, uy
-from SymbolicCollisions.core.cm_symbols import e_D3Q27
+from SymbolicCollisions.core.cm_symbols import e_D3Q27, moments_dict
+
 
 import io
 from contextlib import redirect_stdout
@@ -14,7 +15,7 @@ import sys
 import os
 
 from SymbolicCollisions.core.cm_symbols import dynamic_import
-from SymbolicCollisions.core.MatrixGenerator import get_raw_moments_matrix
+from SymbolicCollisions.core.MatrixGenerator import MatrixGenerator
 
 sys.path.append(os.path.join('Python', 'symbolic_tools'))  # allow CI bot to see the stuff from the main repo dir
 sys.path.append(os.path.join('.'))  # allow CI bot to see the stuff from the main repo dir
@@ -93,7 +94,7 @@ class TestRegexPrinters(TestCase):
 
         f = io.StringIO()
         with redirect_stdout(f):
-            print_as_vector(populations, outprint_symbol='a', moments_order=e_D3Q27)
+            print_as_vector(populations, outprint_symbol='a', output_order_of_moments=e_D3Q27)
         out = f.getvalue()
 
         assert out == expected_results
@@ -148,7 +149,9 @@ class TestRegexPrinters(TestCase):
 
         temp_populations = get_print_symbols_in_indx_notation(q, temp_pop_str)
 
-        Mraw = get_raw_moments_matrix(ex, ey, ez)
+        matrixGenerator = MatrixGenerator(ex, ey, ez, moments_dict[f'D{d}Q{q}'])
+        Mraw = matrixGenerator.get_raw_moments_matrix()
+
         m = Mraw * temp_populations
 
         expected_results = "\tx_in[0] = temp[0] + temp[1] + temp[2] + temp[3] + temp[4] + temp[5] + temp[6] + temp[7] + temp[8];\n" \
