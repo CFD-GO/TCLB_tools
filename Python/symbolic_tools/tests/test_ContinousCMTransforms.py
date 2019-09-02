@@ -176,10 +176,10 @@ class TestContinousCMTransforms(unittest.TestCase):
                                                        moments_order=moments_dict[lattice],
                                                        serial_run=True
                                                        )
-            print("------------\n\n")
-            print_as_vector(cm_eq, 'CM')
-            print_as_vector(expected_result, 'CM_expected')
-            print("------------\n\n")
+            # print("------------\n\n")
+            # print_as_vector(cm_eq, 'CM')
+            # print_as_vector(expected_result, 'CM_expected')
+            # print("------------\n\n")
 
             f = io.StringIO()
             with redirect_stdout(f):

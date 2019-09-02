@@ -21,7 +21,7 @@ import multiprocessing
 
 
 class DiscreteCMTransforms:
-    def __init__(self, e, u, F, rho, cs2=1./3.):
+    def __init__(self, e, u, F, rho, cs2=1./3., w=w_D2Q9):
         """
         :param e: direction (x,y,z)
         :param u: velocity (x,y,z)
@@ -29,12 +29,14 @@ class DiscreteCMTransforms:
         :param rho: density (not necessarily m00, for instance in multiphase flows)
         :param cs2: (speed of sound)^2, for isothermal LB cs2=1./3;
             otherwise  cs2 = Symbol('RT', positive=True)  # positive, negative, real, nonpositive, integer, prime and commutative.
+        :param w: weight coefficients
         """
         self.e = e
         self.u = u
         self.F = F
         self.rho = rho
         self.cs2 = cs2
+        self.w = w
 
     def get_gamma_first_order(self, i):
 
@@ -52,20 +54,33 @@ class DiscreteCMTransforms:
              raise TypeError('cannot add %s and %s' % (type(self), type(other)))
          TypeError: cannot add <class 'sympy.matrices.dense.MutableDenseMatrix'> and <class 'int'>
          """
+        # Symbol
+        eu = self.e[i, :] * self.u
+        gamma = self.w[i] * (Matrix([1]) + eu / self.cs2)
+        return gamma[0]
+
+    def get_gamma_first_order_cht(self, i):
+        """
+        checks the moments from
+        'Boundary Conditions at two-phase interface in the LBM for the convection diffusion equation'
+        by H. Yoshida et al., 2014
+        """
+        gamma = Symbol("Gamma")
+        w_D3Q7 = Matrix([1. - 6. * gamma, gamma, gamma, gamma, gamma, gamma, gamma])
 
         eu = self.e[i, :] * self.u
-        gamma = w_D2Q9[i] * (Matrix([1]) + eu / self.cs2)
-        return gamma[0]
+        result = self.rho*w_D3Q7[i] * (Matrix([1]) + eu / (2.*gamma))
+        return result[0]
 
     def get_velocity_bc(self, i):
         eu = self.e[i, :] * self.u
-        gamma = w_D2Q9[i] * (eu / self.cs2)
+        gamma = self.w[i] * (eu / self.cs2)
         return -2*gamma[0]
 
     def get_pressure_bc(self, i):
         eu = self.e[i, :] * self.u
         u2 = Matrix([self.u.dot(self.u)])
-        gamma = w_D2Q9[i] * (Matrix([1]) + eu * eu / (2 * self.cs2 * self.cs2) - u2 / (2 * self.cs2))
+        gamma = self.w[i] * (Matrix([1]) + eu * eu / (2 * self.cs2 * self.cs2) - u2 / (2 * self.cs2))
         return 2*gamma[0]
 
     def get_heat_flux_bc(self, i):
@@ -77,7 +92,7 @@ class DiscreteCMTransforms:
         # return
         # eu = self.e[i, :] * self.u
         eu = self.e[i, :] * Matrix([Symbol('nx', positive=True), Symbol('ny', positive=True)])
-        gamma = w_D2Q9[i] * (eu / self.cs2)
+        gamma = self.w[i] * (eu / self.cs2)
         return -2*gamma[0]
 
     def get_gamma(self, i):
@@ -98,7 +113,7 @@ class DiscreteCMTransforms:
 
         eu = self.e[i, :] * self.u
         u2 = Matrix([self.u.dot(self.u)])
-        gamma = w_D2Q9[i] * (Matrix([1]) + eu / self.cs2 + eu * eu / (2 * self.cs2 * self.cs2) - u2 / (2 * self.cs2))
+        gamma = self.w[i] * (Matrix([1]) + eu / self.cs2 + eu * eu / (2 * self.cs2 * self.cs2) - u2 / (2 * self.cs2))
 
         return gamma[0]
 
@@ -121,7 +136,7 @@ class DiscreteCMTransforms:
         preconditioner = Symbol('preconditioner', positive=True)
         eu = self.e[i, :] * self.u
         u2 = Matrix([self.u.dot(self.u)])
-        gamma = w_D2Q9[i] * (Matrix([1]) +
+        gamma = self.w[i] * (Matrix([1]) +
                              eu / self.cs2 + eu * eu / (2 * preconditioner * self.cs2 * self.cs2)
                              - u2 / (2 * preconditioner * self.cs2))
         return gamma[0]
@@ -132,7 +147,7 @@ class DiscreteCMTransforms:
 
     def get_EDF_incompressible(self, i):
         gamma = self.get_gamma(i)
-        g = m00 * w_D2Q9[i] + gamma - w_D2Q9[i]
+        g = m00 * self.w[i] + gamma - self.w[i]
         return g
 
     def get_m(self, mno, DF, q):
@@ -161,7 +176,7 @@ class DiscreteCMTransforms:
         version for 'Improved locality of the phase-field lattice-Boltzmann model for immiscible fluids at high density ratios' A. Fakhari et. al., 2017
         """
         eu_terms = self.e[i, :] - self.u.transpose() + self.e[i, :].dot(self.u)*self.e[i, :]/self.cs2
-        result = w_D2Q9[i] * self.F.dot(eu_terms) / (self.rho * self.cs2)
+        result = self.w[i] * self.F.dot(eu_terms) / (self.rho * self.cs2)
         return result
 
     def get_force_He(self, i):

@@ -13,8 +13,8 @@ from SymbolicCollisions.core.printers import print_as_vector
 import time
 
 start = time.process_time()
-lattice = 'D3Q27'
-# lattice = 'D2Q9'
+# lattice = 'D3Q27'
+lattice = 'D2Q9'
 dcmt = DiscreteCMTransforms(e_D2Q9, u2D, F2D, rho)
 ccmt = ContinuousCMTransforms(dzeta3D, u3D, F3D, rho)
 
@@ -22,7 +22,8 @@ print('\n\n// === discrete moments === \n ')
 print("moments: first order (linear) velocity expansion.")
 pop_eq = get_mom_vector_from_discrete_def(lambda i: Symbol('m00') * dcmt.get_gamma_first_order(i),
                                           discrete_transform=dcmt.get_m,
-                                          moments_order=moments_dict[lattice])
+                                          moments_order=moments_dict[lattice],
+                                          serial_run=True)
 print_as_vector(pop_eq, 'pop_eq_first_order')
 
 print("moments: second order (quadratic) velocity expansion.")
