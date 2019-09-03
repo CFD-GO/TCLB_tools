@@ -1,4 +1,4 @@
-from Benchmarks.HeatTransferInMultilayerPipe.steady_two_layer_cylinder_analytical_2D import PipeWithinPipeDirichlet
+from Benchmarks.SteadyHeatConductionInMultilayerPipe.steady_two_layer_cylinder_analytical_2D import PipeWithinPipeDirichlet
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib import cm as colormap
