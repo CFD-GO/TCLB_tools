@@ -2,14 +2,17 @@ import numpy as np
 import sympy as sp
 import matplotlib.pyplot as plt
 import matplotlib.pylab as pylab
-
+import os
 # -------------------- prepare dummy data --------------------
 
 x_range = 1
 step = 0.01
 x = np.arange(0., x_range, step)
 y = -4 * x * (x - x_range) / (x_range * x_range)
-fig_name = f'sample_plot2D_param_b={x_range}.png'
+
+if not os.path.exists('plots'):
+    os.makedirs('plots')
+fig_name = f'plots/sample_plot2D_param_b={x_range}.png'
 
 # -------------------- make dummy plot --------------------
 # plt.figure(figsize=(14, 8))
@@ -58,6 +61,23 @@ plt.xlabel(r'$x_{label}$', fontsize=22)
 plt.ylabel(r'$y_{label}$', fontsize=22)
 plt.legend()
 plt.grid()
+
+# Major ticks every 20, minor ticks every 5
+major_ticks = np.arange(0, x_range, 20*step)
+minor_ticks = np.arange(0, x_range, 5*step)
+
+axes.set_xticks(major_ticks)
+axes.set_xticks(minor_ticks, minor=True)
+axes.set_yticks(major_ticks)
+axes.set_yticks(minor_ticks, minor=True)
+
+# And a corresponding grid
+axes.grid(which='both')
+
+# Or if you want different settings for the grids:
+axes.grid(which='minor', alpha=0.2)
+axes.grid(which='major', alpha=0.5)
+# plt.grid(True)
 
 fig = plt.gcf()  # get current figure
 fig.savefig(fig_name, bbox_inches='tight')

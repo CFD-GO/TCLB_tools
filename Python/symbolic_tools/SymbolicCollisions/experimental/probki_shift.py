@@ -4,15 +4,16 @@ from sympy.matrices import Matrix, eye, zeros, ones, diag
 from sympy import pretty_print
 
 from SymbolicCollisions.core.cm_symbols import *
-from SymbolicCollisions.core.MatrixGenerator import get_shift_matrix
+from SymbolicCollisions.core.MatrixGenerator import MatrixGenerator
 from SymbolicCollisions.core.printers import *
 
+matrixGenerator = MatrixGenerator(ex_D2Q9, ey_D2Q9, None, moments_dict[f'D2Q9'])
+Mraw = matrixGenerator.get_raw_moments_matrix()
+ShiftMat = matrixGenerator.get_shift_matrix(M_ortho_GS)
 
 # cm = get_populations('cm')
 cm = Matrix([0.123, 0.234, 0.345, 0.456, 0.567, 0.678, 0.789, 0.890, 0.901])
 
-
-ShiftMat = get_shift_matrix(M_ortho_GS, ex_D2Q9, ey_D2Q9)
 ShiftMat = ShiftMat.subs({
             'u.x': 0.0123,
             'u.y': 0.0234

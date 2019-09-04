@@ -1,7 +1,7 @@
 import numpy as np
 import sympy as sp
 import matplotlib.pyplot as plt
-
+import os
 # -------------------- prepare dummy data --------------------
 
 # square fun version
@@ -19,7 +19,10 @@ A = np.pi/(x2-x1)
 B = x1
 y2 = np.sin(A*x - A*B)
 # y = -4 * x * (x - x_range) / (x_range * x_range)
-fig_name = f'sample_plot2D_param_b={x2-x1}.png'
+
+if not os.path.exists('plots'):
+    os.makedirs('plots')
+fig_name = f'plots/sample_plot2D_param_b={x2-x1}.png'
 
 # -------------------- make dummy plot --------------------
 plt.rcParams.update({'font.size': 14})

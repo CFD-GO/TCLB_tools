@@ -1,7 +1,7 @@
 from matplotlib import pyplot as plt
 import matplotlib.ticker
 import numpy as np
-
+import os
 
 coeff = np.array([1, 2, 4, 8, 16, 32])
 x = 1*coeff
@@ -10,8 +10,9 @@ y_1st = initial_error/coeff
 y_2nd = initial_error/(coeff*coeff)
 
 # ------------------------------------ PLOT ------------------------------------
-
-fig_name = f'sample_loglog_plot.png'
+if not os.path.exists('plots'):
+    os.makedirs('plots')
+fig_name = f'plots/sample_loglog_plot.png'
 
 fig1, ax1 = plt.subplots(figsize=(14, 8))
 plt.rcParams.update({'font.size': 14})

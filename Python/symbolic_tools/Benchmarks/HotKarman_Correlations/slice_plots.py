@@ -1,8 +1,4 @@
-from DataIO.VTIFile import VTIFile
-import os
 import pandas as pd
-from Benchmarks.ADE.steady_two_layer_cylinder_analytical_2D import InputForMultiLayeredPipe, PipeWithinPipe
-import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib import cm as colormap
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
@@ -27,7 +23,7 @@ def read_data_from_LBM_for_cntr_plot(size):
     vti_reader = VTIFile(filepath_pvti, parallel=True)
 
     T_num = vti_reader.get("T")
-    [ux_num, uy_num, uz_num] = vti_reader.get("U", vector=True)
+    [ux_num, uy_num, uz_num] = vti_reader.get("U", is_vector=True)
     ny, nx, nz = T_num.shape
 
     ux_num_slice = ux_num[:, :, 1]

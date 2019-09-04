@@ -13,15 +13,17 @@ from SymbolicCollisions.core.printers import print_as_vector
 
 import multiprocessing
 from concurrencytest import ConcurrentTestSuite, fork_for_tests
-
+from SymbolicCollisions.core.MatrixGenerator import MatrixGenerator
+from SymbolicCollisions.core.cm_symbols import moments_dict
 
 class TestMatrixGenerator(TestCase):
 
     def test_get_raw_matrix_d2q9(self):
-        from SymbolicCollisions.core.MatrixGenerator import get_raw_moments_matrix
+
         from SymbolicCollisions.core.cm_symbols import ex_D2Q9, ey_D2Q9, Mraw_D2Q9
 
-        M = get_raw_moments_matrix(ex_=ex_D2Q9, ey_=ey_D2Q9)
+        matrix_generator = MatrixGenerator(ex=ex_D2Q9, ey=ey_D2Q9, ez=None, order_of_moments=moments_dict['D2Q9'])
+        M = matrix_generator.get_raw_moments_matrix()
 
         f = io.StringIO()
         with redirect_stdout(f):
@@ -36,11 +38,11 @@ class TestMatrixGenerator(TestCase):
         assert out == out2
 
     def test_Shift_ortho_Straka_d2q5(self):
-        from SymbolicCollisions.core.MatrixGenerator import get_shift_matrix
-        from SymbolicCollisions.core.cm_symbols import Shift_ortho_Straka_d2q5, K_ortho_Straka_d2q5, ex_Straka_d2_q5, \
-            ey_Straka_d2_q5
+        from SymbolicCollisions.core.cm_symbols import Shift_ortho_Straka_d2q5, K_ortho_Straka_d2q5, \
+            ex_Straka_d2_q5, ey_Straka_d2_q5
 
-        Smat = get_shift_matrix(K_ortho_Straka_d2q5, ex_Straka_d2_q5, ey_Straka_d2_q5)
+        matrix_generator = MatrixGenerator(ex=ex_Straka_d2_q5, ey=ey_Straka_d2_q5, ez=None, order_of_moments=moments_dict['D2Q5'])
+        Smat = matrix_generator.get_shift_matrix(K_ortho_Straka_d2q5)
 
         f = io.StringIO()
         with redirect_stdout(f):
@@ -55,10 +57,10 @@ class TestMatrixGenerator(TestCase):
         assert out == out2
 
     def test_Shift_ortho_Geier_d2q9(self):
-        from SymbolicCollisions.core.MatrixGenerator import get_shift_matrix
-        from SymbolicCollisions.core.cm_symbols import Shift_ortho_Geier, K_ortho_Geier, ex_Geier, ey_Geier
 
-        Smat = get_shift_matrix(K_ortho_Geier, ex_Geier, ey_Geier)
+        from SymbolicCollisions.core.cm_symbols import Shift_ortho_Geier, K_ortho_Geier, ex_Geier, ey_Geier
+        matrix_generator = MatrixGenerator(ex=ex_Geier, ey=ey_Geier, ez=None, order_of_moments=moments_dict['D2Q9'])
+        Smat = matrix_generator.get_shift_matrix(K_ortho_Geier)
 
         f = io.StringIO()
         with redirect_stdout(f):
@@ -75,7 +77,6 @@ class TestMatrixGenerator(TestCase):
 # Pycharm runs them sequentially
 # python -m unittest tests/test_example_unit_tests_parallel_run.py # sequential as well
 # python tests/test_example_unit_tests_parallel_run.py # concurrent run :)
-
 
 if __name__ == '__main__':
     loader = unittest.TestLoader()

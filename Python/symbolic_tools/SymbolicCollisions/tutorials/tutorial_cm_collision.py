@@ -1,10 +1,10 @@
 from sympy.matrices import eye
 from sympy.printing import print_ccode
-from SymbolicCollisions.core.cm_symbols import omega_ade, omega_b, omega_v, m00
+from SymbolicCollisions.core.cm_symbols import omega_ade, omega_b, omega_v, m00, moments_dict
 from SymbolicCollisions.core.cm_symbols import dynamic_import
-from SymbolicCollisions.core.DiscreteCMTransforms import get_DF, get_m00
-from SymbolicCollisions.core.printers import print_u2, print_as_vector
-from SymbolicCollisions.core.MatrixGenerator import get_raw_moments_matrix, get_shift_matrix
+from SymbolicCollisions.core.DiscreteCMTransforms import get_m00
+from SymbolicCollisions.core.printers import print_u2, print_as_vector, get_print_symbols_in_indx_notation
+from SymbolicCollisions.core.MatrixGenerator import MatrixGenerator
 
 # inspired by:
 # "Consistent Forcing Scheme in the cascaded LBM" L. Fei et al. 2017
@@ -40,8 +40,9 @@ hardcoded_F_cm = dynamic_import("SymbolicCollisions.core.hardcoded_results", f"h
 from SymbolicCollisions.core.cm_symbols import Force_str as F_str
 
 # ARRANGE STUFF
-Mraw = get_raw_moments_matrix(ex, ey, ez)
-Nraw = get_shift_matrix(Mraw.inv(), ex, ey, ez)
+matrixGenerator = MatrixGenerator(ex, ey, ez, moments_dict[f'D{d}Q{q}'])
+Mraw = matrixGenerator.get_raw_moments_matrix()
+Nraw = matrixGenerator.get_shift_matrix()
 
 # from sympy import pprint
 # pprint(Mraw)  # see what you have done
@@ -84,19 +85,19 @@ make_variables(model)
 print(f"\tfor (int i = 0; i < {q}; i++) {{\n\t"
       f"\t{temp_pop_str}[i] = {pop_in_str}[i];}}")
 
-populations = get_DF(q, pop_in_str)
-temp_populations = get_DF(q, temp_pop_str)
-cm_eq = get_DF(q, cm_eq_pop_str)
-F_cm = get_DF(q, F_str)
+populations = get_print_symbols_in_indx_notation(q, pop_in_str)
+temp_populations = get_print_symbols_in_indx_notation(q, temp_pop_str)
+cm_eq = get_print_symbols_in_indx_notation(q, cm_eq_pop_str)
+F_cm = get_print_symbols_in_indx_notation(q, F_str)
 m = Mraw * temp_populations
 
 print("\n\t//raw moments from density-probability functions")
 # print("\t//[m00, m10, m01, m20, m02, m11, m21, m12, m22]")
-print_as_vector(m, print_symbol=pop_in_str)
+print_as_vector(m, outprint_symbol=pop_in_str)
 
 print("\n\t//central moments from raw moments")
 cm = Nraw * populations
-print_as_vector(cm, print_symbol=temp_pop_str)
+print_as_vector(cm, outprint_symbol=temp_pop_str)
 
 print("\n\t//collision in central moments space")
 print("\t//collide")
@@ -113,7 +114,7 @@ def make_collision(choice):
     }
     # Get the function from switcher dictionary
     cm_after_collision = model_switcher.get(choice, lambda: "Invalid argument")
-    print_as_vector(cm_after_collision, print_symbol=pop_in_str)
+    print_as_vector(cm_after_collision, outprint_symbol=pop_in_str)
 
 make_collision(model)
 

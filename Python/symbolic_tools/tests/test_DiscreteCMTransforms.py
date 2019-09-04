@@ -126,7 +126,7 @@ class TestDiscreteCMTransforms(unittest.TestCase):
 
     def test_get_cm_eq_hydro_discrete(self):
         dcmt = DiscreteCMTransforms(e_D2Q9, u2D, F2D, rho)
-        cm_eq = get_mom_vector_from_discrete_def(dcmt.get_EDF_hydro,
+        cm_eq = get_mom_vector_from_discrete_def(dcmt.get_EDF_incompressible,
                                                  discrete_transform=dcmt.get_cm,
                                                  moments_order=moments_dict['D2Q9'],
                                                  serial_run=True)
