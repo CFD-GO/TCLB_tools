@@ -1,15 +1,15 @@
 
-from SymbolicCollisions.core.DiscreteCMTransforms import get_DF
+
 from SymbolicCollisions.core.cm_symbols import *
 from sympy.matrices import Matrix
 from sympy import pretty_print, exp
 from SymbolicCollisions.core.cm_symbols import ex_D2Q9, ey_D2Q9
-from SymbolicCollisions.core.printers import print_as_vector
+from SymbolicCollisions.core.printers import print_as_vector, get_print_symbols_in_indx_notation
 import numpy as np
 from sympy.utilities.iterables import flatten
 
 
-DF = get_DF('g')
+DF = get_print_symbols_in_indx_notation('g')
 # pretty_print(M_ortho_GS*DF)
 
 
@@ -41,7 +41,7 @@ print("\n\n=== CM ===\n")
 # pretty_print(N_ortho)
 XXX_ortho = T_raw_to_ortho * Mraw_D2Q9
 pretty_print(XXX_ortho * XXX_ortho.transpose())
-print_as_vector(XXX_ortho * XXX_ortho.transpose(), print_symbol='xxx')
+print_as_vector(XXX_ortho * XXX_ortho.transpose(), outprint_symbol='xxx')
 
 
 

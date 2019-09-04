@@ -3,12 +3,19 @@ from SymbolicCollisions.core.cm_symbols import ux, uy, uz, \
     uxuy, uxuz, uyuz, \
     ux2, uy2, uz2,\
     ux3, uy3, uz3,\
-    uxuy3
+    uxuy3,\
+    Sigma2
 
 # from decimal import Decimal
-from sympy import simplify, Float, preorder_traversal
+from sympy import simplify, Float, preorder_traversal, Matrix
 from sympy.core.evalf import N as symbol_to_number
 from fractions import Fraction
+from sympy import Symbol
+
+import numpy as np
+import pandas as pd
+
+
 
 
 def print_u2(d=3):
@@ -31,6 +38,13 @@ def print_u3():
     print("")
 
 
+def print_sigma_cht():
+    # print(f"{Sigma2}")
+    print_as_vector(Matrix([Sigma2]), outprint_symbol="real_t Sigma2")
+    # print(f"real_t Sigma2 = (h_stability_enhancement*1./3.)/(cp*rho);")
+    # print(f"real_t Sigma2 = {Sigma2};")
+
+
 def round_and_simplify(stuff):
     simplified_stuff = simplify(stuff)
     rounded_stuff = simplified_stuff
@@ -43,10 +57,53 @@ def round_and_simplify(stuff):
     return rounded_and_simplified_stuff
 
 
-def print_as_vector(some_matrix, print_symbol='default_symbol1', raw_output=False, withbrackets=True):
-    rows = some_matrix._mat
+def get_print_symbols_in_m_notation(moments_order, print_symbol='m_', as_list=False):
+    if type(moments_order) != Matrix:
+        moments_order = Matrix(moments_order)
 
-    for i in range(len(rows)):
+    q = moments_order.shape[0]
+
+    print_symbols = []
+    for i in range(q):
+        direction = moments_order[i, :]
+        direction = [str(d) for d in direction]
+        direction = ''.join(direction)
+        direction = re.sub(r'-1', '2', direction)
+        print_symbols.append(f"{print_symbol}{direction}")
+
+    if as_list:
+        return print_symbols
+    else:
+        return Matrix(print_symbols)
+
+
+def get_print_symbols_in_indx_notation(q=9, print_symbol='default_symbol2', withbrackets=True, as_list=False):
+    # symbols_ = [Symbol("%s[%d]" % (print_symbol, i)) for i in range(0, q)]
+    # return Matrix(symbols_)
+
+    if q == 1:
+        print_symbols = [Symbol("%s" % print_symbol)]
+    elif withbrackets:
+        print_symbols = [Symbol("%s[%d]" % (print_symbol, i)) for i in range(0, q)]
+    else:
+        print_symbols = [Symbol("%s%d" % (print_symbol, i)) for i in range(0, q)]
+
+    if as_list:
+        return print_symbols
+    else:
+        return Matrix(print_symbols)
+
+
+def print_as_vector(some_matrix, outprint_symbol='default_symbol1', raw_output=False, withbrackets=True, output_order_of_moments=None):
+    rows = some_matrix._mat
+    q = len(rows)
+
+    if output_order_of_moments is not None:
+        print_symbols = get_print_symbols_in_m_notation(output_order_of_moments, outprint_symbol, as_list=True)
+    else:
+        print_symbols = get_print_symbols_in_indx_notation(q, outprint_symbol, withbrackets, as_list=True)
+
+    for i in range(q):
         row = rows[i]
 
         if raw_output:
@@ -83,7 +140,8 @@ def print_as_vector(some_matrix, print_symbol='default_symbol1', raw_output=Fals
                                             r"(\w+)\*\*1\.",  # dont power by 1.0
                                             r"1\.\*",  # dont multiply by 1.*
                                             r"(\w+)\*\*2\.0",
-                                            r"(\w+)\*\*2"  # x**2 --> x*x
+                                            r"(\w+)\*\*2",  # x**2 --> x*x
+                                            r"(\w+)\*\*3",  # x**3 --> x*x*x
                                             ]
                 ugly_operations = []
                 for ugly_operations_pattern in ugly_operations_patterns:
@@ -100,12 +158,28 @@ def print_as_vector(some_matrix, print_symbol='default_symbol1', raw_output=Fals
                 for square_pattern in square_patterns:
                     to_be_squared = re.findall(r"(\w+)" + square_pattern, row)
                     if len(to_be_squared) > 1:
-                        raise NotImplementedError('There is to much square patterns '
-                                                  'and I dont know not how to simplify them yet.')
+                        msg = 'There is to much square patterns and I dont know not how to simplify them yet.\n ' \
+                              'Please generate and check the raw, unparsed output!'
+                        # raise NotImplementedError(msg)
+                        print(msg)
+                        row = re.sub(square_pattern, "*" + to_be_squared[0], row)
+
                     elif len(to_be_squared) == 1:
                         row = re.sub(square_pattern, "*" + to_be_squared[0], row)
 
-        if withbrackets:
-            print(f"\t{print_symbol}[{i}] = {row};")
-        else:
-            print(f"\t{print_symbol}{i} = {row};")
+                cube_patterns = [r"\*\*3\.0", r"\*\*3\.", r"\*\*3"]  # order matters
+                for cube_pattern in cube_patterns:
+                    to_be_squared = re.findall(r"(\w+)" + cube_pattern, row)
+                    if len(to_be_squared) > 1:
+                        msg = 'There is to much cubic patterns and I dont know not how to simplify them yet.\n ' \
+                              'Please generate and check the raw, unparsed output!'
+                        # raise NotImplementedError(msg)
+                        print(msg)
+                        row = re.sub(cube_pattern, "*" + to_be_squared[0] + "*" + to_be_squared[0], row)
+
+                    elif len(to_be_squared) == 1:
+                        row = re.sub(cube_pattern, "*" + to_be_squared[0] + "*" + to_be_squared[0], row)
+
+
+        print(f"\t{print_symbols[i]} = {row};")
+        # print(f"stuff = re.sub(r'{print_symbols[i]}', '{row}', stuff)")

@@ -1,15 +1,6 @@
-from DataIO.VTIFile import VTIFile
-import os
-import pandas as pd
-from Benchmarks.ADE.steady_two_layer_cylinder_analytical_2D import InputForMultiLayeredPipe, PipeWithinPipe
-import matplotlib as mpl
 import matplotlib.pyplot as plt
-from matplotlib import cm as colormap
-from matplotlib.ticker import LinearLocator, FormatStrFormatter
 import numpy as np
-from mpl_toolkits.mplot3d import Axes3D
 import os
-import pwd
 from DataIO.VTIFile import VTIFile
 
 
@@ -71,11 +62,32 @@ ax.set_aspect('equal')
 fig.colorbar(cntr, shrink=0.5, aspect=5)
 
 plt.title(f'Laplace benchmark\n ')
-plt.grid(True)
+
+# # Major ticks every 20, minor ticks every 5
+# major_ticks = np.arange(0, nx, nx/5)
+# minor_ticks = np.arange(0, nx, nx/10)
+#
+# ax.set_xticks(major_ticks)
+# ax.set_xticks(minor_ticks, minor=True)
+# # ax.set_yticks(major_ticks)
+# # ax.set_yticks(minor_ticks, minor=True)
+#
+# # And a corresponding grid
+# ax.grid(which='both')
+#
+# # Or if you want different settings for the grids:
+# ax.grid(which='minor', alpha=0.2)
+# ax.grid(which='major', alpha=0.5)
+plt.grid(True)  # or use default grid
+
+
 
 # fake2Dline = mpl.lines.Line2D([0], [0], linestyle="none", c='b', marker='o')
 # ax.legend([fake2Dline], [r'$Err_{T} = T_{anal} - T_{num}$'], numpoints=1)
-fig_name = f'Plot_from_3D_data.png'
+
+if not os.path.exists('plots'):
+    os.makedirs('plots')
+fig_name = f'plots/Plot_from_3D_data.png'
 
 fig.savefig(fig_name, bbox_inches='tight')
 plt.show()

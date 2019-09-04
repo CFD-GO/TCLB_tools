@@ -1,6 +1,7 @@
 from SymbolicCollisions.core.printers import print_as_vector
 from sympy.matrices import Matrix
 from sympy import Symbol
+from SymbolicCollisions.core.DiscreteCMTransforms import DiscreteCMTransforms, get_mom_vector_from_discrete_def
 from SymbolicCollisions.core.ContinuousCMTransforms import ContinuousCMTransforms, get_mom_vector_from_continuous_def
 from SymbolicCollisions.core.cm_symbols import \
     F3D, dzeta3D, u3D, rho
@@ -15,6 +16,18 @@ lattice = 'D3Q27'
 ccmt = ContinuousCMTransforms(dzeta3D, u3D, F3D, rho)
 # ccmt = ContinuousCMTransforms(dzeta2D, u2D, F2D, rho)
 start = time.process_time()
+
+print('\n\n// === discrete m === \n ')
+
+from SymbolicCollisions.core.cm_symbols import e_D3Q7
+print("moments: first order (linear) velocity expansion.")
+
+dcmt = DiscreteCMTransforms(e_D3Q7, u3D, F3D, rho)
+pop_eq = get_mom_vector_from_discrete_def(lambda i: dcmt.get_gamma_first_order_cht(i),
+                                          discrete_transform=dcmt.get_m,
+                                          moments_order=moments_dict['D3Q7'],
+                                          serial_run=True)
+print_as_vector(pop_eq, 'pop_eq_first_order', raw_output=True)
 
 print('\n\n// === continous cm === \n ')
 

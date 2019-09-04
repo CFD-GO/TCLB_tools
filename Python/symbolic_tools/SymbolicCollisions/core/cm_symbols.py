@@ -17,22 +17,56 @@ def dynamic_import(abs_module_path, class_name):
     return target_class
 
 
-# SYMBOLS:
-cs2_thermal = Symbol('RT', positive=True)
+####################################################### SYMBOLS #######################################################
+cs2_thermal = Symbol('RT', positive=True)  # variance of the distribution
+cs2 = 1/3.  # variance of the distribution
+sigma2 = Symbol('Sigma2', positive=True)  # variance of the distribution
 
-ux = Symbol('u.x')
+ux = Symbol('u.x')  # don't set real=True for velocity as it freezes the test suite :/
 uy = Symbol('u.y')
 uz = Symbol('u.z')
+u1D = Matrix([ux])
 u2D = Matrix([ux, uy])
 u3D = Matrix([ux, uy, uz])
 
-dzeta_x = Symbol('dzeta_x')
-dzeta_y = Symbol('dzeta_y')
-dzeta_z = Symbol('dzeta_z')
+ux2 = Symbol('ux2')
+uy2 = Symbol('uy2')
+uz2 = Symbol('uz2')
 
+ux3 = Symbol('ux3')
+uy3 = Symbol('uy3')
+uz3 = Symbol('uy3')
+
+uxuy3 = Symbol('uxuy3')
+
+uxuy = Symbol('uxuy')
+uxuz = Symbol('uxuz')
+uyuz = Symbol('uyuz')
+
+m00 = Symbol('m00', positive=True)
+rho = Symbol('rho', positive=True)
+Temperature = Symbol('T', positive=True)
+Enthalpy = Symbol('H', positive=True)  # consider it as enthalpy
+cp = Symbol('cp', positive=True)
+cht_gamma = Symbol('h_stability_enhancement', positive=True)  # magic stability enhancement
+# (h_stability_enhancement * 1. / 3.) / (cp * rho);
+
+Sigma2 = cs2*cht_gamma/(cp*rho)
+Sigma2asSymbol = Symbol('Sigma2', positive=True)
+
+dzeta_x = Symbol('dzeta_x', real=True)
+dzeta_y = Symbol('dzeta_y', real=True)
+dzeta_z = Symbol('dzeta_z', real=True)
+dzeta1D = Matrix([dzeta_x])
 dzeta2D = Matrix([dzeta_x, dzeta_y])
 dzeta3D = Matrix([dzeta_x, dzeta_y, dzeta_z])
 
+s_x = Symbol('s_x', real=False)
+s_y = Symbol('s_y', real=False)
+s_z = Symbol('s_z', real=False)
+s1D = Matrix([s_x])
+s2D = Matrix([s_x, s_y])
+s3D = Matrix([s_x, s_y, s_z])
 
 Fx = Symbol('Fhydro.x')
 Fy = Symbol('Fhydro.y')
@@ -50,8 +84,11 @@ omega_ade = Symbol('omega_ade')
 omega_v = Symbol('omega_nu')
 omega_b = Symbol('omega_bulk')  # omega_bulk='1.0/(3*bulk_visc+0.5)'
 
+####################################################### END OF SYMBOLS #######################################################
+# D2Q9 notation from TCLB
 ex_D2Q9 = Matrix([0, 1, 0, -1, 0, 1, -1, -1, 1])
 ey_D2Q9 = Matrix([0, 0, 1, 0, -1, 1, 1, -1, -1])
+ez_D2Q9 = Matrix([0, 0, 0, 0, 0, 0, 0, 0, 0])
 e_D2Q9 = ex_D2Q9.col_insert(1, ey_D2Q9)
 
 # D3Q7 notation from TCLB
@@ -59,6 +96,10 @@ ex_D3Q7 = Matrix([0, 1, -1, 0, 0, 0, 0])
 ey_D3Q7 = Matrix([0, 0, 0, 1, -1, 0, 0])
 ez_D3Q7 = Matrix([0, 0, 0, 0, 0, 1, -1])
 
+e_D3Q7 = ex_D3Q7.col_insert(1, ey_D3Q7)
+e_D3Q7 = e_D3Q7.col_insert(2, ez_D3Q7)
+
+S_relax_ADE_D3Q7 = diag(1, omega_ade, omega_ade, omega_ade, 1, 1, 1)
 
 # D3Q15 - notation from 'LBM Principles and Practise' Book p. 89
 # ex_D3Q15 = Matrix([0, 1, -1, 0, 0, 0, 0, 1, -1, 1, -1, 1, -1, -1, 1])
@@ -115,6 +156,8 @@ S_relax_ADE_D3Q19 = diag(1, omega_ade, omega_ade, omega_ade, 1, 1, 1, 1, 1, 1, 1
 ex_D3Q27 = Matrix([0, 1, -1, 0, 0, 0, 0, 1, -1, 1, -1, 1, -1, 1, -1, 1, -1, 1, -1, 1, -1, 1, -1, 0, 0, 0, 0])
 ey_D3Q27 = Matrix([0, 0, 0, 1, -1, 0, 0, 1, 1, -1, -1, 1, 1, -1, -1, 1, 1, -1, -1, 0, 0, 0, 0, 1, -1, 1, -1])
 ez_D3Q27 = Matrix([0, 0, 0, 0, 0, 1, -1, 1, 1, 1, 1, -1, -1, -1, -1, 0, 0, 0, 0, 1, 1, -1, -1, 1, 1, -1, -1])
+e_D3Q27 = ex_D3Q27.col_insert(1, ey_D3Q27)
+e_D3Q27 = e_D3Q27.col_insert(2, ez_D3Q27)
 
 # D3Q27 - notation from "Three-dimensional cascaded lattice
 # % Boltzmann method: improved implementation and consistent forcing scheme" by Linlin Fei
@@ -129,28 +172,12 @@ ez_D3Q27 = Matrix([0, 0, 0, 0, 0, 1, -1, 1, 1, 1, 1, -1, -1, -1, -1, 0, 0, 0, 0,
 #
 # F_phi_coeff = Symbol('F_phi_coeff')  # F_phi_coeff=(1.0 - 4.0*(myPhaseF - pfavg)*(myPhaseF - pfavg))/inteface_width;
 
-m00 = Symbol('m00', positive=True)
-rho = Symbol('rho', positive=True)
-Temperature = Symbol('T', positive=True)
-cp = Symbol('cp', positive=True)
-cht_gamma = Symbol('gamma', positive=True)  # magic stability enhancement
+
 
 w_D2Q9 = Matrix([4. / 9, 1. / 9, 1. / 9, 1. / 9, 1. / 9, 1. / 36, 1. / 36, 1. / 36, 1. / 36])
 
 
-ux2 = Symbol('ux2')
-uy2 = Symbol('uy2')
-uz2 = Symbol('uz2')
 
-ux3 = Symbol('ux3')
-uy3 = Symbol('uy3')
-uz3 = Symbol('uy3')
-
-uxuy3 = Symbol('uxuy3')
-
-uxuy = Symbol('uxuy')
-uxuz = Symbol('uxuz')
-uyuz = Symbol('uyuz')
 
 # this matrix will produce raw moments (m=M*f) in the following order:
 # [m00, m10, m01, m20, m02, m11, m21, m12, m22]
@@ -258,13 +285,13 @@ S_relax_hydro_D2Q9[4, 3] = s_minus_D2Q9
 
 S_relax_ADE_D2Q9 = diag(1, omega_ade, omega_ade, 1, 1, 1, 1, 1, 1)
 
-# Both S_relax_D3Q27 andorder of 3D (central) moments as in
+# Both S_relax_D3Q27 and order of 3D (central) moments as in
 # `Three-dimensional cascaded lattice Boltzmann method:
 # Improved implementation and consistent forcing scheme`
 # by Linlin Fei, Kai H.  Luo,  Qing Li. 2018
 
 # bulk_visc_3D = cs2*(2/3)*(1/sb -0.5)  # this is different than in 2D for some reason...
-#  kin_visc_3D = cs2(1/s_v -0.5)
+#  kin_visc_3D = cs2(1/s_v - 0.5)
 
 s_plus_D3Q27 = (omega_b + 2*omega_v)/3
 s_minus_D3Q27 = (omega_b - omega_v)/3
@@ -276,7 +303,8 @@ S_relax_hydro_D3Q27[8, 9] = s_minus_D3Q27
 S_relax_hydro_D3Q27[9, 7] = s_minus_D3Q27
 S_relax_hydro_D3Q27[9, 8] = s_minus_D3Q27
 
-
+# S_relax_ADE_D3Q27 = diag(1, omega_ade, omega_ade, omega_ade, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+S_relax_ADE_D3Q27 = diag(1, omega_ade, omega_ade, omega_ade, 1, 1, 1, 1, 1, 1, omega_ade, omega_ade, omega_ade, omega_ade, omega_ade, omega_ade, 1, 1, 1, 1, 1, 1, 1, omega_ade, omega_ade, omega_ade, 1)
 
 S_relax_MRT_GS = diag(1, 1, 1, 1, 1, 1, 1, omega_v, omega_v)  #
 # S_relax_MRT_GS = diag(0, 0, 0, 0, 0, 0, 0, sv, sv)   #
@@ -381,4 +409,34 @@ moments_dict = {
               (2, 2, 1),  # skipped in      D3Q19, D3Q7
               (2, 2, 2),  # skipped in      D3Q19, D3Q7
               ],
+
+    # beware that, R in tclb generates different order of moments and lattice vectors (e),
+    # 'D3Q27_r': [(0, 0, 0),
+    #           (1, 0, 0),
+    #           (2, 0, 0),
+    #           (0, 1, 0),
+    #           (1, 1, 0),
+    #           (2, 1, 0),
+    #           (0, 2, 0),
+    #           (1, 2, 0),
+    #           (2, 2, 0),
+    #           (0, 0, 1),
+    #           (1, 0, 1),
+    #           (2, 0, 1),
+    #           (0, 1, 1),
+    #           (1, 1, 1),
+    #           (2, 1, 1),
+    #           (0, 2, 1),
+    #           (1, 2, 1),
+    #           (2, 2, 1),
+    #           (0, 0, 2),
+    #           (1, 0, 2),
+    #           (2, 0, 2),
+    #           (0, 1, 2),
+    #           (1, 1, 2),
+    #           (2, 1, 2),
+    #           (0, 2, 2),
+    #           (1, 2, 2),
+    #           (2, 2, 2),
+    #           ],
 }

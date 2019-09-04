@@ -131,6 +131,18 @@ class TestContinousCMTransforms(unittest.TestCase):
         # this test runs long without output and CI may consider it as a timeout :/
         ccmt = ContinuousCMTransforms(dzeta3D, u3D, F3D, rho)
 
+        from SymbolicCollisions.core.cm_symbols import Sigma2asSymbol
+        ccmt_cht = ContinuousCMTransforms(dzeta3D, u3D, F3D, rho, cs2=Sigma2asSymbol)
+
+        ccmts = [
+            ccmt,
+            ccmt,
+            ccmt,
+            ccmt,
+            ccmt,
+            ccmt_cht,
+        ]
+
         lattices = [
             'D2Q9',
             'D3Q19',
@@ -146,7 +158,7 @@ class TestContinousCMTransforms(unittest.TestCase):
             ccmt.get_force_Guo,
             ccmt.get_force_He_MB,
             ccmt.get_force_He_MB,
-            ccmt.get_cht_DF,
+            ccmt_cht.get_cht_DF,
         ]
 
         expected_results = [
@@ -158,9 +170,9 @@ class TestContinousCMTransforms(unittest.TestCase):
             hardcoded_cm_eq_cht_D2Q9,
         ]
 
-        for fun, lattice, expected_result in zip(functions, lattices, expected_results):
+        for fun, lattice, _ccmt, expected_result in zip(functions, lattices, ccmts, expected_results):
             cm_eq = get_mom_vector_from_continuous_def(fun,
-                                                       continuous_transformation=ccmt.get_cm,
+                                                       continuous_transformation=_ccmt.get_cm,
                                                        moments_order=moments_dict[lattice],
                                                        serial_run=True
                                                        )
@@ -180,6 +192,7 @@ class TestContinousCMTransforms(unittest.TestCase):
             ccode_expected_result = f2.getvalue()
 
             assert ccode_expected_result == out
+
 
 # Pycharm runs them sequentially
 # python -m unittest tests/test_example_unit_tests_parallel_run.py # sequential as well

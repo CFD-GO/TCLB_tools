@@ -62,7 +62,7 @@ jobs:
       # https://pytest.org
       - run:
           name: run tests
-          no_output_timeout: 45m
+          no_output_timeout: 120m
           # working_directory: ${PYTHON_TOOLS_DIR}
           command: |
             pwd

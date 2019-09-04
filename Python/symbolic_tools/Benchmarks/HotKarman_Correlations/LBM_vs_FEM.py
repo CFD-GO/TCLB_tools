@@ -28,7 +28,7 @@ filepath_pvti = os.path.join(main_folder, f'keepU_sizer_{sizer}_Re{Re}_Pr{Pr}', 
 vti_reader = VTIFile(filepath_pvti, parallel=True)
 
 T_num = vti_reader.get("T")
-[ux_num, uy_num, uz_num] = vti_reader.get("U", vector=True)
+[ux_num, uy_num, uz_num] = vti_reader.get("U", is_vector=True)
 ny, nx, nz = T_num.shape
 
 ux_num_slice = ux_num[:, :, 1]

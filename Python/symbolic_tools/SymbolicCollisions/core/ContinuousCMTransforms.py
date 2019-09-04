@@ -6,23 +6,25 @@ from joblib import Parallel, delayed
 import multiprocessing
 from sympy import Symbol
 import warnings
-
+from sympy import Derivative, ln, simplify
 from sympy.matrices import Matrix
 from SymbolicCollisions.core.printers import round_and_simplify
-from SymbolicCollisions.core.cm_symbols import m00
+from SymbolicCollisions.core.cm_symbols import m00, s3D
 # from SymbolicCollisions.core.cm_symbols import rho
 from SymbolicCollisions.core.cm_symbols import Temperature, cht_gamma as cht_stability_enhancement
 from SymbolicCollisions.core.cm_symbols import cp as specific_heat_capacity
+from SymbolicCollisions.core.cm_symbols import Enthalpy, Sigma2asSymbol
 
 class ContinuousCMTransforms:
     def __init__(self, dzeta, u, F, rho, cs2=1. / 3.,
-                 T=Temperature, cp=specific_heat_capacity, cht_gamma=cht_stability_enhancement):
+                 T=Temperature, cp=specific_heat_capacity, cht_gamma=cht_stability_enhancement, enthalpy=Enthalpy):
         """
         :param dzeta: direction (x,y,z)
         :param u: velocity (x,y,z)
         :param u: Force (x,y,z)
         :param rho: density (not necessarily m00, for instance in multiphase flows)
-        :param cs2: (speed of sound)^2, for isothermal LB cs2=1./3;
+        :param cs2: variance of the distribution = (speed of sound)^2,
+                    for isothermal LB cs2=1./3;
                     otherwise  cs2 = Symbol('RT', positive=True)  # positive, negative, real, nonpositive, integer, prime and commutative.
 
         """
@@ -34,48 +36,7 @@ class ContinuousCMTransforms:
         self.T = T
         self.cp = cp
         self.gamma = cht_gamma
-
-    def get_Maxwellian_DF_old(self, psi=m00, _u=None):
-        """
-        :param _u: velocity (x,y,z)
-        :param psi: quantity of interest aka scaling function like density
-        :return: continuous, local Maxwell-Boltzmann distribution
-        'Incorporating forcing terms in cascaded lattice Boltzmann approach by method of central moments'
-        Kannan N. Premnath, Sanjoy Banerjee, 2009
-        eq 22
-        """
-        u = None
-        if _u:
-            u = _u
-        else:
-            u = self.u
-
-        PI = sp.pi
-        dzeta_minus_u = self.dzeta - u
-        dzeta_u2 = dzeta_minus_u.dot(dzeta_minus_u)
-
-        # thank you sympy...
-        # hacks:
-        # for 2D
-        # df = psi / pow(2 * PI * self.cs2, 2/2)
-        # LOL: 2/2 gives not simplified result for m22 on d2q9:
-        # 1.0 * m00 * (RT * u.y ** 2 - RT ** 1.0 * u.y ** 2 + RT ** 2.0);
-        # while 1 does ;p
-        # RT ** 2 * m00;
-
-        dim = len(self.dzeta)  # number od dimensions
-        # df = psi / pow(2 * PI * self.cs2, dim / 2)  # this is to difficult for sympy :/
-
-        if dim == 2:
-            df = psi / (2 * PI * self.cs2)  # 2D version hack
-        else:
-            df = psi / pow(2 * PI * self.cs2, dim / 2)  # this may be to difficult for sympy :/
-            if self.cs2 != 1. / 3.:
-                warnings.warn("Sympy may have problem with 3D non isothermal version (cs2=RT) \n "
-                              "It also can't simplify it, thus check the raw output", UserWarning)
-
-        df *= exp(-dzeta_u2 / (2 * self.cs2))
-        return df
+        self.enthalpy = enthalpy
 
     def get_internal_energy_Maxwellian_DF(self):
         df = self.get_Maxwellian_DF(psi=m00, u=self.u, sigma2=self.cs2)
@@ -95,7 +56,7 @@ class ContinuousCMTransforms:
 
     def get_Maxwellian_DF(self, psi=m00, u=None, sigma2=None):
         """
-        :param u: velocity (x,y,z)
+        :param u: velocity (x,y,z) i.e., mean of the distribution
         :param sigma2: variance of the distribution
         :param psi: quantity of interest aka scaling function like density
         :return: continuous, local Maxwell-Boltzmann distribution
@@ -129,19 +90,63 @@ class ContinuousCMTransforms:
 
         if dim == 2:
             df = psi / (2 * PI * sigma2)  # 2D version hack
-        else:
+        elif dim == 3:
             df = psi / pow(2 * PI * sigma2, dim / 2)  # this may be to difficult for sympy :/
             # if self.cs2 != 1. / 3.:
             #     warnings.warn("Sympy may have problem with 3D non isothermal version (cs2=RT) \n "
             #                   "It also can't simplify it, thus check the raw output", UserWarning)
+        # else:
+        #     raise Exception(f"Wrong dimension: {dim}")
 
         df *= exp(-dzeta_u2 / (2 * sigma2))
         return df
 
+    def calc_laplace_transform_of_edf(self, DF, s=s3D):
+        # DF = self.get_Maxwellian_DF(psi=m00, u=self.u, sigma2=self.cs2)
+        lim = [(dim, -oo, oo) for dim in self.dzeta]
+        # lim = [(dim, 0, oo) for dim in _dzeta]  # TODO: sympy's transform is from 0 to inf
+        # lim = [(dzeta_x, -oo, oo), (dzeta_y, -oo, oo), (dzeta_z, -oo, oo)]  # oj, sympy w 3D tym razem nie scalkuje ;p
+
+        DF *= sp.exp(-s.dot(self.dzeta))
+        result = integrate(DF, *lim)
+        result = round_and_simplify(result)
+        return result
+
+    def calc_cumulant(self, _fun, direction, order):
+        cgf = ln(_fun)
+        deriv = Derivative(cgf, (direction, order))
+        all_terms = deriv.doit()
+        all_terms = simplify(all_terms)
+        return all_terms
+
+    def get_cumulants(self, mno, DF, *args, **kwargs):
+        # TODO: this shall be refactored, since we don't need to recalculate laplace transform each time
+        fun = DF(*args, **kwargs)
+        l_fun = self.calc_laplace_transform_of_edf(fun, s=s3D)
+        cgf = ln(l_fun)
+
+        d = cgf
+        for s_i, mno_i in zip(s3D, mno):
+            d = Derivative(d, (s_i, mno_i), evaluate=True)
+        d_at_0 = simplify(d)
+
+        for s_i in s3D:
+            d_at_0 = d_at_0.subs(s_i, 0)
+
+        import re
+        s_mno = re.sub(r',', '', str(mno))
+        s_mno = re.sub(r' ', '', s_mno)
+        s_mno = re.sub(r'\(', '', s_mno)
+        s_mno = re.sub(r'\)', '', s_mno)
+
+        print(f"c{s_mno} =  {d_at_0}")  # cumulant is at s = 0
+
     def get_cht_DF(self):
-        H = self.T * self.cp * self.rho
-        Sigma2 = self.gamma * self.cs2 / (self.cp * self.rho)
-        df_H = self.get_Maxwellian_DF(psi=H, u=self.u, sigma2=Sigma2)
+        # from SymbolicCollisions.core.cm_symbols import Enthalpy as H
+        # from SymbolicCollisions.core.cm_symbols import Sigma2asSymbol
+        # H = self.T * self.cp * self.rho
+        # Sigma2 = self.gamma * self.cs2 / (self.cp * self.rho)
+        df_H = self.get_Maxwellian_DF(psi=self.enthalpy, u=self.u, sigma2=self.cs2)
         return df_H
 
     def get_force_He_hydro_DF(self):
@@ -177,6 +182,7 @@ class ContinuousCMTransforms:
         """
         eu_dot_f = (self.dzeta - self.u).dot(self.F)
         Sigma2 = self.gamma * self.cs2 / (self.cp * self.rho)
+        # Sigma2 = Symbol('Sigma', positive=True)
         H = self.T * self.cp * self.rho
         result = -2*self.get_Maxwellian_DF(psi=H, u=self.u, sigma2=Sigma2) * eu_dot_f / self.cs2
         return result
