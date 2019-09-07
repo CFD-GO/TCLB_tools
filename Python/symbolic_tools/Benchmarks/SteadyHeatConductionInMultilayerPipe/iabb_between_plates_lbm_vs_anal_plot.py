@@ -5,14 +5,13 @@ from DataIO.helpers import calc_L2, calc_mse
 import pwd
 from Benchmarks.PoiseuilleFlow.pipe_poiseuille_plots import cntr_plot, slice_plot
 from Benchmarks.SteadyHeatConductionInMultilayerPipe.contour_and_slice_plot import cntr_plot
-from Benchmarks.SteadyHeatConductionInMultilayerPipe.steady_two_layer_cylinder_analytical_2D import PipeWithinPipeDirichlet
+from Benchmarks.SteadyHeatConductionInMultilayerPipe.steady_two_layer_cylinder_analytical_2D import HeatConductionBetweenTwoPlates
 from DataIO.VTIFile import VTIFile
 import os
 import pwd
 import numpy as np
 
-eff_pipe_diam = 120
-eff_cyl_diam = 60
+Heff=60.5
 conductivity = 0.1
 kin_visc = 0.1
 
@@ -43,14 +42,7 @@ ny, nx = T_num_slice.shape
 
 # -------- anal solution ---------------
 
-x0 = 64.  # center of the cylinder/pipe
-y0 = 64.  # center of the cylinder/pipe
-
-r0 = eff_cyl_diam/2.  # inner radius
-r2 = eff_pipe_diam/2.  # outer radius
-r1 = (r0 + r2)/2.  # interface between layers
-
-pwp = PipeWithinPipeDirichlet(r0, r1, r2, conductivity, conductivity, T0=11, T2=10)
+hcbp = HeatConductionBetweenTwoPlates(T0=11, T2=10, Heff=Heff)
 
 x_grid = np.linspace(0, nx, nx, endpoint=False) + 0.5
 y_grid = np.linspace(0, ny, ny, endpoint=False) + 0.5
@@ -59,14 +51,12 @@ xx, yy = np.meshgrid(x_grid, y_grid)
 T_anal = np.zeros((ny, nx))
 r_anal = np.zeros((ny, nx))
 
-cuttoff_r2 = eff_pipe_diam / 2. - 1
-cuttoff_r0 = eff_cyl_diam / 2. + 1
+cuttoff_y2 = Heff - 1
+cuttoff_y0 = 0 + 1
 for i in range(ny):
     for j in range(nx):
-        r = get_r_from_xy(xx[i][j], yy[i][j], x0, y0)
-        r_anal[i, j] = r
-        T_anal[i, j] = pwp.get_temperature_r(r)
-        if r < cuttoff_r0 or r > cuttoff_r2:
+        T_anal[i, j] = hcbp.get_T_profile(i)
+        if i < cuttoff_y0 or i > cuttoff_y2:
             T_anal[i, j] = np.nan
 
 
@@ -81,7 +71,7 @@ T_L2 = calc_L2(T_anal_masked, T_num_slice_masked)
 # print(f"T_mse={T_mse[g]:.2e} for grid {xSIZE} x {xSIZE} [lu]")
 # print(f"T_L2={T_L2[g]:.2e} for grid {xSIZE} x {xSIZE} [lu]")
 
-cntr_plot(T_anal, T_num_slice, xx, yy, conductivity, eff_pipe_diam)
+cntr_plot(T_anal, T_num_slice, xx, yy, conductivity, Heff)
 # # 2D clip
 # r_anal = r_anal[:, 63]
 # u_anal = u_anal[:, 63]
