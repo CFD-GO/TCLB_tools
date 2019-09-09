@@ -7,6 +7,7 @@ def get_r_from_xy(x, y, x0=0, y0=0):
     r = np.sqrt(pow(x0 - x, 2) + pow(y0 - y, 2))
     return r
 
+
 def eat_dots_for_texmaker(value):
     s_value = str(value)
     s_value = re.sub(r"\.", 'o', s_value)

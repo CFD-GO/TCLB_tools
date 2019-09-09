@@ -24,8 +24,6 @@ class VTIFile:
         self.data = self.reader.GetOutput()
         self.dim = self.data.GetDimensions()
 
-        # self.s_vec = [self.dim[1] - 1, self.dim[0] - 1, 3]
-
         self.trim_0 = [0, 0, 0]
         self.trim_1 = [x - 1 for x in self.dim]
 

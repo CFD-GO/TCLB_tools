@@ -15,9 +15,6 @@ from sympy import Symbol
 import numpy as np
 import pandas as pd
 
-
-
-
 def print_u2(d=3):
     print(f"\treal_t {uxuy} = {ux}*{uy};")
     print(f"\treal_t {ux2} = {ux}*{ux};")

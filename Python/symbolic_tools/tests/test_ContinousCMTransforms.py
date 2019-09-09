@@ -15,9 +15,9 @@ sys.path.append(os.path.join('.'))  # allow CI bot to see the stuff from the mai
 
 from SymbolicCollisions.core.printers import print_as_vector
 
-from SymbolicCollisions.core.hardcoded_results import hardcoded_F_cm_hydro_density_based_D3Q19, \
-    hardcoded_F_cm_Guo_hydro_LB_incompressible_D2Q9, \
-    hardcoded_F_cm_hydro_density_based_D2Q9, \
+from SymbolicCollisions.core.hardcoded_results import hardcoded_F_cm_hydro_compressible_D3Q19, \
+    hardcoded_F_cm_Guo_hydro_incompressible_D2Q9, \
+    hardcoded_F_cm_hydro_compressible_D2Q9, \
     hardcoded_cm_eq_compressible_D2Q9,    hardcoded_cm_eq_compressible_D3Q19, \
     hardcoded_cm_eq_incompressible_D2Q9, \
     hardcoded_cm_eq_compressible_D2Q9_thermal, \
@@ -92,14 +92,14 @@ class TestContinousCMTransforms(unittest.TestCase):
 
         expected_result = \
             '\tF_cm[0] = 0;\n' \
-            '\tF_cm[1] = Fhydro.x*m00/rho;\n' \
-            '\tF_cm[2] = Fhydro.y*m00/rho;\n' \
-            '\tF_cm[3] = -2.*Fhydro.x*u.x*(m00 - 1.)/rho;\n' \
-            '\tF_cm[4] = -2.*Fhydro.y*u.y*(m00 - 1.)/rho;\n' \
-            '\tF_cm[5] = (-Fhydro.x*m00*u.y + Fhydro.x*u.y - Fhydro.y*m00*u.x + Fhydro.y*u.x)/rho;\n' \
-            '\tF_cm[6] = (2.*Fhydro.x*m00*uxuy - 2.*Fhydro.x*uxuy + Fhydro.y*m00*ux2 + 1/3.*Fhydro.y*m00 - Fhydro.y*ux2)/rho;\n' \
-            '\tF_cm[7] = (Fhydro.x*m00*uy2 + 1/3.*Fhydro.x*m00 - Fhydro.x*uy2 + 2.*Fhydro.y*m00*uxuy - 2.*Fhydro.y*uxuy)/rho;\n' \
-            '\tF_cm[8] = (-2.*Fhydro.x*m00*u.x*uy2 - 2/3.*Fhydro.x*m00*u.x + 2.*Fhydro.x*u.x*uy2 + 2/3.*Fhydro.x*u.x - 2.*Fhydro.y*m00*ux2*u.y - 2/3.*Fhydro.y*m00*u.y + 2.*Fhydro.y*ux2*u.y + 2/3.*Fhydro.y*u.y)/rho;\n'
+            '\tF_cm[1] = F.x*m00/rho;\n' \
+            '\tF_cm[2] = F.y*m00/rho;\n' \
+            '\tF_cm[3] = -2.*F.x*u.x*(m00 - 1.)/rho;\n' \
+            '\tF_cm[4] = -2.*F.y*u.y*(m00 - 1.)/rho;\n' \
+            '\tF_cm[5] = (-F.x*m00*u.y + F.x*u.y - F.y*m00*u.x + F.y*u.x)/rho;\n' \
+            '\tF_cm[6] = (2.*F.x*m00*uxuy - 2.*F.x*uxuy + F.y*m00*ux2 + 1/3.*F.y*m00 - F.y*ux2)/rho;\n' \
+            '\tF_cm[7] = (F.x*m00*uy2 + 1/3.*F.x*m00 - F.x*uy2 + 2.*F.y*m00*uxuy - 2.*F.y*uxuy)/rho;\n' \
+            '\tF_cm[8] = (-2.*F.x*m00*u.x*uy2 - 2/3.*F.x*m00*u.x + 2.*F.x*u.x*uy2 + 2/3.*F.x*u.x - 2.*F.y*m00*ux2*u.y - 2/3.*F.y*m00*u.y + 2.*F.y*ux2*u.y + 2/3.*F.y*u.y)/rho;\n'
 
         assert expected_result == out
 
@@ -164,9 +164,9 @@ class TestContinousCMTransforms(unittest.TestCase):
         expected_results = [
             hardcoded_cm_eq_compressible_D2Q9,
             hardcoded_cm_eq_compressible_D3Q19,
-            hardcoded_F_cm_Guo_hydro_LB_incompressible_D2Q9,
-            hardcoded_F_cm_hydro_density_based_D2Q9,
-            hardcoded_F_cm_hydro_density_based_D3Q19,
+            hardcoded_F_cm_Guo_hydro_incompressible_D2Q9,
+            hardcoded_F_cm_hydro_compressible_D2Q9,
+            hardcoded_F_cm_hydro_compressible_D3Q19,
             hardcoded_cm_eq_cht_D2Q9,
         ]
 
