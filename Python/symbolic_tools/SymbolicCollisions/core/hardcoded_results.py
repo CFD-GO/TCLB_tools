@@ -10,7 +10,7 @@ from SymbolicCollisions.core.cm_symbols import Enthalpy as H
 from SymbolicCollisions.core.cm_symbols import cht_gamma, Sigma2asSymbol
 
 # save time and hardcode some of the results
-hardcoded_F_cm_hydro_density_based_D2Q9 = Matrix([
+hardcoded_F_cm_hydro_compressible_D2Q9 = Matrix([
     0,
     Fx * m00 / rho,
     Fy * m00 / rho,
@@ -22,7 +22,7 @@ hardcoded_F_cm_hydro_density_based_D2Q9 = Matrix([
     0,
 ])
 
-hardcoded_F_cm_hydro_density_based_D3Q19 = Matrix([
+hardcoded_F_cm_hydro_compressible_D3Q19 = Matrix([
     0,
     Fx*m00/rho,
     Fy*m00/rho,
@@ -115,7 +115,7 @@ hardcoded_F_cm_pf_D3Q27 = Matrix([
     0,
 ])
 
-hardcoded_F_cm_He_hydro_LB_incompressible_D2Q9 = Matrix([
+hardcoded_F_cm_hydro_incompressible_D2Q9 = Matrix([
     0,
     Fx / rho,
     Fy / rho,
@@ -128,7 +128,7 @@ hardcoded_F_cm_He_hydro_LB_incompressible_D2Q9 = Matrix([
 ])
 
 # D3Q27 - notation for hydrodynamics as in TCLB's d3q27_pf_velocity model
-hardcoded_F_cm_He_hydro_LB_incompressible_D3Q27 = Matrix([
+hardcoded_F_cm_hydro_incompressible_D3Q27 = Matrix([
     0,
     Fx / rho,
     Fy / rho,
@@ -158,7 +158,7 @@ hardcoded_F_cm_He_hydro_LB_incompressible_D3Q27 = Matrix([
     0,
 ])
 
-hardcoded_F_cm_Guo_hydro_LB_incompressible_D2Q9 = Matrix([
+hardcoded_F_cm_Guo_hydro_incompressible_D2Q9 = Matrix([
     0,
     Fx / rho,
     Fy / rho,

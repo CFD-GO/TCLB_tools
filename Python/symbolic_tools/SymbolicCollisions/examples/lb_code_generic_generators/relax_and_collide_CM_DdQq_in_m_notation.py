@@ -1,11 +1,10 @@
 from sympy.matrices import eye
-from sympy.printing import print_ccode
+
 from SymbolicCollisions.core.cm_symbols import omega_ade, omega_b, omega_v, m00
 from SymbolicCollisions.core.cm_symbols import Force_str as F_str
 from SymbolicCollisions.core.cm_symbols import dynamic_import, moments_dict
 from SymbolicCollisions.core.DiscreteCMTransforms import get_m00
-from SymbolicCollisions.core.printers import print_as_vector, get_print_symbols_in_indx_notation, \
-    get_print_symbols_in_m_notation
+from SymbolicCollisions.core.printers import print_as_vector, get_print_symbols_in_m_notation
 from SymbolicCollisions.core.printers import print_u2, print_sigma_cht
 from SymbolicCollisions.core.MatrixGenerator import get_m_order_as_in_r, get_e_as_in_r, MatrixGenerator
 from sympy.matrices import Matrix
@@ -44,7 +43,6 @@ def get_s_relax_switcher(choice):
 
 
 S_Relax = get_s_relax_switcher(model)
-
 
 def get_cm_eq_and_F_cm_switcher(choice):
     cm_eq_switcher = {
@@ -120,32 +118,6 @@ if 'cht' in model:
 
 print_u2(d)
 
-
-def make_variables(choice):
-    model_switcher = {
-        'hydro_compressible': f"\n\treal_t {temp_pop_str}[{q}];\n",
-        'hydro_incompressible': f"\n\treal_t {temp_pop_str}[{q}];\n",
-        'ade_with_f': f"\n\treal_t {temp_pop_str}[{q}];\n",
-        'ade': f"\n\treal_t {temp_pop_str}[{q}];\n",
-        'cht': f"\n\treal_t {temp_pop_str}[{q}];\n",
-    }
-    # Get the function from switcher dictionary
-    result = model_switcher.get(choice, lambda: "Invalid argument")
-    print(result)
-
-
-# make_variables(model)
-
-# populations = get_print_symbols_in_indx_notation(q, pop_in_str)
-# temp_populations = get_print_symbols_in_indx_notation(q, temp_pop_str)
-# cm_eq = get_print_symbols_in_indx_notation(q, cm_eq_pop_str)
-# F_cm = get_print_symbols_in_indx_notation(q, F_str)
-
-# print_ccode(get_m00(q, pop_in_str), assign_to=f'\treal_t {m00}')
-# print(f"\tfor (int i = 0; i < {q}; i++) {{\n\t"
-#       f"\t{temp_pop_str}[i] = {pop_in_str}[i];}}")
-
-# rpopulations = get_print_symbols_in_m_notation(rmoments_order, pop_in_str)
 rtemp_populations = get_print_symbols_in_m_notation(rmoments_order, temp_pop_str)
 
 populations = get_print_symbols_in_m_notation(moments_order, pop_in_str)
@@ -165,14 +137,7 @@ print("\n\t//central moments from raw moments")
 print_as_vector(Nraw * populations, outprint_symbol=temp_pop_str, output_order_of_moments=moments_order)
 
 print("\n\t//collision in central moments space")
-# print("//calculate equilibrium distributions in cm space")
-# print("real_t {cm_eq_pop_str}[{q}];\n")
-# print_as_vector(hardcoded_cm_eq, cm_eq_pop_str)  # save time, verbosity
-# print("//calculate forces in cm space")
-# print("real_t {F_cm_str}[{q}];")
-# print_as_vector(hardcoded_F_cm, F_cm_str)  # save time, verbosity
 print("\t//collide")
-
 
 def make_collision(choice):
     model_switcher = {
