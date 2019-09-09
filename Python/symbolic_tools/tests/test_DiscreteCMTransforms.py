@@ -27,7 +27,7 @@ from SymbolicCollisions.core.cm_symbols import \
 from SymbolicCollisions.core.printers import print_as_vector
 
 from SymbolicCollisions.core.hardcoded_results import \
-    hardcoded_F_cm_Guo_hydro_LB_incompressible_D2Q9, hardcoded_cm_eq_compressible_D2Q9
+    hardcoded_F_cm_Guo_hydro_incompressible_D2Q9, hardcoded_cm_eq_compressible_D2Q9
 
 
 class TestDiscreteCMTransforms(unittest.TestCase):
@@ -80,7 +80,7 @@ class TestDiscreteCMTransforms(unittest.TestCase):
 
         f = io.StringIO()
         with redirect_stdout(f):
-            print_as_vector(hardcoded_F_cm_Guo_hydro_LB_incompressible_D2Q9, 'F_cm')
+            print_as_vector(hardcoded_F_cm_Guo_hydro_incompressible_D2Q9, 'F_cm')
         expected_result = f.getvalue()
 
         for result in results:
@@ -103,24 +103,24 @@ class TestDiscreteCMTransforms(unittest.TestCase):
         out = f.getvalue()
 
         expected_result = '\tF_in_cm[0] = 0;\n' \
-                          '\tF_in_cm[1] = Fhydro.x*m00/rho;\n' \
-                          '\tF_in_cm[2] = Fhydro.y*m00/rho;\n' \
-                          '\tF_in_cm[3] = -3.*m00*ux2*(Fhydro.x*u.x + Fhydro.y*u.y)/rho;\n' \
-                          '\tF_in_cm[4] = -3.*m00*uy2*(Fhydro.x*u.x + Fhydro.y*u.y)/rho;\n' \
-                          '\tF_in_cm[5] = -3.*m00*uxuy*(Fhydro.x*u.x + Fhydro.y*u.y)/rho;\n' \
-                          '\tF_in_cm[6] = m00*(9.*Fhydro.x*ux3*u.y + 9.*Fhydro.y*ux2*uy2 + 1/3.*Fhydro.y)/rho;\n' \
-                          '\tF_in_cm[7] = m00*(9.*Fhydro.x*ux2*uy2 + 1/3.*Fhydro.x + 9.*Fhydro.y*u.x*uy3)/rho;\n' \
-                          '\tF_in_cm[8] = -m00*(18.*Fhydro.x*ux3*uy2 + Fhydro.x*ux3 + 3.*Fhydro.x*u.x*uy2 + 18.*Fhydro.y*ux2*uy3 + 3.*Fhydro.y*ux2*u.y + Fhydro.y*uy3)/rho;\n'  # noqa
+                          '\tF_in_cm[1] = F.x*m00/rho;\n' \
+                          '\tF_in_cm[2] = F.y*m00/rho;\n' \
+                          '\tF_in_cm[3] = -3.*m00*ux2*(F.x*u.x + F.y*u.y)/rho;\n' \
+                          '\tF_in_cm[4] = -3.*m00*uy2*(F.x*u.x + F.y*u.y)/rho;\n' \
+                          '\tF_in_cm[5] = -3.*m00*uxuy*(F.x*u.x + F.y*u.y)/rho;\n' \
+                          '\tF_in_cm[6] = m00*(9.*F.x*ux3*u.y + 9.*F.y*ux2*uy2 + 1/3.*F.y)/rho;\n' \
+                          '\tF_in_cm[7] = m00*(9.*F.x*ux2*uy2 + 1/3.*F.x + 9.*F.y*u.x*uy3)/rho;\n' \
+                          '\tF_in_cm[8] = -m00*(18.*F.x*ux3*uy2 + F.x*ux3 + 3.*F.x*u.x*uy2 + 18.*F.y*ux2*uy3 + 3.*F.y*ux2*u.y + F.y*uy3)/rho;\n'  # noqa
 
         assert 'F_in_cm[0] = 0;' in out
-        assert 'F_in_cm[1] = Fhydro.x*m00/rho;' in out
-        assert 'F_in_cm[2] = Fhydro.y*m00/rho;' in out
-        assert 'F_in_cm[3] = -3.*m00*ux2*(Fhydro.x*u.x + Fhydro.y*u.y)/rho;\n' in out
-        assert 'F_in_cm[4] = -3.*m00*uy2*(Fhydro.x*u.x + Fhydro.y*u.y)/rho;\n' in out
-        assert 'F_in_cm[5] = -3.*m00*uxuy*(Fhydro.x*u.x + Fhydro.y*u.y)/rho;\n' in out
-        assert 'F_in_cm[6] = m00*(9.*Fhydro.x*ux3*u.y + 9.*Fhydro.y*ux2*uy2 + 1/3.*Fhydro.y)/rho;\n' in out
-        assert 'F_in_cm[7] = m00*(9.*Fhydro.x*ux2*uy2 + 1/3.*Fhydro.x + 9.*Fhydro.y*u.x*uy3)/rho;\n' in out
-        assert 'F_in_cm[8] = -m00*(18.*Fhydro.x*ux3*uy2 + Fhydro.x*ux3 + 3.*Fhydro.x*u.x*uy2 + 18.*Fhydro.y*ux2*uy3 + 3.*Fhydro.y*ux2*u.y + Fhydro.y*uy3)/rho;\n' in out  # noqa
+        assert 'F_in_cm[1] = F.x*m00/rho;' in out
+        assert 'F_in_cm[2] = F.y*m00/rho;' in out
+        assert 'F_in_cm[3] = -3.*m00*ux2*(F.x*u.x + F.y*u.y)/rho;\n' in out
+        assert 'F_in_cm[4] = -3.*m00*uy2*(F.x*u.x + F.y*u.y)/rho;\n' in out
+        assert 'F_in_cm[5] = -3.*m00*uxuy*(F.x*u.x + F.y*u.y)/rho;\n' in out
+        assert 'F_in_cm[6] = m00*(9.*F.x*ux3*u.y + 9.*F.y*ux2*uy2 + 1/3.*F.y)/rho;\n' in out
+        assert 'F_in_cm[7] = m00*(9.*F.x*ux2*uy2 + 1/3.*F.x + 9.*F.y*u.x*uy3)/rho;\n' in out
+        assert 'F_in_cm[8] = -m00*(18.*F.x*ux3*uy2 + F.x*ux3 + 3.*F.x*u.x*uy2 + 18.*F.y*ux2*uy3 + 3.*F.y*ux2*u.y + F.y*uy3)/rho;\n' in out  # noqa
 
         assert expected_result == out
 

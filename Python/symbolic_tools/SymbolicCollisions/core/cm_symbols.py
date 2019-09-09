@@ -68,14 +68,14 @@ s1D = Matrix([s_x])
 s2D = Matrix([s_x, s_y])
 s3D = Matrix([s_x, s_y, s_z])
 
-Fx = Symbol('Fhydro.x')
-Fy = Symbol('Fhydro.y')
-Fz = Symbol('Fhydro.z')
+Force_str = "F"
+Fx = Symbol(Force_str + '.x')
+Fy = Symbol(Force_str + '.y')
+Fz = Symbol(Force_str + '.z')
 
 F2D = Matrix([Fx, Fy])
 F3D = Matrix([Fx, Fy, Fz])
 
-Force_str = "F"
 F_phi_x = Symbol(Force_str + '.x')
 F_phi_y = Symbol(Force_str + '.y')
 F_phi_z = Symbol(Force_str + '.z')

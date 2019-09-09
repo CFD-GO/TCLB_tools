@@ -1,11 +1,10 @@
 from sympy.matrices import eye
 from sympy.printing import print_ccode
-from SymbolicCollisions.core.cm_symbols import omega_ade, omega_b, omega_v, m00
+from SymbolicCollisions.core.cm_symbols import omega_ade, omega_b, omega_v, m00, moments_dict
 from SymbolicCollisions.core.cm_symbols import Force_str as F_str
 from SymbolicCollisions.core.cm_symbols import dynamic_import
 from SymbolicCollisions.core.DiscreteCMTransforms import get_m00
-from SymbolicCollisions.core.printers import print_as_vector, get_print_symbols_in_indx_notation, get_print_symbols_in_m_notation
-from SymbolicCollisions.core.printers import print_u2, print_sigma_cht
+from SymbolicCollisions.core.printers import print_u2, print_as_vector, get_print_symbols_in_indx_notation
 from SymbolicCollisions.core.MatrixGenerator import MatrixGenerator
 from sympy.matrices import Matrix
 import numpy as np
@@ -17,11 +16,7 @@ import numpy as np
 # SETUP
 d = 3
 q = 27
-
-from SymbolicCollisions.core.cm_symbols import moments_dict
-mmd = Matrix(moments_dict[f'D{d}Q{q}'])
-
-model = 'cht'  # choose from '['hydro_compressible', 'hydro_incompressible', 'ade', 'ade_with_f', 'cht']
+model = 'ade'  # choose from '['hydro_compressible', 'hydro_incompressible', 'ade', 'ade_with_f']
 
 # DYNAMIC IMPORTS
 ex = dynamic_import("SymbolicCollisions.core.cm_symbols", f"ex_D{d}Q{q}")
@@ -32,14 +27,12 @@ else:
     ez = None
 
 
-
 def get_s_relax_switcher(choice):
     s_relax_switcher = {
         'hydro_compressible':   ("SymbolicCollisions.core.cm_symbols", f"S_relax_hydro_D{d}Q{q}"),
         'hydro_incompressible': ("SymbolicCollisions.core.cm_symbols", f"S_relax_hydro_D{d}Q{q}"),
         'ade_with_f': ("SymbolicCollisions.core.cm_symbols", f"S_relax_ADE_D{d}Q{q}"),
         'ade': ("SymbolicCollisions.core.cm_symbols", f"S_relax_ADE_D{d}Q{q}"),
-        'cht': ("SymbolicCollisions.core.cm_symbols", f"S_relax_ADE_D{d}Q{q}"),
     }
     which_model = s_relax_switcher.get(choice, lambda: "Invalid argument")
     return dynamic_import(*which_model)
@@ -48,35 +41,39 @@ def get_s_relax_switcher(choice):
 S_Relax = get_s_relax_switcher(model)
 
 
-def get_cm_eq_and_F_cm_switcher(choice):
+def get_m_eq_and_F_m_switcher(choice):
     cm_eq_switcher = {
         'hydro_compressible': ("SymbolicCollisions.core.hardcoded_results", f"hardcoded_cm_eq_compressible_D{d}Q{q}"),
         'hydro_incompressible': ("SymbolicCollisions.core.hardcoded_results", f"hardcoded_cm_eq_incompressible_D{d}Q{q}"),
         'ade_with_f': ("SymbolicCollisions.core.hardcoded_results", f"hardcoded_cm_eq_compressible_D{d}Q{q}"),
-        'ade': ("SymbolicCollisions.core.hardcoded_results", f"hardcoded_cm_eq_compressible_D{d}Q{q}"),
-        'cht': ("SymbolicCollisions.core.hardcoded_results", f"hardcoded_cm_eq_cht_D{d}Q{q}"),
+        'ade': ("SymbolicCollisions.core.hardcoded_results", f"hardcoded_m_eq_D{d}Q{q}"),
     }
-    which_cm_eq = cm_eq_switcher.get(choice, lambda: "Invalid argument")
-    hardcoded_cm_eq = dynamic_import(*which_cm_eq)
+    which_m_eq = cm_eq_switcher.get(choice, lambda: "Invalid argument")
+    hardcoded_m_eq = dynamic_import(*which_m_eq)
 
 
-    F_cm_switcher = {
+    F_m_switcher = {
         'hydro_compressible': ("SymbolicCollisions.core.hardcoded_results", f"hardcoded_F_cm_hydro_density_based_D{d}Q{q}"),
         'hydro_incompressible': ("SymbolicCollisions.core.hardcoded_results", f"hardcoded_F_cm_hydro_velocity_based_D{d}Q{q}"),
         'ade_with_f': ("SymbolicCollisions.core.hardcoded_results", f"hardcoded_F_cm_pf_D{d}Q{q}"),
         'ade': None,
-        'cht': None,
     }
-    which_F_cm = F_cm_switcher.get(choice, lambda: "Invalid argument")
-    hardcoded_F_cm = \
-        dynamic_import(*which_F_cm) if which_F_cm is not None \
+    which_F_m = F_m_switcher.get(choice, lambda: "Invalid argument")
+    hardcoded_F_m = \
+        dynamic_import(*which_F_m) if which_F_m is not None \
         else Matrix(np.full((q, 1), 1, dtype=int))  # make dummy F
 
+
     # hardcoded_F_cm = dynamic_import(*which_F_cm)
-    return hardcoded_cm_eq, hardcoded_F_cm
+    return hardcoded_m_eq, hardcoded_F_m
 
 
-hardcoded_cm_eq, hardcoded_F_cm = get_cm_eq_and_F_cm_switcher(model)
+hardcoded_m_eq, hardcoded_F_m = get_m_eq_and_F_m_switcher(model)
+# hardcoded_cm_eq = dynamic_import("SymbolicCollisions.core.hardcoded_results", f"hardcoded_cm_eq_compressible_D{d}Q{q}")
+# hardcoded_F_cm = dynamic_import("SymbolicCollisions.core.hardcoded_results", f"hardcoded_F_cm_pf_D{d}Q{q}")
+
+# hardcoded_cm_eq = dynamic_import("SymbolicCollisions.core.hardcoded_results", f"hardcoded_cm_eq_incompressible_D{d}Q{q}")
+# hardcoded_F_cm = dynamic_import("SymbolicCollisions.core.hardcoded_results", f"hardcoded_F_cm_He_hydro_LB_incompressible_D{d}Q{q}")
 
 
 # ARRANGE STUFF
@@ -88,9 +85,9 @@ Nraw = matrixGenerator.get_shift_matrix()
 # pprint(Mraw)  # see what you have done
 # pprint(Nraw)
 
-pop_in_str = 'h'  # symbol defining populations
+pop_in_str = 'x_in'  # symbol defining populations
 temp_pop_str = 'temp'  # symbol defining populations
-cm_eq_pop_str = 'cm_eq'  # symbol defining populations
+m_eq_pop_str = 'm_eq'  # symbol defining populations
 
 
 # GENERATE CODE
@@ -100,8 +97,6 @@ def make_header(choice):
         'hydro_incompressible': f"CudaDeviceFunction void relax_and_collide_hydro_with_F(real_t {pop_in_str}[{q}], real_t {omega_v}, vector_t u, vector_t {F_str}) \n{{",
         'ade_with_f': f"CudaDeviceFunction void relax_and_collide_ADE_with_F(real_t {pop_in_str}[{q}], real_t {omega_ade}, vector_t u, vector_t {F_str}) \n{{",
         'ade': f"CudaDeviceFunction void relax_and_collide_ADE(real_t {pop_in_str}[{q}], real_t {omega_ade}, vector_t u) \n{{",
-        # 'cht': f"CudaDeviceFunction void relax_and_collide_ADE(real_t {pop_in_str}[<?R C( h_pop_size) ?>], real_t rho, real_t {omega_ade}, vector_t u) \n{{",
-        'cht': f"CudaDeviceFunction void relax_and_collide_ADE_CM(real_t rho, real_t {omega_ade}, vector_t u) \n{{",
     }
     result = model_switcher.get(choice, lambda: "Invalid argument")
     print(result)
@@ -114,12 +109,8 @@ print("\t//=== THIS IS AUTOMATICALLY GENERATED CODE ===")
 # print("real_t bulk_visc = 1./6. ;")
 # print("real_t {sb} = 1./(3*bulk_visc + 0.5);")
 # print(f"real_t {sb} = omega_bulk;\n")  # s_b = 1./(3*bulk_visc + 0.5)
-
-
-if 'cht' in model:
-    print_sigma_cht()
-
 print_u2(d)
+print_ccode(get_m00(q, pop_in_str), assign_to=f'\treal_t {m00}')
 
 
 def make_variables(choice):
@@ -128,46 +119,29 @@ def make_variables(choice):
         'hydro_incompressible': f"\n\treal_t {temp_pop_str}[{q}];\n",
         'ade_with_f': f"\n\treal_t {temp_pop_str}[{q}];\n",
         'ade': f"\n\treal_t {temp_pop_str}[{q}];\n",
-        'cht': f"\n\treal_t {temp_pop_str}[{q}];\n",
     }
     # Get the function from switcher dictionary
     result = model_switcher.get(choice, lambda: "Invalid argument")
     print(result)
 
 
-# make_variables(model)
+make_variables(model)
 
-# populations = get_print_symbols_in_indx_notation(q, pop_in_str)
-# temp_populations = get_print_symbols_in_indx_notation(q, temp_pop_str)
-# cm_eq = get_print_symbols_in_indx_notation(q, cm_eq_pop_str)
-# F_cm = get_print_symbols_in_indx_notation(q, F_str)
+print(f"\tfor (int i = 0; i < {q}; i++) {{\n\t"
+      f"\t{temp_pop_str}[i] = {pop_in_str}[i];}}")
 
-# print_ccode(get_m00(q, pop_in_str), assign_to=f'\treal_t {m00}')
-# print(f"\tfor (int i = 0; i < {q}; i++) {{\n\t"
-#       f"\t{temp_pop_str}[i] = {pop_in_str}[i];}}")
-
-
-
-populations = get_print_symbols_in_m_notation(moments_dict[f'D{d}Q{q}'], pop_in_str)
-temp_populations = get_print_symbols_in_m_notation(moments_dict[f'D{d}Q{q}'], temp_pop_str)
-cm_eq = get_print_symbols_in_m_notation(moments_dict[f'D{d}Q{q}'], cm_eq_pop_str)
-F_cm = get_print_symbols_in_m_notation(moments_dict[f'D{d}Q{q}'], F_str)
+populations = get_print_symbols_in_indx_notation(q, pop_in_str)
+temp_populations = get_print_symbols_in_indx_notation(q, temp_pop_str)
+cm_eq = get_print_symbols_in_indx_notation(q, m_eq_pop_str)
+F_cm = get_print_symbols_in_indx_notation(q, F_str)
 m = Mraw * temp_populations
-
-print(f"\treal_t H = {sum(populations)};")
-
-for t, p in zip(temp_populations, populations):
-    print(f"\treal_t {t} = {p};")
 
 print("\n\t//raw moments from density-probability functions")
 # print("\t//[m00, m10, m01, m20, m02, m11, m21, m12, m22]")
-print_as_vector(m, outprint_symbol=pop_in_str, output_order_of_moments=moments_dict[f'D{d}Q{q}'])
+print_as_vector(m, outprint_symbol=pop_in_str)
 
-print("\n\t//central moments from raw moments")
-cm = Nraw * populations
-print_as_vector(cm, outprint_symbol=temp_pop_str, output_order_of_moments=moments_dict[f'D{d}Q{q}'])
 
-print("\n\t//collision in central moments space")
+print("\n\t//collision in moments space")
 # print("//calculate equilibrium distributions in cm space")
 # print("real_t {cm_eq_pop_str}[{q}];\n")
 # print_as_vector(hardcoded_cm_eq, cm_eq_pop_str)  # save time, verbosity
@@ -181,36 +155,29 @@ def make_collision(choice):
     model_switcher = {
         # Relax 2nd moments for hydro, SOI
         'hydro_compressible': (eye(q) - S_Relax) * temp_populations
-                 + S_Relax * hardcoded_cm_eq
-                 + (eye(q) - S_Relax / 2) * hardcoded_F_cm,
+                              + S_Relax * hardcoded_m_eq
+                              + (eye(q) - S_Relax / 2) * hardcoded_F_m,
 
         'hydro_incompressible': (eye(q) - S_Relax) * temp_populations
-                              + S_Relax * hardcoded_cm_eq
-                              + (eye(q) - S_Relax / 2) * hardcoded_F_cm,
+                                + S_Relax * hardcoded_m_eq
+                                + (eye(q) - S_Relax / 2) * hardcoded_F_m,
         # Relax 1st moments for ADE, SOI
         'ade_with_f': (eye(q) - S_Relax) * temp_populations
-                      + S_Relax * hardcoded_cm_eq
-                      + (eye(q) - S_Relax / 2) * hardcoded_F_cm,
+                      + S_Relax * hardcoded_m_eq
+                      + (eye(q) - S_Relax / 2) * hardcoded_F_m,
         # Relax 1st moments for ADE, SOI without force
         'ade': (eye(q) - S_Relax) * temp_populations
-               + S_Relax * hardcoded_cm_eq,
-        # Relax 1,3,5 moments for ADE, SOI without force
-        'cht': (eye(q) - S_Relax) * temp_populations
-               + S_Relax * hardcoded_cm_eq,
+               + S_Relax * hardcoded_m_eq,
     }
     # Get the function from switcher dictionary
     cm_after_collision = model_switcher.get(choice, lambda: "Invalid argument")
-
-    print_as_vector(cm_after_collision, outprint_symbol=pop_in_str, output_order_of_moments=moments_dict[f'D{d}Q{q}'])
+    print_as_vector(cm_after_collision, outprint_symbol=pop_in_str)
 
 
 make_collision(model)
-print("\n\t//back to raw moments")
-m = Nraw.inv() * populations
-print_as_vector(m, outprint_symbol=temp_pop_str, output_order_of_moments=moments_dict[f'D{d}Q{q}'])
 
 print("\n\t//back to density-probability functions")
 populations = Mraw.inv() * temp_populations
-print_as_vector(populations, outprint_symbol=pop_in_str, output_order_of_moments=moments_dict[f'D{d}Q{q}'])
+print_as_vector(populations, outprint_symbol=pop_in_str)
 
 print("\n}\n")

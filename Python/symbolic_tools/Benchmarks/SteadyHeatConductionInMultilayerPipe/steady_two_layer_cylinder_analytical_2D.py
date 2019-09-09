@@ -3,6 +3,25 @@ import numpy as np
 from typing import Callable
 from abc import ABC, abstractmethod
 
+class HeatConductionBetweenTwoPlates:
+    def __init__(self, T0, T2, Heff):
+        """
+        :param T0: temperature for h = 0
+        :param T2: temperature for h = H
+        :param Heff: effective height of the channel
+        """
+        self.T0 = T0
+        self.T2 = T2
+        self.Heff = Heff
+        self.dT = T2-T0
+
+    def get_T_profile(self, y):
+        """
+        :param y: distance from the bottom wall
+        :return: T
+        """
+        T = self.T0 + self.dT*y/H
+        return T
 
 class PipeWithinPipe:
 

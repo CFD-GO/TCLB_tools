@@ -1,33 +1,35 @@
 from sympy.matrices import eye
-
-from SymbolicCollisions.core.cm_symbols import omega_ade, omega_b, omega_v, m00
+from SymbolicCollisions.core.cm_symbols import omega_ade, omega_b, omega_v, m00, moments_dict
 from SymbolicCollisions.core.cm_symbols import Force_str as F_str
-from SymbolicCollisions.core.cm_symbols import dynamic_import, moments_dict
-from SymbolicCollisions.core.DiscreteCMTransforms import get_m00
-from SymbolicCollisions.core.printers import print_as_vector, get_print_symbols_in_m_notation
+from SymbolicCollisions.core.cm_symbols import dynamic_import
+from SymbolicCollisions.core.printers import print_as_vector, get_print_symbols_in_indx_notation
 from SymbolicCollisions.core.printers import print_u2, print_sigma_cht
-from SymbolicCollisions.core.MatrixGenerator import get_m_order_as_in_r, get_e_as_in_r, MatrixGenerator
+from SymbolicCollisions.core.MatrixGenerator import MatrixGenerator
 from sympy.matrices import Matrix
 import numpy as np
-import pandas as pd
 
 # inspired by:
 # "Consistent Forcing Scheme in the cascaded LBM" L. Fei et al. 2017
 # eqs 8-12 : (eye(q)-S)*cm + S*cm_eq + (eye(q)-S/2.)*force_in_cm_space
 
-model = 'cht'  # choose from '['hydro_compressible', 'hydro_incompressible', 'ade', 'ade_with_f', 'cht']
+# SETUP
+d = 3
+q = 27
 
-m_seed = [0, 1, 2]
-rmoments_order = get_m_order_as_in_r(m_seed, m_seed, m_seed)
-q, d = rmoments_order.shape
+pop_in_str = 'f'  # symbol defining populations
+temp_pop_str = 'temp'  # symbol defining populations
+cm_eq_pop_str = 'cm_eq'  # symbol defining populations
 
-moments_order = np.array(moments_dict[f'D{d}Q{q}'])
-print(f"order of moments | rmoments: \n "
-      f"{pd.concat([pd.DataFrame.from_records(moments_order),pd.DataFrame.from_records(rmoments_order)], axis=1)}")
 
-e_seed = [0, 1, -1]
-ex_D3Q27new, ey_D3Q27new, ez_D3Q27new, e_D3Q27new = get_e_as_in_r(e_seed, e_seed, e_seed)
-print(f"lattice velocities - e: \n {np.array(e_D3Q27new)}")
+model = 'hydro_incompressible'  # choose from '['hydro_compressible', 'hydro_incompressible', 'ade', 'ade_with_f', 'cht']
+
+# DYNAMIC IMPORTS
+ex = dynamic_import("SymbolicCollisions.core.cm_symbols", f"ex_D{d}Q{q}")
+ey = dynamic_import("SymbolicCollisions.core.cm_symbols", f"ey_D{d}Q{q}")
+if d == 3:
+    ez = dynamic_import("SymbolicCollisions.core.cm_symbols", f"ez_D{d}Q{q}")
+else:
+    ez = None
 
 
 def get_s_relax_switcher(choice):
@@ -44,11 +46,11 @@ def get_s_relax_switcher(choice):
 
 S_Relax = get_s_relax_switcher(model)
 
+
 def get_cm_eq_and_F_cm_switcher(choice):
     cm_eq_switcher = {
         'hydro_compressible': ("SymbolicCollisions.core.hardcoded_results", f"hardcoded_cm_eq_compressible_D{d}Q{q}"),
-        'hydro_incompressible': (
-        "SymbolicCollisions.core.hardcoded_results", f"hardcoded_cm_eq_incompressible_D{d}Q{q}"),
+        'hydro_incompressible': ("SymbolicCollisions.core.hardcoded_results", f"hardcoded_cm_eq_incompressible_D{d}Q{q}"),
         'ade_with_f': ("SymbolicCollisions.core.hardcoded_results", f"hardcoded_cm_eq_compressible_D{d}Q{q}"),
         'ade': ("SymbolicCollisions.core.hardcoded_results", f"hardcoded_cm_eq_compressible_D{d}Q{q}"),
         'cht': ("SymbolicCollisions.core.hardcoded_results", f"hardcoded_cm_eq_cht_D{d}Q{q}"),
@@ -57,10 +59,8 @@ def get_cm_eq_and_F_cm_switcher(choice):
     hardcoded_cm_eq = dynamic_import(*which_cm_eq)
 
     F_cm_switcher = {
-        'hydro_compressible': (
-        "SymbolicCollisions.core.hardcoded_results", f"hardcoded_F_cm_hydro_density_based_D{d}Q{q}"),
-        'hydro_incompressible': (
-        "SymbolicCollisions.core.hardcoded_results", f"hardcoded_F_cm_hydro_velocity_based_D{d}Q{q}"),
+        'hydro_compressible': ("SymbolicCollisions.core.hardcoded_results", f"hardcoded_F_cm_hydro_compressible_D{d}Q{q}"),
+        'hydro_incompressible': ("SymbolicCollisions.core.hardcoded_results", f"hardcoded_F_cm_hydro_incompressible_D{d}Q{q}"),
         'ade_with_f': ("SymbolicCollisions.core.hardcoded_results", f"hardcoded_F_cm_pf_D{d}Q{q}"),
         'ade': None,
         'cht': None,
@@ -77,18 +77,13 @@ def get_cm_eq_and_F_cm_switcher(choice):
 hardcoded_cm_eq, hardcoded_F_cm = get_cm_eq_and_F_cm_switcher(model)
 
 # ARRANGE STUFF
-matrixGenerator = MatrixGenerator(ex_D3Q27new, ey_D3Q27new, ez_D3Q27new, moments_order)
+matrixGenerator = MatrixGenerator(ex, ey, ez, moments_dict[f'D{d}Q{q}'])
 Mraw = matrixGenerator.get_raw_moments_matrix()
 Nraw = matrixGenerator.get_shift_matrix()
 
 # from sympy import pprint
 # pprint(Mraw)  # see what you have done
 # pprint(Nraw)
-
-pop_in_str = 'h'  # symbol defining populations
-temp_pop_str = 'temp'  # symbol defining populations
-cm_eq_pop_str = 'cm_eq'  # symbol defining populations
-
 
 # GENERATE CODE
 def make_header(choice):
@@ -118,26 +113,23 @@ if 'cht' in model:
 
 print_u2(d)
 
-rtemp_populations = get_print_symbols_in_m_notation(rmoments_order, temp_pop_str)
+print(f"\n\treal_t {temp_pop_str}[{q}];\n")
 
-populations = get_print_symbols_in_m_notation(moments_order, pop_in_str)
-temp_populations = get_print_symbols_in_m_notation(moments_order, temp_pop_str)
-cm_eq = get_print_symbols_in_m_notation(moments_order, cm_eq_pop_str)
-F_cm = get_print_symbols_in_m_notation(moments_order, F_str)
+populations = get_print_symbols_in_indx_notation(q, pop_in_str)
+temp_populations = get_print_symbols_in_indx_notation(q, temp_pop_str)
+cm_eq = get_print_symbols_in_indx_notation(q, cm_eq_pop_str)
+F_cm = get_print_symbols_in_indx_notation(q, F_str)
 
-print(f"\treal_t H = {sum(populations)};")
+m = Mraw * temp_populations
 
-for t, p in zip(temp_populations, populations):
-    print(f"\treal_t {t} = {p};")
+print(f"\treal_t {m00} = {sum(populations)};")
 
 print("\n\t//raw moments from density-probability functions")
-print_as_vector(Mraw * rtemp_populations, outprint_symbol=pop_in_str, output_order_of_moments=moments_order)
+print_as_vector(m, outprint_symbol=pop_in_str)
 
 print("\n\t//central moments from raw moments")
-print_as_vector(Nraw * populations, outprint_symbol=temp_pop_str, output_order_of_moments=moments_order)
-
-print("\n\t//collision in central moments space")
-print("\t//collide")
+cm = Nraw * populations
+print_as_vector(cm, outprint_symbol=temp_pop_str)
 
 def make_collision(choice):
     model_switcher = {
@@ -163,15 +155,19 @@ def make_collision(choice):
     # Get the function from switcher dictionary
     cm_after_collision = model_switcher.get(choice, lambda: "Invalid argument")
 
-    print_as_vector(cm_after_collision, outprint_symbol=pop_in_str, output_order_of_moments=moments_order)
+    print_as_vector(cm_after_collision, outprint_symbol=pop_in_str)
 
 
+print("\n\t//collision in central moments space")
+print("\t//collide")
 make_collision(model)
 
 print("\n\t//back to raw moments")
-print_as_vector(Nraw.inv() * populations, outprint_symbol=temp_pop_str, output_order_of_moments=moments_order)
+m = Nraw.inv() * populations
+print_as_vector(m, outprint_symbol=temp_pop_str)
 
 print("\n\t//back to density-probability functions")
-print_as_vector(Mraw.inv() * temp_populations, outprint_symbol=pop_in_str, output_order_of_moments=rmoments_order)
+populations = Mraw.inv() * temp_populations
+print_as_vector(populations, outprint_symbol=pop_in_str)
 
 print("\n}\n")
