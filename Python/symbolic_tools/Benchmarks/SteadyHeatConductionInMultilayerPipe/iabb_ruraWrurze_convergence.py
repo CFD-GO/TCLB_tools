@@ -72,8 +72,8 @@ def calculate_error_norms(_case_folder):
     T_anal = np.zeros((ny, nx))
     r_anal = np.zeros((ny, nx))
 
-    cuttoff_r2 = eff_pipe_diam[d] / 2. - 1
-    cuttoff_r0 = eff_cyl_diam[d] / 2. + 1
+    cuttoff_r2 = eff_pipe_diam[d] / 2. - 2
+    cuttoff_r0 = eff_cyl_diam[d] / 2. + 2
 
     for i in range(ny):
         for j in range(nx):
