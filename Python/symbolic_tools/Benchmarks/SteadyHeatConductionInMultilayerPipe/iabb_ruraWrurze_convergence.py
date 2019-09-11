@@ -19,7 +19,7 @@ wd = os.getcwd()
 wd = os.path.dirname(wd)  # go level up
 home = pwd.getpwuid(os.getuid()).pw_dir
 main_folder = os.path.join(home, 'DATA_FOR_PLOTS', 'batch_IABB_ruraWrurze')
-
+collision_type = 'CM_HIGHER'
 
 eff_pipe_diam = np.array([30, 46, 60, 92, 120])
 eff_cyl_diam = np.array([15, 23, 30, 46, 60])
@@ -88,7 +88,7 @@ def calculate_error_norms(_case_folder):
     T_num_slice_masked = T_num_slice[not_nan_mask]
     r_anal_masked = r_anal[not_nan_mask]
 
-    cntr_plot(T_anal, T_num_slice, xx, yy, conductivities[k], eff_pipe_diam[d])
+    # cntr_plot(T_anal, T_num_slice, xx, yy, conductivities[k], eff_pipe_diam[d])
 
     # u_anal_masked = np.array([max(u_anal_masked)])
     # uz_num_slice_masked = np.array([max(uz_num_slice_masked)])
@@ -99,14 +99,14 @@ def calculate_error_norms(_case_folder):
 
 for k in range(n_conductivities):
     for d in range(n_diam):
-        case_folder = f'iabb_ruraWrurze_Dirichlet_Cumulants_k_{conductivities[k]}_nu_{kin_visc}_effdiam_{eff_pipe_diam[d]}'
+        case_folder = f'iabb_ruraWrurze_Dirichlet_{collision_type}_k_{conductivities[k]}_nu_{kin_visc}_effdiam_{eff_pipe_diam[d]}'
 
         T_iabb_mse[k, d], T_iabb_L2[k, d] = calculate_error_norms(os.path.join(main_folder, case_folder))
 
         print(f"uz_ibb_mse={T_iabb_mse[k, d]:.2e} for k{conductivities[k]}_effdiam_{eff_pipe_diam[d]}")
         print(f"uz_ibb_L2={T_iabb_L2[k, d]:.2e} for v{conductivities[k]}_effdiam_{eff_pipe_diam[d]}")
 
-        case_folder = f'abb_ruraWrurze_Dirichlet_Cumulants_k_{conductivities[k]}_nu_{kin_visc}_effdiam_{eff_pipe_diam[d]}'
+        case_folder = f'abb_ruraWrurze_Dirichlet_{collision_type}_k_{conductivities[k]}_nu_{kin_visc}_effdiam_{eff_pipe_diam[d]}'
         T_abb_mse[k, d], T_abb_L2[k, d] = calculate_error_norms(os.path.join(main_folder, case_folder))
 
         print(f"uz_bb_mse={T_abb_mse[k, d]:.2e} for k{conductivities[k]}_effdiam_{eff_pipe_diam[d]}")
@@ -165,7 +165,7 @@ def make_plot_for_given_conductivity(_k):
     # plt.title(f'Pipe within pipe Benchmark - Grid Convergence Study\n '
     #           r'$k$=' + f'{k} \t')
     plt.xlabel(r'lattice size [lu]', fontsize=18)
-    plt.ylabel(r'$u_{x}: \; L_2 \, error \, norm $', fontsize=18)
+    plt.ylabel(r'$T: \; L_2 \, error \, norm $', fontsize=18)
     plt.tick_params(axis='both', which='major', labelsize=14)
     plt.tick_params(axis='both', which='minor', labelsize=1E-16)
     plt.legend()
@@ -234,7 +234,7 @@ def make_plot_for_all_viscosities():
     # plt.title(f'Pipe within pipe Benchmark - Grid Convergence Study\n '
     #           r'$k$=' + f'{k} \t')
     plt.xlabel(r'lattice size [lu]', fontsize=20)
-    plt.ylabel(r'$u_{x}: \; L_2 \, error \, norm $', fontsize=20)
+    plt.ylabel(r'T: \; L_2 \, error \, norm $', fontsize=20)
     plt.tick_params(axis='both', which='major', labelsize=18)
     plt.tick_params(axis='both', which='minor', labelsize=1E-16)
     plt.legend()

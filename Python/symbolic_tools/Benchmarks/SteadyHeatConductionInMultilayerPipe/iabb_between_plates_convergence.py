@@ -172,7 +172,7 @@ for q in qs:
     # plt.title(f'Pipe within pipe Benchmark - Grid Convergence Study\n '
     #           r'$k$=' + f'{k} \t')
     plt.xlabel(r'lattice size [lu]', fontsize=18)
-    plt.ylabel(r'$u_{x}: \; L_2 \, error \, norm $', fontsize=18)
+    plt.ylabel(r'$T: \; L_2 \, error \, norm $', fontsize=18)
     plt.tick_params(axis='both', which='major', labelsize=14)
     plt.tick_params(axis='both', which='minor', labelsize=1E-16)
     plt.legend()
@@ -182,68 +182,3 @@ for q in qs:
     fig.savefig(fig_name, bbox_inches='tight')
     plt.show()
     plt.close(fig)  # close the figure
-
-
-###################################################################################################################
-def see_ux_plot(d):
-    print("------------------------------------ ux  PLOT ------------------------------------")
-    fig_name = f'Conduction_between_plates_anal_vs_lbm_k{conductivity}_q{q}_effdiam_{effdiam}.png'
-
-    # -------------------- make dummy plot --------------------
-    plt.rcParams.update({'font.size': 14})
-    plt.figure(figsize=(14, 8))
-
-    axes = plt.gca()
-
-    plt.plot(T_anal, y_anal + expected_wall_location,
-             color="black", marker="o", markevery=1, markersize=5, linestyle=":", linewidth=2,
-             label=r'$analytical \, solution$')
-
-    # plt.plot(u_anal, y_anal + len(y_grid) / 2,
-    #          color="black", marker="o", markevery=1, markersize=5, linestyle=":", linewidth=2,
-    #          label=r'$analytical \, solution$')
-
-    # plt.plot(u_fd, y_fd + len(y_grid) / 2,
-    #          color="black", marker="", markevery=1, markersize=5, linestyle="-", linewidth=2,
-    #          label=r'$FD \, solution$')
-
-    plt.plot(T_iabb_num_slice, y_grid,
-             color="black", marker="x", markevery=1, markersize=7, linestyle="", linewidth=2,
-             label=r'$LBM \, IBB$')
-
-    plt.plot(T_abb_num_slice, y_grid,
-             color="black", marker="v", markevery=1, markersize=6, linestyle="", linewidth=2,
-             label=r'$LBM \, BB$')
-
-    # ------ format y axis ------ #
-    yll = y_grid.min()
-    yhl = y_grid.max()
-    # axes.set_ylim([yll, yhl])
-    # axes.set_yticks(np.linspace(yll, yhl, 8))
-    # axes.set_yticks(np.arange(yll, yhl, 1E-2))
-    # axes.set_yticks([1E-4, 1E-6, 1E-8, 1E-10, 1E-12])
-    # axes.set_yticks([0.5, 1.5, 2.5, 31.5, 32, 32.5, 61.5, 62.5, 63.5])
-    # axes.yaxis.set_major_formatter(xfmt)
-
-    # plt.yscale('log')
-    # ------ format x axis ------ #
-    # plt.xlim(0, int(xSIZE / 2))
-    # plt.xlim(int(xSIZE / 2), xSIZE)
-
-    # plt.ticklabel_format(style='sci', axis='x', scilimits=(0, 0))
-    # plt.ticklabel_format(style='sci', axis='y', scilimits=(0, 0))  # scilimits=(-8, 8)
-
-
-    plt.title(f'IABB conductucion_between_plates:\n' +
-              r'$ \nu = $' + f'{conductivity} ' + r'$D_{eff}=$' + f'{effdiam}, q={q}')
-
-    plt.xlabel(r'$u_x$')
-    plt.ylabel(r'$y$')
-    plt.legend()
-    plt.grid()
-
-    fig = plt.gcf()  # get current figure
-    fig.savefig(fig_name, bbox_inches='tight')
-    plt.show()
-
-    # plt.close(fig)  # close the figure
