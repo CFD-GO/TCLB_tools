@@ -10,8 +10,8 @@ import os
 import pwd
 import numpy as np
 
-H = 15  # [15, 31, 63]
-q = 0.25  # [0.25, 0.5, 0.75]
+H = 63# [15, 31, 63]
+q = 0.5  # [0.25, 0.5, 0.75]
 expected_wall_location = 1.5 - q  # location of bottom wall, where h = 0
 Heff = H - 2 * expected_wall_location
 
@@ -50,6 +50,8 @@ hcbp = HeatConductionBetweenTwoPlates(T0=11, T2=10, Heff=Heff, y0=expected_wall_
 
 x_grid = np.linspace(0, nx, nx, endpoint=False) + 0.5
 y_grid = np.linspace(0, ny, ny, endpoint=False) + 0.5
+# np.insert(y_grid, len(y_grid)-2, Heff, axis=0)
+
 xx, yy = np.meshgrid(x_grid, y_grid)
 
 T_anal = np.zeros((ny, nx))

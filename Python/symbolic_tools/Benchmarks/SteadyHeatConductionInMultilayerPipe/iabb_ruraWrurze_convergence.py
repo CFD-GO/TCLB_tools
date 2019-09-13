@@ -19,10 +19,16 @@ wd = os.getcwd()
 wd = os.path.dirname(wd)  # go level up
 home = pwd.getpwuid(os.getuid()).pw_dir
 main_folder = os.path.join(home, 'DATA_FOR_PLOTS', 'batch_IABB_ruraWrurze')
-collision_type = 'CM_HIGHER'
+collision_type = 'Cumulants'
+# main_folder = os.path.join(home, 'DATA_FOR_PLOTS', 'batch_IABB_ruraWrurze_test')
+# collision_type = 'CM_HIGHER'
 
-eff_pipe_diam = np.array([30, 46, 60, 92, 120])
-eff_cyl_diam = np.array([15, 23, 30, 46, 60])
+# eff_pipe_diam = np.array([30, 46, 60, 92, 120])
+# eff_cyl_diam = np.array([15, 23, 30, 46, 60])
+# eff_pipe_diam = np.array([60, 92, 120])
+# eff_cyl_diam = np.array([30, 46, 60])
+eff_pipe_diam = np.array([30, 46, 66, 94, 118])
+eff_cyl_diam = np.array([15, 23, 33, 47, 59])
 conductivities = np.array([0.1])
 kin_visc = 0.1
 
@@ -39,6 +45,8 @@ T_iabb_mse = np.zeros([n_conductivities, n_diam])
 T_iabb_L2 = np.zeros([n_conductivities, n_diam])
 T_abb_mse = np.zeros([n_conductivities, n_diam])
 T_abb_L2 = np.zeros([n_conductivities, n_diam])
+T_eq_mse = np.zeros([n_conductivities, n_diam])
+T_eq_L2 = np.zeros([n_conductivities, n_diam])
 
 
 def read_data_from_LBM(case_folder):
@@ -112,6 +120,9 @@ for k in range(n_conductivities):
         print(f"uz_bb_mse={T_abb_mse[k, d]:.2e} for k{conductivities[k]}_effdiam_{eff_pipe_diam[d]}")
         print(f"uz_bb_L2={T_abb_L2[k, d]:.2e} for k{conductivities[k]}_effdiam_{eff_pipe_diam[d]}")
 
+        case_folder = f'eq_ruraWrurze_Dirichlet_{collision_type}_k_{conductivities[k]}_nu_{kin_visc}_effdiam_{eff_pipe_diam[d]}'
+        T_eq_mse[k, d], T_eq_L2[k, d] = calculate_error_norms(os.path.join(main_folder, case_folder))
+
 
 def make_plot_for_given_conductivity(_k):
     print("------------------------------------ Convergence  PLOT ------------------------------------")
@@ -131,7 +142,7 @@ def make_plot_for_given_conductivity(_k):
     y_05st = np.sqrt(eff_pipe_diam.min())*initial_error_05st/np.sqrt(eff_pipe_diam)
 
     # initial_error_1st = 0.18
-    initial_error_1st = 1.15*max(np.concatenate((T_iabb_L2[_k, :], T_abb_L2[_k, :])))
+    initial_error_1st = 3.15*max(np.concatenate((T_iabb_L2[_k, :], T_abb_L2[_k, :])))
     y_1st = eff_pipe_diam.min()*initial_error_1st/eff_pipe_diam
     # initial_error_2nd = 0.05
     initial_error_2nd = 0.85 * min((max(T_iabb_L2[_k, :]), max(T_abb_L2[_k, :])))
@@ -149,6 +160,10 @@ def make_plot_for_given_conductivity(_k):
              color="black", marker="o", markevery=1, markersize=5, linestyle="", linewidth=2,
              label='ABB')
 
+    ax1.plot(eff_pipe_diam, T_eq_L2[_k, :],
+             color="black", marker="v", markevery=1, markersize=5, linestyle="", linewidth=2,
+             label='EQ')
+
     ax1.plot(eff_pipe_diam, y_1st,
              color="black", marker="", markevery=1, markersize=5, linestyle="--", linewidth=2,
              label=r'$\mathcal{O}(n)$ convergence')
@@ -164,7 +179,7 @@ def make_plot_for_given_conductivity(_k):
     ax1.get_xaxis().set_major_formatter(matplotlib.ticker.ScalarFormatter())
     # plt.title(f'Pipe within pipe Benchmark - Grid Convergence Study\n '
     #           r'$k$=' + f'{k} \t')
-    plt.xlabel(r'lattice size [lu]', fontsize=18)
+    plt.xlabel(r'$D_{outer}$ [lu]', fontsize=18)
     plt.ylabel(r'$T: \; L_2 \, error \, norm $', fontsize=18)
     plt.tick_params(axis='both', which='major', labelsize=14)
     plt.tick_params(axis='both', which='minor', labelsize=1E-16)
@@ -177,7 +192,7 @@ def make_plot_for_given_conductivity(_k):
     plt.close(fig)  # close the figure
 
 
-def make_plot_for_all_viscosities():
+def make_plot_for_all_conductivities():
     print("------------------------------------ Convergence  PLOT 2 ------------------------------------")
 
     if not os.path.exists('plots'):
@@ -233,7 +248,7 @@ def make_plot_for_all_viscosities():
     ax1.get_xaxis().set_major_formatter(matplotlib.ticker.ScalarFormatter())
     # plt.title(f'Pipe within pipe Benchmark - Grid Convergence Study\n '
     #           r'$k$=' + f'{k} \t')
-    plt.xlabel(r'lattice size [lu]', fontsize=20)
+    plt.xlabel(r'D_{outer} [lu]', fontsize=20)
     plt.ylabel(r'T: \; L_2 \, error \, norm $', fontsize=20)
     plt.tick_params(axis='both', which='major', labelsize=18)
     plt.tick_params(axis='both', which='minor', labelsize=1E-16)

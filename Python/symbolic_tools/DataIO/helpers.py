@@ -3,6 +3,12 @@ import re
 import numpy as np
 
 
+def delete_unphysical_data_from_wall_nodes(data):
+    data = np.delete(data, 0, axis=0)
+    data = np.delete(data, -1, axis=0)
+    return data
+
+
 def peel_the_skin(some_2d_array):
     # clip the array from each side, so that both EQ and ABB scheme would have the same 'measurement' nodes
     some_2d_array = np.delete(some_2d_array, 0, axis=0)

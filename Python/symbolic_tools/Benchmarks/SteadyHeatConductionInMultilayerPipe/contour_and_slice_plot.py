@@ -141,4 +141,4 @@ def slice_plot(anal_field, num_field, y, title='dummy_title'):
         fig.savefig(fig_name, bbox_inches='tight')
         plt.show()
 
-        plt.close(fig)  # close the figure
+        # plt.close(fig)  # close the figure

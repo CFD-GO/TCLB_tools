@@ -13,25 +13,26 @@ from DataIO.VTIFile import VTIFile
 import matplotlib.pyplot as plt
 import matplotlib.ticker
 import matplotlib.pylab as pylab
+
+
 rho = 1
 conductivity = '0.1'
 mu = rho * float(conductivity)
 
-diameters = np.array([15, 31, 63, 127])
-qs = [0.25, 0.5, 0.75]
+# diameters = np.array([15, 31, 63, 127])
+diameters = np.array([15, 31, 63])
+qs = [0.5]
 
 collision_type = 'CM_HIGHER'
 
 # -------- numerical solution ---------------
-
-
 wd = os.getcwd()
 wd = os.path.dirname(wd)  # go level up
 home = pwd.getpwuid(os.getuid()).pw_dir
 main_folder = os.path.join(home, 'DATA_FOR_PLOTS', 'batch_IABB_plates')
 
 
-def read_ux(folder):
+def read_data_from_LBM(folder):
     folder = strip_folder_name(folder)
     case_folder = os.path.join(main_folder, folder)
     oldest = find_oldest_iteration(case_folder)
@@ -45,32 +46,25 @@ def read_ux(folder):
     return T_num_slice
 
 
-def delete_unphysical_data_from_wall_nodes(data):
-    data = np.delete(data, 0, axis=0)
-    data = np.delete(data, -1, axis=0)
-    return data
-
-
 for q in qs:
     n_diam = len(diameters)
     T_iabb_mse = np.zeros(n_diam)
     T_iabb_L2 = np.zeros(n_diam)
     T_abb_mse = np.zeros(n_diam)
     T_abb_L2 = np.zeros(n_diam)
+    T_eq_mse = np.zeros(n_diam)
+    T_eq_L2 = np.zeros(n_diam)
 
     for d in range(n_diam):
         expected_wall_location = 1.5 - q
         effdiam = diameters[d] - 2 * expected_wall_location
 
         iabb_case_folder = f"iabb_plates_Dirichlet_{collision_type}_k_{conductivity}_effdiam_{effdiam}"
-        T_iabb_num_slice = read_ux(iabb_case_folder)
+        T_iabb_num_slice = read_data_from_LBM(iabb_case_folder)
         abb_case_folder = f"abb_plates_Dirichlet_{collision_type}_k_{conductivity}_effdiam_{effdiam}"
-        T_abb_num_slice = read_ux(abb_case_folder)
-
-        # T_iabb_num_slice = delete_unphysical_data_from_wall_nodes(T_iabb_num_slice)
-        # T_abb_num_slice = delete_unphysical_data_from_wall_nodes(T_abb_num_slice)
-        # y_grid = delete_unphysical_data_from_wall_nodes(y_grid)
-
+        T_abb_num_slice = read_data_from_LBM(abb_case_folder)
+        eq_case_folder = f"eq_plates_Dirichlet_{collision_type}_k_{conductivity}_effdiam_{effdiam}"
+        T_eq_num_slice = read_data_from_LBM(eq_case_folder)
 
         hcbp = HeatConductionBetweenTwoPlates(T0=11, T2=10, Heff=effdiam, y0=expected_wall_location)
 
@@ -81,8 +75,8 @@ for q in qs:
 
         T_anal = np.zeros((ny, nx))
 
-        cuttoff_y2 = effdiam - 2
-        cuttoff_y0 = 0 + 2
+        cuttoff_y2 = effdiam - 1
+        cuttoff_y0 = 0 + 1
         for i in range(ny):
             for j in range(nx):
                 y = yy[i][j]
@@ -94,13 +88,15 @@ for q in qs:
         T_anal_masked = T_anal[not_nan_mask]
         T_iabb_num_slice_masked = T_iabb_num_slice[not_nan_mask]
         T_abb_num_slice_masked = T_abb_num_slice[not_nan_mask]
+        T_eq_num_slice_masked = T_eq_num_slice[not_nan_mask]
         yy_masked = yy[not_nan_mask]
 
         T_iabb_mse[d] = calc_mse(T_anal_masked, T_iabb_num_slice_masked)
         T_iabb_L2[d] = calc_L2(T_anal_masked, T_iabb_num_slice_masked)
         T_abb_mse[d] = calc_mse(T_anal_masked, T_abb_num_slice_masked)
         T_abb_L2[d] = calc_L2(T_anal_masked, T_abb_num_slice_masked)
-
+        T_eq_mse[d] = calc_mse(T_anal_masked, T_eq_num_slice_masked)
+        T_eq_L2[d] = calc_L2(T_anal_masked, T_eq_num_slice_masked)
 
         # cntr_plot(T_anal, T_num_slice, xx, yy, conductivity, effdiam, title=iabb_case_folder)
 
@@ -113,15 +109,15 @@ for q in qs:
         T_iabb_num_slice_masked = T_iabb_num_slice[not_nan_mask]
         y_masked = y_grid[not_nan_mask]
 
-        slice_plot(T_anal_masked, T_iabb_num_slice_masked, y_masked, title=f'{iabb_case_folder}_q{q}')
+        # slice_plot(T_anal_masked, T_iabb_num_slice_masked, y_masked, title=f'{iabb_case_folder}_q{q}')
 
-        print(f"T_iabb_mse={T_iabb_mse[d]:.2e} T_abb_mse={T_abb_mse[d]:.2e} \t for k{conductivity}_q{q}_effdiam_{effdiam}")
-        print(f"T_iabb_L2={T_iabb_L2[d]:.2e} T_abb_L2={T_abb_L2[d]:.2e} \tfor k{conductivity}_q{q}_effdiam_{effdiam}")
+        print(f"T_iabb_mse={T_iabb_mse[d]:.2e} T_abb_mse={T_abb_mse[d]:.2e} T_eq_mse={T_eq_L2[d]:.2e}\t for k{conductivity}_q{q}_effdiam_{effdiam}")
+        print(f"T_iabb_L2={T_iabb_L2[d]:.2e} T_abb_L2={T_abb_L2[d]:.2e} T_eq_L2={T_eq_L2[d]:.2e}  \tfor k{conductivity}_q{q}_effdiam_{effdiam}")
 
     print("------------------------------------ Convergence  PLOT ------------------------------------")
     if not os.path.exists('plots'):
         os.makedirs('plots')
-    fig_name = f'plots/grid_convergence_conduction_between_plates_k{eat_dots_for_texmaker(conductivity)}_q{eat_dots_for_texmaker(q)}.png'
+    fig_name = f'plots/iabb_grid_convergence_conduction_between_plates_k{eat_dots_for_texmaker(conductivity)}_q{eat_dots_for_texmaker(q)}.png'
 
     params = {'legend.fontsize': 'xx-large',
               'figure.figsize': (14, 8),
@@ -152,9 +148,15 @@ for q in qs:
              color="black", marker="x", markevery=1, markersize=8, linestyle="", linewidth=2,
              label='IABB')
 
+    if q == 0.5:
+        T_abb_L2 = np.flip(T_abb_L2)
     ax1.plot(diameters, T_abb_L2,
              color="black", marker="o", markevery=1, markersize=5, linestyle="", linewidth=2,
              label='ABB')
+
+    ax1.plot(diameters, T_eq_L2,
+             color="black", marker="v", markevery=1, markersize=5, linestyle="", linewidth=2,
+             label='EQ')
 
     ax1.plot(diameters, y_1st,
              color="black", marker="", markevery=1, markersize=5, linestyle="--", linewidth=2,
