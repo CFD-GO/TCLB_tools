@@ -440,3 +440,35 @@ moments_dict = {
     #           (2, 2, 2),
     #           ],
 }
+
+walberla_csys = {
+    r'vC ': r'h000 ',  # x={1:E, 2:W} y={1:N, 2:S} z={1:T, 2:B}
+    r'vE ': r'h100 ',
+    r'vW ': r'h200 ',
+    r'vN ': r'h010 ',
+    r'vS ': r'h020 ',
+    r'vT ': r'h001 ',
+    r'vB ': r'h002 ',
+
+    r'vNE ': r'h110 ',
+    r'vNW ': r'h210 ',
+    r'vSE ': r'h120 ',
+    r'vSW ': r'h220 ',
+    r'vTE ': r'h101 ',
+    r'vTW ': r'h201 ',
+    r'vBE ': r'h102 ',
+    r'vBW ': r'h202 ',
+    r'vTN ': r'h011 ',
+    r'vTS ': r'h021 ',
+    r'vBN ': r'h012 ',
+    r'vBS ': r'h022 ',
+
+    r'vTNE': r'h111 ',
+    r'vTNW': r'h211 ',
+    r'vTSE': r'h121 ',
+    r'vTSW': r'h221 ',
+    r'vBNE': r'h112 ',
+    r'vBNW': r'h212 ',
+    r'vBSE': r'h122 ',
+    r'vBSW': r'h222 ',
+}
