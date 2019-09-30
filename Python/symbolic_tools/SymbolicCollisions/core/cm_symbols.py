@@ -43,7 +43,7 @@ uxuy = Symbol('uxuy')
 uxuz = Symbol('uxuz')
 uyuz = Symbol('uyuz')
 
-m00 = Symbol('m00', positive=True)
+m00 = Symbol('m000', positive=True)
 rho = Symbol('rho', positive=True)
 Temperature = Symbol('T', positive=True)
 Enthalpy = Symbol('H', positive=True)  # consider it as enthalpy
@@ -68,7 +68,7 @@ s1D = Matrix([s_x])
 s2D = Matrix([s_x, s_y])
 s3D = Matrix([s_x, s_y, s_z])
 
-Force_str = "F"
+Force_str = "F_total"
 Fx = Symbol(Force_str + '.x')
 Fy = Symbol(Force_str + '.y')
 Fz = Symbol(Force_str + '.z')
