@@ -16,18 +16,21 @@ with open(path, "r") as f:
 print('=== raw input ===')
 print(stuff)
 
-# old parser
-# for key, value in walberla_csys.items():
-#     stuff = re.sub(key, value, stuff)
-#
-# print('=== NSEWTB -> mom ===')
-# stuff = re.sub('const ', '', stuff)
-# print(stuff)
-# stuff = re.sub('dst', 'src', stuff)
-# print('\n\n')
-# print(stuff)
+print('=== file parser ===')
+for key, value in walberla_csys.items():
+    stuff = re.sub(key, value, stuff)
+
 
 print('=== NSEWTB -> mom ===')
+# print(stuff)
+stuff = re.sub(r'const ', '', stuff)
+stuff = re.sub(r'\\', '', stuff)
+# stuff = re.sub('dst', 'src', stuff)
+print('\n\n')
+print(stuff)
+
+
+print('=== printer NSEWTB -> mom ===')
 
 
 def read_from(src_or_dst):
@@ -42,7 +45,7 @@ print('\n\n')
 read_from('dst')
 
 
-print('=== mom -> NSEWTB ===')
+print('=== printer  mom -> NSEWTB ===')
 
 
 def write_to(src_or_dst):
