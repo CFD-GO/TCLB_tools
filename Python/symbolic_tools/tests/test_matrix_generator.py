@@ -16,6 +16,7 @@ from concurrencytest import ConcurrentTestSuite, fork_for_tests
 from SymbolicCollisions.core.MatrixGenerator import MatrixGenerator
 from SymbolicCollisions.core.cm_symbols import moments_dict
 
+
 class TestMatrixGenerator(TestCase):
 
     def test_get_raw_matrix_d2q9(self):

@@ -13,8 +13,8 @@ import numpy as np
 # eqs 8-12 : (eye(q)-S)*cm + S*cm_eq + (eye(q)-S/2.)*force_in_cm_space
 
 # SETUP
-d = 3
-q = 27
+d = 2
+q = 9
 
 pop_in_str = 'f'  # symbol defining populations
 temp_pop_str = 'temp'  # symbol defining populations

@@ -1,14 +1,8 @@
-from SymbolicCollisions.core.cm_symbols import ux, uy, uz, moments_dict
+from SymbolicCollisions.core.cm_symbols import ux, uy, uz
 from SymbolicCollisions.core.printers import round_and_simplify
 from sympy.matrices import Matrix, diag
 import numpy as np
 import pandas as pd
-
-
-def get_cm_coeff_diag_matrix(m, n, ex_, ey_):
-    N = len(ex_)
-    diagonala = [pow((ex_[i] - ux), m) * pow((ey_[i] - uy), n) for i in range(0, N)]
-    return diag(*diagonala)
 
 
 def get_m_order_as_in_r(x, y, z):

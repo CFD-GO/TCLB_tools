@@ -15,7 +15,7 @@ from SymbolicCollisions.core.DiscreteCMTransforms import \
 
 lattice = 'D2Q9'
 ccmt = ContinuousCMTransforms(dzeta3D, u3D, F3D, rho)
-dcmt = DiscreteCMTransforms(e_D2Q9, u2D, F2D, rho)
+# dcmt = DiscreteCMTransforms(e_D2Q9, u2D, F2D, rho)
 
 start = time.process_time()
 
@@ -70,14 +70,14 @@ cm_eq = get_mom_vector_from_continuous_def(ccmt.get_Maxwellian_DF,
 print_as_vector(cm_eq, 'cm_eq')
 print_as_vector(cm_eq, 'cm_eq', output_order_of_moments=moments_dict[lattice])
 
-# print('\n//population_eq -> cm_eq - from continous definition: \n'
-#       'k_mn = integrate(fun, (x, -oo, oo), (y, -oo, oo)) \n'
-#       'where fun = fM(rho,u,x,y) *(x-ux)^m *(y-uy)^n *(z-uz)^o ')
-# cm_eq = get_mom_vector_from_continuous_def(ccmt.get_incompressible_DF,
-#                                            continuous_transformation=ccmt.get_cm,
-#                                            moments_order=moments_dict[lattice])
-#
-# print_as_vector(cm_eq, 'cm_eq')
+print('\n//population_eq -> cm_eq - from continous definition: \n'
+      'k_mn = integrate(fun, (x, -oo, oo), (y, -oo, oo)) \n'
+      'where fun = fM(rho,u,x,y) *(x-ux)^m *(y-uy)^n *(z-uz)^o ')
+cm_eq = get_mom_vector_from_continuous_def(ccmt.get_incompressible_DF,
+                                           continuous_transformation=ccmt.get_cm,
+                                           moments_order=moments_dict[lattice])
+
+print_as_vector(cm_eq, 'cm_eq')
 
 
 print(f'\n\n Done in {time.process_time() - start} [s].')
