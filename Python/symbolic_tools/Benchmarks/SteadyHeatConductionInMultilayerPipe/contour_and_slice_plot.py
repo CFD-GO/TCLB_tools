@@ -36,7 +36,7 @@ def cntr_plot(anal_field, num_field, xx, yy, conductivity, eff_pipe_diam, title=
 
     fig.colorbar(cntr, shrink=0.5, aspect=5)
 
-    plt.title(f'error: {title}')
+    plt.title(f'error field: {title}')
 
     # # Major ticks every 20, minor ticks every 5
     # major_ticks = np.arange(0, nx, nx/5)
@@ -64,7 +64,7 @@ def cntr_plot(anal_field, num_field, xx, yy, conductivity, eff_pipe_diam, title=
 
     fig.savefig(fig_name, bbox_inches='tight')
     plt.show()
-    plt.close(fig)  # close the figure
+    # plt.close(fig)  # close the figure
     # print('bye')
 
 

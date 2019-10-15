@@ -43,9 +43,11 @@ def find_oldest_iteration(folder, extension='.pvti'):
     for root, dirs, files in os.walk(folder):
         for file in files:
             if file.endswith(extension):
-                # it_counter = re.findall(r"(\d{8})", file)
-                it_counter = re.findall(r"(\d{8})", file)[0]
-                iterations.append(it_counter)
+                it_counter = re.findall(r"(\d{4,8})", file)  # from 4 to 8 digits
+                if len(it_counter) > 0:
+                    iterations.append(it_counter[0])
+
+
 
     # int_iterations = [int(i) for i in iterations]
     # oldest = max(int_iterations)
@@ -57,8 +59,8 @@ def find_oldest_iteration(folder, extension='.pvti'):
     return oldest
 
 
-def get_vti_from_iteration(folder, iteration, extension='.vti'):
-    pattern = f"VTK_P00_{iteration}{extension}"
+def get_vti_from_iteration(folder, iteration, extension='.vti', prefix='VTK_P00_'):
+    pattern = f"{prefix}{iteration}{extension}"
     matched_files = []
     for root, dirs, files in os.walk(folder):
         for file in files:
