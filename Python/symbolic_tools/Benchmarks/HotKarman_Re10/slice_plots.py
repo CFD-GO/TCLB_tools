@@ -7,7 +7,7 @@ from mpl_toolkits.mplot3d import Axes3D
 import os
 import pwd
 from DataIO.VTIFile import VTIFile
-# from Benchmarks.HotKarman_Correlations.LBM_vs_FEM_v2 import read_data_from_LBM
+# from Benchmarks.HotKarman_Re10.LBM_vs_FEM_v2 import read_data_from_LBM
 
 home = pwd.getpwuid(os.getuid()).pw_dir
 main_folder = os.path.join(home, 'DATA_FOR_PLOTS', 'HotBarman3D')
