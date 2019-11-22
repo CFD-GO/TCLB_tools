@@ -40,7 +40,6 @@ local_logs_folder = os.path.join(home, 'DATA_FOR_PLOTS', 'HotKarman_Re1000')
 #     logs.append(log)
 
 
-
 def calc_Nu(q_conv, k, D, L):
     T_surf = 1
     T_inf = 0
@@ -168,12 +167,9 @@ for root, dirs, files in os.walk(local_logs_folder):
 
             match = re.search(r'_D0_(\d\.\d\de\+\d\d)_', file, re.IGNORECASE)
             D0 = float(match.group(1))
-            # D0=30
+
             match = re.search(r'_U_(\d\.\d\de\-\d\d)_', file, re.IGNORECASE)
             u = float(match.group(1))
-            #
-            # u = 0.01/size
-            # D = 30*size
 
             v = log['nu'][0]
             if Re != u*D0/v:

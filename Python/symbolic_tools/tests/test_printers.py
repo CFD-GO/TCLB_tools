@@ -117,9 +117,9 @@ class TestRegexPrinters(TestCase):
             "\ttest = rho;\n",
             "\ttest = T*cp*rho;\n",
             "\ttest = 1/9.*T*gamma*gamma/(cp*rho);\n",
-            "\ttest = RT*RT*m00;\n",
-            "\ttest = -RT*m00*uy2;\n",
-            "\ttest = RT*RT*m00;\n",
+            "\ttest = RT*RT*m000;\n",
+            "\ttest = -RT*m000*uy2;\n",
+            "\ttest = RT*RT*m000;\n",
             ## "\ttest[0] = m00*(-RT*uy2 + RT*uy2 + RT*RT);\n",   # it seems that the order is sometimes swapped and the test fails Oo
         ]
 
