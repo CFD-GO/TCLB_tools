@@ -39,11 +39,15 @@ def strip_folder_name(some_folder):
 
 
 def find_oldest_iteration(folder, extension='.pvti'):
+    prefix = 'VTK_P00_'
+    pattern = prefix.join(r"(\d{4,8})")
     iterations = []
+# "batch_HotKarman_Re1000_D0_1.28e+02_nu_0.0055_U_4.30e-02_bc_HeaterDirichletTemperatureEQ_CM_HIGHER_VTK_P00_00006003"
     for root, dirs, files in os.walk(folder):
         for file in files:
             if file.endswith(extension):
-                it_counter = re.findall(r"(\d{4,8})", file)  # from 4 to 8 digits
+                it_counter = re.findall(r"VTK_P00_(\d{4,8})", file)  # from 4 to 8 digits
+                # it_counter = re.findall(r"(\d{4,8})", file)  # from 4 to 8 digits
                 if len(it_counter) > 0:
                     iterations.append(it_counter[0])
 

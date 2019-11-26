@@ -41,12 +41,13 @@ local_logs_folder = os.path.join(home, 'DATA_FOR_PLOTS', 'HotKarman_Re1000')
 
 
 def calc_Nu(q_conv, k, D, L):
-    T_surf = 1
-    T_inf = 0
+    T_surf = 11
+    T_inf = 10
     Surface = np.pi * D * L
     ht_coeff_experimental = q_conv / (Surface * (T_surf - T_inf))
     Nu = ht_coeff_experimental * D / k
-    return Nu
+    Nu_jfm = q_conv*D/(k*L*(T_surf - T_inf))
+    return Nu, Nu_jfm
 
 
 def make_std_q_plot(x, y, x2, y2, fig_name):

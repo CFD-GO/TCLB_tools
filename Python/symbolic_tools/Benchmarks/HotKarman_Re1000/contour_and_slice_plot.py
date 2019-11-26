@@ -8,7 +8,7 @@ import numpy as np
 from DataIO.helpers import find_oldest_iteration, get_vti_from_iteration, strip_folder_name, eat_dots_for_texmaker, get_r_from_xy
 
 
-def cntr_plot(anal_field, num_field, xx, yy, conductivity, eff_pipe_diam, title='dummy_tittle'):
+def cntr_plot(anal_field, num_field, xx, yy, title='dummy_tittle'):
     print("---------- PLOTTING -------------")
     fig = plt.figure(figsize=(12, 8))
     # ax = fig.gca(projection='3d')
