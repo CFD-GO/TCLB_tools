@@ -18,7 +18,7 @@ import warnings
 home = pwd.getpwuid(os.getuid()).pw_dir
 local_logs_folder = os.path.join(home, 'DATA_FOR_PLOTS', 'HotKarman_Re1000')
 # local_logs_folder = os.path.join(home, 'DATA_FOR_PLOTS', 'logs_pro')
-# host_folder = os.path.join(f'$FROM_PRO', 'batch_HotKarman3D_CM_HIGHER', 'keep_nu_and_k_sizer*')
+# host_folder = os.path.join(f'$FROM_PRO', 'batch_HotKarman_Re1000')
 #
 # if not os.path.exists(local_logs_folder):
 #     os.makedirs(local_logs_folder)
@@ -46,8 +46,8 @@ def calc_Nu(q_conv, k, D, L):
     Surface = np.pi * D * L
     ht_coeff_experimental = q_conv / (Surface * (T_surf - T_inf))
     Nu = ht_coeff_experimental * D / k
-    Nu_jfm = q_conv*D/(k*L*(T_surf - T_inf))
-    return Nu, Nu_jfm
+    # Nu_jfm = q_conv*D/(k*L*(T_surf - T_inf))
+    return Nu
 
 
 def make_std_q_plot(x, y, x2, y2, fig_name):
@@ -101,7 +101,7 @@ def make_std_q_plot(x, y, x2, y2, fig_name):
     plt.close(fig)  # close the figure
 
 
-def make_Nu_plot(x, y, x2, y2, fig_name):
+def make_Nu_plot(x, y, x2, y2, fig_name, plot_title=''):
     if not os.path.exists('convergence_plots'):
         os.makedirs('convergence_plots')
 
@@ -116,11 +116,11 @@ def make_Nu_plot(x, y, x2, y2, fig_name):
     axes = plt.gca()
     plt.plot(x, y,
              color="black", marker="", markevery=25, markersize=7, linestyle="-", linewidth=2,
-             label='Heater')
+             label='Source')
 
-    # plt.plot(x2, y2,
-    #          color="black", marker=">", markevery=25, markersize=7, linestyle=":", linewidth=2,
-    #          label='Outlet')
+    plt.plot(x2, y2,
+             color="black", marker=">", markevery=25, markersize=7, linestyle=":", linewidth=2,
+             label='Outlet')
 
     # ------ format y axis ------ #
     yll = min(y.min(), y2.min())
@@ -140,7 +140,7 @@ def make_Nu_plot(x, y, x2, y2, fig_name):
     plt.ticklabel_format(style='sci', axis='x', scilimits=(0, 0))
     # plt.ticklabel_format(style='sci', axis='y', scilimits=(0, 0))  # scilimits=(-8, 8)
 
-    plt.title(f'')
+    plt.title(f'{plot_title}')
     plt.xlabel(r'$iterations$')
     plt.ylabel(r'$Nu$')
     plt.legend()
@@ -172,9 +172,10 @@ for root, dirs, files in os.walk(local_logs_folder):
             match = re.search(r'_U_(\d\.\d\de\-\d\d)_', file, re.IGNORECASE)
             u = float(match.group(1))
 
+            blockage_ratio = '1over12'  # d_cylinder / domain_y
             v = log['nu'][0]
-            if Re != u*D0/v:
-                print(f"Re={Re} while u*D0/v = {u*D0/v}")
+            # if Re != u*D0/v:
+            #     print(f"Re={Re:0.1f} while u*D0/v = {u*D0/v:0.1f}")
 
             k = log['conductivity-DefaultZone'][0]
             rho = 1
@@ -192,10 +193,10 @@ for root, dirs, files in os.walk(local_logs_folder):
 
 
             # calculate Nu in all possible ways
-            n_last_it_to_avg = 30
-            q_conv_avg_source = log['HeatSource'][-n_last_it_to_avg:].mean()
-            q_conv_avg_inlet = log['HeatFluxX'][-n_last_it_to_avg:].mean()
-            q_conv_avg_outlet = log['HeatFluxX2'][-n_last_it_to_avg:].mean()
+            n_last_it_to_analyze = 150
+            q_conv_avg_source = log['HeatSource'][-n_last_it_to_analyze:].mean()
+            q_conv_avg_inlet = log['HeatFluxX'][-n_last_it_to_analyze:].mean()
+            q_conv_avg_outlet = log['HeatFluxX2'][-n_last_it_to_analyze:].mean()
             dq_conv_avg_outlet = -(q_conv_avg_outlet - q_conv_avg_inlet)
 
             L = 3
@@ -206,18 +207,17 @@ for root, dirs, files in os.walk(local_logs_folder):
 
             Nu_corr = get_Nu_cylinder_by_Churchill_Bernstein(Re=Re, Pr=Pr)
 
-            print(f"\n\n Re={Re:0.1f} Pr={Pr:0.1f} D0={D0} "
-                  f"Nu_conv_avg_source={Nu_conv_avg_source:0.2f} Nu_conv_avg_outlet={Nu_conv_avg_doutlet:0.2f} Nu_corr={Nu_corr:0.2f} "
-                  )
+            Nu_txt_description = f"Nu_avg_source={Nu_conv_avg_source:0.2f} Nu_avg_outlet={Nu_conv_avg_doutlet:0.2f} Nu_corr={Nu_corr:0.2f}"
+            print(f"\n\nRe={Re:0.1f} Pr={Pr:0.1f} D0={D0} \n{Nu_txt_description}")
 
-            skip_first_iterations = 1
-            y1 = log['HeatSource'][skip_first_iterations:].apply(calc_Nu, args=(k, D0, L)).dropna()
+
+            y1 = log['HeatSource'][-n_last_it_to_analyze:].apply(calc_Nu, args=(k, D0, L)).dropna()
 
             dHeatFluxX = -(log['HeatFluxX2'] - log['HeatFluxX'])
-            y2 = dHeatFluxX[skip_first_iterations:].apply(calc_Nu, args=(k, D0, L)).dropna()
-            x = log['Iteration'][skip_first_iterations:]
-            plot_name = "convergence_plots/convergence_Nu_" + re.sub(r".csv", r".png", file)
-            make_Nu_plot(x, y1, x, y2, plot_name)
+            y2 = dHeatFluxX[-n_last_it_to_analyze:].apply(calc_Nu, args=(k, D0, L)).dropna()
+            x = log['Iteration'][-n_last_it_to_analyze:]
+            plot_name = f"convergence_plots/BR{blockage_ratio}_Nu_" + re.sub(r".csv", r".png", file)
+            make_Nu_plot(x, y1, x, y2, plot_name, plot_title=Nu_txt_description)
 
             def calc_norm_std(x):
                 result = abs(np.std(x) / np.mean(x))
@@ -225,17 +225,17 @@ for root, dirs, files in os.walk(local_logs_folder):
 
             window = 20
             # y1 = log['HeatSource'][100:].rolling(window).apply(lambda x: np.std(x) / np.mean(x)).dropna()
-            y1 = log['HeatSource'][skip_first_iterations:].rolling(window).apply(calc_norm_std, raw=False).dropna()
+            y1 = log['HeatSource'][-n_last_it_to_analyze:].rolling(window).apply(calc_norm_std, raw=False).dropna()
             # x1 = np.linspace(start=window - 1, stop=len(y1) + 1, num=len(y1), endpoint=True)
 
-            y2 = log['HeatFluxX'][skip_first_iterations:].rolling(window).apply(calc_norm_std, raw=True).dropna()
+            y2 = log['HeatFluxX'][-n_last_it_to_analyze:].rolling(window).apply(calc_norm_std, raw=True).dropna()
             # x2 = np.linspace(start=window - 1, stop=len(y2) + 1, num=len(y2), endpoint=True)
 
-            x = log['Iteration'][skip_first_iterations + window - 1:]
+            x = log['Iteration'][-n_last_it_to_analyze + window - 1:]
 
             plot_name = "convergence_plots/convergence_MA_" + re.sub(r".csv", r".png", file)
             plot_name = re.sub(r"_Log_P00_00000000", r"", plot_name)
-            make_std_q_plot(x, y1, x, y2, plot_name)
+            # make_std_q_plot(x, y1, x, y2, plot_name)
 
             print(f"processed {file}.")
 

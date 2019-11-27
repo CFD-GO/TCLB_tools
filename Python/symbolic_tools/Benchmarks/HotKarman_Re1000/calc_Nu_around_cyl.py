@@ -13,7 +13,7 @@ from scipy.interpolate import griddata
 from scipy.interpolate import interp2d
 
 
-from Benchmarks.HotKarman_Re1000.contour_and_slice_plot import cntr_plot
+from Benchmarks.HotKarman_Re1000.contour_and_slice_plot import cntr_plot, Nu_phi_plot
 
 # eff_pipe_diam = 66
 # eff_cyl_diam = 33
@@ -21,7 +21,8 @@ from Benchmarks.HotKarman_Re1000.contour_and_slice_plot import cntr_plot
 # kin_visc = 0.1
 
 Pr = 0.71
-
+dr = 1.5
+whichT = 'T'  # 'T', 'averageT'  # TODO: add mask T=11 for averageT
 solver = 'TCLB'  # 'TCLB' or 'walberla
 
 wd = os.getcwd()
@@ -34,10 +35,10 @@ if solver == 'walberla':
     # case_folder = os.path.join('vtk_test_old', 'thermal_field')
     case_folder = os.path.join(f'vtk_eff_pipe_diam_{eff_pipe_diam}', 'thermal_field')
 elif solver == 'TCLB':
-    main_folder = os.path.join(home, 'DATA_FOR_PLOTS')
+    main_folder = os.path.join(home, 'DATA_FOR_PLOTS', 'HotKarman_Re1000')
     # case_folder = f'abb_ruraWrurze_Dirichlet_Cumulants_k_{conductivity}_nu_{kin_visc}_effdiam_{eff_pipe_diam}'
     # case_folder = f'test_batch_HotKarman_Re1000_D0_1.28e+02_nu_0.0055_U_4.30e-02_1st_order_bc_CM_HIGHER'
-    case_folder = 'test_batch_HotKarman_Re1000_D0_6.40e+01_nu_0.0055_U_8.59e-02_bc_HeaterDirichletTemperatureEQ_CM_HIGHER'
+    case_folder = 'batch_HotKarman_Re1000_D0_6.40e+01_nu_0.003_U_4.69e-02_1st_order_bc_CM_HIGHER'
 else:
     raise Exception("Choose solver [\'TCLB\' or \'walberla\'] ")
 
@@ -58,7 +59,7 @@ def read_data_from_lbm(_case_folder):
     else:
         raise Exception("Choose solver [\'TCLB\' or \'walberla\'] ")
 
-    T_num = vti_reader.get("T")
+    T_num = vti_reader.get(whichT)
     T_num_slice = T_num[:, :, 1]
 
     # [ux_num, uy_num, uz_num] = vti_reader.get("U", is_vector=True)
@@ -78,7 +79,7 @@ def get_sim_params_from_folder_name(_case_folder):
     match = re.search(r'_D0_(\d\.\d\de\+\d\d)_', _case_folder, re.IGNORECASE)
     d = float(match.group(1))
 
-    match = re.search(r'_nu_(0\.\d{4,6})_', _case_folder, re.IGNORECASE)
+    match = re.search(r'_nu_(0\.\d{1,4})_', _case_folder, re.IGNORECASE)
     kin_visc = float(match.group(1))
 
     np.testing.assert_allclose(Re, u*d/kin_visc, rtol=1e-1)
@@ -90,74 +91,60 @@ ny, nx = T_num_slice.shape
 
 u, d, kin_visc = get_sim_params_from_folder_name(os.path.join(main_folder, case_folder))
 conductivity = kin_visc/Pr
-eff_cyl_diam = d  # true for i(a)bb
-cuttoff_r0 = eff_cyl_diam / 2. + 1
+r = d/2.  # true for I(A)BB
 
-x0 = 0.25 * nx  # center of the cylinder/pipe
-y0 = 0.5 * ny  # center of the cylinder/pipe
-# -------- anal solution ---------------
+x0 = 0.25 * nx  # x-center of the cylinder/pipe
+y0 = 0.5 * ny   # y-center of the cylinder/pipe
 
-
-
+# generate points where data needs to be interpolated in cartesian coord
 x_grid = np.linspace(0, nx, nx, endpoint=False) + 0.5
 y_grid = np.linspace(0, ny, ny, endpoint=False) + 0.5
 xx, yy = np.meshgrid(x_grid, y_grid)
 
+# transform them to radial coord
+phi_deg = np.linspace(0, 360, num=120)
+x_r = np.array(x0 + (r+dr)*np.cos(np.deg2rad(phi_deg)))
+y_r = np.array(y0 + (r+dr)*np.sin(np.deg2rad(phi_deg)))
 
 # https://stackoverflow.com/questions/37872171/how-can-i-perform-two-dimensional-interpolation-using-scipy
 
-interpol_fun = interp2d(x_grid, y_grid, T_num_slice, kind='linear')
-phi_deg = np.linspace(0, 90, 10)
-dr = 1
-x_r = np.array(x0 + (eff_cyl_diam/2+dr)*np.cos(np.deg2rad(phi_deg)))
-y_r = np.array(y0 + (eff_cyl_diam/2+dr)*np.sin(np.deg2rad(phi_deg)))
-Tr = interpol_fun(x_r, y_r)
+# interpolation 1 - poor results
+# interpol_fun = interp2d(x_grid, y_grid, T_num_slice, kind='cubic')
+# Tr = interpol_fun(x_r, y_r)
+# Tr = Tr.diagonal()
+# Nu_phi_plot(Tr, phi_deg, title=r'$T(\phi)$', file_name='interp2d')
 
-# # points = np.mgrid[x_r, y_r]
-# points = np.meshgrid(x_r, y_r)
-# # points_x, points_y = np.mgrid[x_r, y_r]
-# ipoints_x, ipoints_y = np.meshgrid(x_r, y_r)
-#
-# data = np.concatenate(([x_r], [y_r]), axis=0)
-# Tr = griddata(data, T_num_slice, (ipoints_x, ipoints_y), method='linear')
+# interpolation 2
+ipoints_xr, ipoints_yr = np.meshgrid(x_r, y_r)  # points where data needs to be interpolated
+known_data = np.array([xx.flatten(), yy.flatten()]).T
+Tr = griddata(known_data, T_num_slice.flatten(), (ipoints_xr, ipoints_yr), method='linear')
+Tr = Tr.diagonal()
+Nu_phi_plot(Tr, phi_deg, title=r'$T(\phi)$', file_name=f'T_dr{dr}_{whichT}')
 
-title=''
-import matplotlib.pyplot as plt
-import matplotlib.pylab as pylab
+# T_inf = 10
+# q = conductivity*(Tr - T_inf)
+# L = 1  # we are already on slice
+# S = np.pi * d * L
+# h = q/(S*(Tr-T_inf))
+# Nu = h*d/conductivity
 
-params = {'legend.fontsize': 'xx-large',
-          'figure.figsize': (14, 8),
-          'axes.labelsize': 'xx-large',
-          'axes.titlesize': 'xx-large',
-          'xtick.labelsize': 'xx-large',
-          'ytick.labelsize': 'xx-large'}
-pylab.rcParams.update(params)
 
-# -------------------- make dummy plot --------------------
-plt.rcParams.update({'font.size': 14})
-plt.figure(figsize=(14, 8))
+def calc_Nu(q_conv, k, D, L):
+    T_surf = 11
+    T_inf = 10
+    Surface = np.pi * D * L
+    ht_coeff_experimental = q_conv / (Surface * (T_surf - T_inf))
+    Nu = ht_coeff_experimental * D / k
+    Nu_jfm = q_conv*D/(k*L*(T_surf - T_inf))  # TODO:
+    return Nu, Nu_jfm
 
-axes = plt.gca()
+T_inf = 10
+q = conductivity*(Tr - T_inf)
+Nu, Nu_jfm = calc_Nu(q, conductivity, d, 1)
 
-plt.plot(phi_deg, Tr,
-         color="black", marker="x", markevery=1, markersize=7, linestyle="", linewidth=2,
-         # label=r'$numerical \, solution$'
-         )
+# TODO: policz calke z Nu i porownaj z logiem
+Nu_phi_plot(Nu_jfm, phi_deg, title=r'$Nu(\phi)$', file_name=f'Nu_dr{dr}_{whichT}')
 
-plt.title(title)
-
-plt.xlabel(r'$T$')
-plt.ylabel(r'$\phi$')
-plt.legend()
-plt.grid()
-
-fig = plt.gcf()  # get current figure
-if not os.path.exists('plots'):
-    os.makedirs('plots')
-
-fig_name = f'plots/slice_{title}.png'
-fig.savefig(fig_name, bbox_inches='tight')
-plt.show()
 
 # x_grid2 = np.linspace(0, nx, 0.2*nx, endpoint=False) + 0.5
 # y_grid2 = np.linspace(0, ny, 0.2*ny, endpoint=False) + 0.5
@@ -183,19 +170,10 @@ plt.show()
 # T_anal_masked = T_anal[not_nan_mask]
 # T_num_slice_masked = T_num_slice[not_nan_mask]
 # r_anal_masked = r_anal[not_nan_mask]
-#
-# T_mse = calc_mse(T_anal_masked, T_num_slice_masked)
-# T_L2 = calc_L2(T_anal_masked, T_num_slice_masked)
 
 
-
-
-
-# cntr_plot(T_anal, T_num_slice, xx, yy, conductivity, eff_cyl_diam)
-# # 2D clip
-# r_anal = r_anal[:, 63]
-# u_anal = u_anal[:, 63]
-# uz_num_slice = uz_num_slice[:, int(nx / 2)]
-# slice_plot(u_anal, uz_num_slice, kin_visc, effdiam, r_anal)
+# show the intepolation points
+points_be_shown_on_plot = np.concatenate(([x_r], [y_r]), axis=0)
+cntr_plot(None, T_num_slice, xx, yy, title='interpolation_points_for_T', extra_points=points_be_shown_on_plot)
 
 print('bye')
