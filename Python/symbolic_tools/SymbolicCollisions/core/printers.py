@@ -4,7 +4,7 @@ from SymbolicCollisions.core.cm_symbols import ux, uy, uz, \
     ux2, uy2, uz2,\
     ux3, uy3, uz3,\
     uxuy3,\
-    Sigma2
+    Sigma2, Sigma2asSymbol
 
 # from decimal import Decimal
 from sympy import simplify, Float, preorder_traversal, Matrix
@@ -36,10 +36,12 @@ def print_u3():
 
 
 def print_sigma_cht():
-    # print(f"{Sigma2}")
-    print_as_vector(Matrix([Sigma2]), outprint_symbol="real_t Sigma2")
-    # print(f"real_t Sigma2 = (h_stability_enhancement*1./3.)/(cp*rho);")
-    # print(f"real_t Sigma2 = {Sigma2};")
+    print("\t#ifdef OPTIONS_CHT")
+    # print_as_vector(Matrix([Sigma2]), outprint_symbol="real_t Sigma2")
+    print(f"\t\treal_t {Sigma2asSymbol} = {Sigma2};")
+    print("\t#else")
+    print(f"\t\treal_t {Sigma2asSymbol} = 1./3.;")
+    print("\t#endif")
 
 
 def round_and_simplify(stuff):

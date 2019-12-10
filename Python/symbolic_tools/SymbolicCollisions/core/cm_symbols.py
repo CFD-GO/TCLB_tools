@@ -283,7 +283,8 @@ S_relax_hydro_D2Q9 = diag(1, 1, 1, s_plus_D2Q9, s_plus_D2Q9, omega_v, 1, 1, 1)
 S_relax_hydro_D2Q9[3, 4] = s_minus_D2Q9
 S_relax_hydro_D2Q9[4, 3] = s_minus_D2Q9
 
-S_relax_ADE_D2Q9 = diag(1, omega_ade, omega_ade, 1, 1, 1, 1, 1, 1)
+# S_relax_ADE_D2Q9 = diag(1, omega_ade, omega_ade, 1, 1, 1, 1, 1, 1)
+S_relax_ADE_D2Q9 = diag(1, omega_ade, omega_ade, 1, 1, 1, omega_ade, omega_ade, 1)
 
 # Both S_relax_D3Q27 and order of 3D (central) moments as in
 # `Three-dimensional cascaded lattice Boltzmann method:

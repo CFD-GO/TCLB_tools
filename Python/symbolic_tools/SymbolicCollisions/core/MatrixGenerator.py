@@ -5,12 +5,48 @@ import numpy as np
 import pandas as pd
 
 
+# def get_m_order_as_in_r(x, y, z):
+#     if z is not None:
+#         yG, zG, xG = np.meshgrid(x, y, z)  # create the actual grid
+#         xG = xG.flatten()  # make the grid 1d
+#         yG = yG.flatten()  # same
+#         zG = zG.flatten()
+#         df = pd.DataFrame({'x': xG, 'y': yG, 'z': zG})  # prepare a dataframe
+#     else:
+#         xG, yG = np.meshgrid(x, y)  # create the actual grid
+#         xG = xG.flatten()  # make the grid 1d
+#         yG = yG.flatten()  # same
+#         df = pd.DataFrame({'x': xG, 'y': yG})
+#     return df.to_numpy()
+
+
+# def get_e_as_in_r(x, y, z):
+#     if z is not None:
+#         yG, zG, xG = np.meshgrid(x, y, z)  # create the actual grid
+#         xG = xG.flatten()  # make the grid 1d
+#         yG = yG.flatten()  # same
+#         zG = zG.flatten()
+#         ex_D3Q27 = Matrix(xG)
+#         ey_D3Q27 = Matrix(yG)
+#         ez_D3Q27 = Matrix(zG)
+#         e_D3Q27 = ex_D3Q27.col_insert(1, ey_D3Q27)
+#         e_D3Q27 = e_D3Q27.col_insert(2, ez_D3Q27)
+#         return ex_D3Q27, ey_D3Q27, ez_D3Q27, e_D3Q27
+#     else:
+#         xG, yG = np.meshgrid(x, y)  # create the actual grid
+#         xG = xG.flatten()  # make the grid 1d
+#         yG = yG.flatten()  # same
+#         ex_D3Q27 = Matrix(xG)
+#         ey_D3Q27 = Matrix(yG)
+#         e_D3Q27 = ex_D3Q27.col_insert(1, ey_D3Q27)
+#         return ex_D3Q27, ey_D3Q27, e_D3Q27
+
 def get_m_order_as_in_r(x, y, z):
     yG, zG, xG = np.meshgrid(x, y, z)  # create the actual grid
     xG = xG.flatten()  # make the grid 1d
     yG = yG.flatten()  # same
     zG = zG.flatten()
-    df = pd.DataFrame({'x': xG, 'y': yG, 'z': zG}) # prepare a dataframe
+    df = pd.DataFrame({'x': xG, 'y': yG, 'z': zG})  # prepare a dataframe
     return df.to_numpy()
 
 

@@ -139,8 +139,8 @@ class TestDiscreteCMTransforms(unittest.TestCase):
         #  thank you sympy...
 
         assert f'cm_eq[0] = {m00};' in out
-        assert f'cm_eq[1] = u.x*(1 - {m00});' or f'cm_eq[1] = u.x*(-{m00} + 1);' in out
-        assert f'cm_eq[2] = u.y*(1 - {m00});' or f'cm_eq[1] = u.y*(-{m00} + 1);' in out
+        assert f'cm_eq[1] = u.x*(1 - {m00});' in out or f'cm_eq[1] = u.x*(-{m00} + 1);' in out
+        assert f'cm_eq[2] = u.y*(1 - {m00});' in out or f'cm_eq[2] = u.y*(-{m00} + 1);' in out
         assert f'cm_eq[3] = {m00}*ux2 + 1/3.*{m00} - ux2;\n' in out
         assert f'cm_eq[4] = {m00}*uy2 + 1/3.*{m00} - uy2;\n' in out
         assert f'cm_eq[5] = uxuy*({m00} - 1.);\n' in out

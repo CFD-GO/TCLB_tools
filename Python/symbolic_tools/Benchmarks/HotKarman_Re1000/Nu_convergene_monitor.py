@@ -179,8 +179,11 @@ for root, dirs, files in os.walk(local_logs_folder):
                 blockage_ratio = float(match.group(1))
                 blockage_ratio = Fraction(blockage_ratio).limit_denominator(100)
                 blockage_ratio = str(blockage_ratio).replace('/', 'over')
+            match = re.search(r'_BR_(\do\d{1,4})_', file, re.IGNORECASE)
+            if match is not None:
+                blockage_ratio = match.group(1)
             else:
-                blockage_ratio = '1over12'  # d_cylinder / domain_y
+                blockage_ratio = 'unknownBR'  # d_cylinder / domain_y
 
 
             v = log['nu'][0]
@@ -203,7 +206,7 @@ for root, dirs, files in os.walk(local_logs_folder):
 
 
             # calculate Nu in all possible ways
-            n_last_it_to_analyze = 150
+            n_last_it_to_analyze = 50
             q_conv_avg_source = log['HeatSource'][-n_last_it_to_analyze:].mean()
             q_conv_avg_inlet = log['HeatFluxX'][-n_last_it_to_analyze:].mean()
             q_conv_avg_outlet = log['HeatFluxX2'][-n_last_it_to_analyze:].mean()
@@ -217,7 +220,9 @@ for root, dirs, files in os.walk(local_logs_folder):
 
             Nu_corr = get_Nu_cylinder_by_Churchill_Bernstein(Re=Re, Pr=Pr)
 
-            Nu_txt_description = f"Nu_avg_source={Nu_conv_avg_source:0.2f} Nu_avg_outlet={Nu_conv_avg_doutlet:0.2f} Nu_corr={Nu_corr:0.2f}"
+            Nu_txt_description = f"Nu_avg_source={Nu_conv_avg_source:0.2f} Nu_avg_outlet={Nu_conv_avg_doutlet:0.2f} " \
+                                 f"Nu_jfm=14.7" \
+                                 f"Nu_corr={Nu_corr:0.2f}"
             print(f"\n\nRe={Re:0.1f} Pr={Pr:0.1f} D0={D0} \n{Nu_txt_description}")
 
 
