@@ -7,6 +7,8 @@ import matplotlib.pyplot as plt
 import matplotlib.pylab as pylab
 import re
 import warnings
+from fractions import Fraction
+
 
 #######################################################
 #                       README
@@ -172,7 +174,15 @@ for root, dirs, files in os.walk(local_logs_folder):
             match = re.search(r'_U_(\d\.\d\de\-\d\d)_', file, re.IGNORECASE)
             u = float(match.group(1))
 
-            blockage_ratio = '1over12'  # d_cylinder / domain_y
+            match = re.search(r'_BR_(\d\.\d\de\-\d\d)_', file, re.IGNORECASE)
+            if match is not None:
+                blockage_ratio = float(match.group(1))
+                blockage_ratio = Fraction(blockage_ratio).limit_denominator(100)
+                blockage_ratio = str(blockage_ratio).replace('/', 'over')
+            else:
+                blockage_ratio = '1over12'  # d_cylinder / domain_y
+
+
             v = log['nu'][0]
             # if Re != u*D0/v:
             #     print(f"Re={Re:0.1f} while u*D0/v = {u*D0/v:0.1f}")

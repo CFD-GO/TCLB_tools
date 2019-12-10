@@ -21,8 +21,8 @@ from Benchmarks.HotKarman_Re1000.contour_and_slice_plot import cntr_plot, Nu_phi
 # kin_visc = 0.1
 
 Pr = 0.71
-dr = 1.5
-whichT = 'T'  # 'T', 'averageT'  # TODO: add mask T=11 for averageT
+dr = 0.5
+whichT = 'averageT'  # 'T', 'averageT'  # TODO: add mask T=11 for averageT
 solver = 'TCLB'  # 'TCLB' or 'walberla
 
 wd = os.getcwd()
