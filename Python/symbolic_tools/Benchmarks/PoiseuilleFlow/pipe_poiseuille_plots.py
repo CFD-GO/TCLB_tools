@@ -5,6 +5,7 @@ import matplotlib.pylab as pylab
 import os
 import matplotlib.ticker
 
+
 class OOMFormatter(matplotlib.ticker.ScalarFormatter):
     def __init__(self, order=0, fformat="%1.1f", offset=True, mathText=True):
         self.oom = order

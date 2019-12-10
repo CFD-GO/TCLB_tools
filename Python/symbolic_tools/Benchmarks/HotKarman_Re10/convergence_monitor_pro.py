@@ -39,8 +39,8 @@ os.system(cmd)
 
 
 def calc_Nu(q_conv, k, D, L):
-    T_surf = 1
-    T_inf = 0
+    T_surf = 11
+    T_inf = 10
     Surface = np.pi * D * L
     ht_coeff_experimental = q_conv / (Surface * (T_surf - T_inf))
     Nu = ht_coeff_experimental * D / k

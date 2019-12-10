@@ -15,7 +15,7 @@ import pandas as pd
 # "Consistent Forcing Scheme in the cascaded LBM" L. Fei et al. 2017
 # eqs 8-12 : (eye(q)-S)*cm + S*cm_eq + (eye(q)-S/2.)*force_in_cm_space
 
-model = 'cht'  # choose from '['hydro_compressible', 'hydro_incompressible', 'ade', 'ade_with_f', 'cht']
+model = 'hydro_incompressible'  # choose from '['hydro_compressible', 'hydro_incompressible', 'ade', 'ade_with_f', 'cht']
 
 m_seed = [0, 1, 2]
 rmoments_order = get_m_order_as_in_r(m_seed, m_seed, m_seed)
@@ -58,9 +58,9 @@ def get_cm_eq_and_F_cm_switcher(choice):
 
     F_cm_switcher = {
         'hydro_compressible': (
-        "SymbolicCollisions.core.hardcoded_results", f"hardcoded_F_cm_hydro_density_based_D{d}Q{q}"),
+        "SymbolicCollisions.core.hardcoded_results", f"hardcoded_F_cm_hydro_compressible_D{d}Q{q}"),
         'hydro_incompressible': (
-        "SymbolicCollisions.core.hardcoded_results", f"hardcoded_F_cm_hydro_velocity_based_D{d}Q{q}"),
+        "SymbolicCollisions.core.hardcoded_results", f"hardcoded_F_cm_hydro_incompressible_D{d}Q{q}"),
         'ade_with_f': ("SymbolicCollisions.core.hardcoded_results", f"hardcoded_F_cm_pf_D{d}Q{q}"),
         'ade': None,
         'cht': None,
@@ -85,7 +85,7 @@ Nraw = matrixGenerator.get_shift_matrix()
 # pprint(Mraw)  # see what you have done
 # pprint(Nraw)
 
-pop_in_str = 'h'  # symbol defining populations
+pop_in_str = 'g'  # symbol defining populations
 temp_pop_str = 'temp'  # symbol defining populations
 cm_eq_pop_str = 'cm_eq'  # symbol defining populations
 
@@ -125,7 +125,8 @@ temp_populations = get_print_symbols_in_m_notation(moments_order, temp_pop_str)
 cm_eq = get_print_symbols_in_m_notation(moments_order, cm_eq_pop_str)
 F_cm = get_print_symbols_in_m_notation(moments_order, F_str)
 
-print(f"\treal_t H = {sum(populations)};")
+print(f"\treal_t {omega_b} = 1.0;")
+print(f"\treal_t {m00} = {sum(populations)};")
 
 for t, p in zip(temp_populations, populations):
     print(f"\treal_t {t} = {p};")

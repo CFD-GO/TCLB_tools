@@ -43,7 +43,7 @@ uxuy = Symbol('uxuy')
 uxuz = Symbol('uxuz')
 uyuz = Symbol('uyuz')
 
-m00 = Symbol('m00', positive=True)
+m00 = Symbol('m000', positive=True)
 rho = Symbol('rho', positive=True)
 Temperature = Symbol('T', positive=True)
 Enthalpy = Symbol('H', positive=True)  # consider it as enthalpy
@@ -68,7 +68,7 @@ s1D = Matrix([s_x])
 s2D = Matrix([s_x, s_y])
 s3D = Matrix([s_x, s_y, s_z])
 
-Force_str = "F"
+Force_str = "F_total"
 Fx = Symbol(Force_str + '.x')
 Fy = Symbol(Force_str + '.y')
 Fz = Symbol(Force_str + '.z')
@@ -439,38 +439,4 @@ moments_dict = {
     #           (1, 2, 2),
     #           (2, 2, 2),
     #           ],
-}
-
-
-pop_symbol = 'f'
-walberla_csys = {
-    r'vC ': f'{pop_symbol}000 ',  # x={1:E, 2:W} y={1:N, 2:S} z={1:T, 2:B}
-    r'vE ': f'{pop_symbol}100 ',
-    r'vW ': f'{pop_symbol}200 ',
-    r'vN ': f'{pop_symbol}010 ',
-    r'vS ': f'{pop_symbol}020 ',
-    r'vT ': f'{pop_symbol}001 ',
-    r'vB ': f'{pop_symbol}002 ',
-
-    r'vNE ': f'{pop_symbol}110 ',
-    r'vNW ': f'{pop_symbol}210 ',
-    r'vSE ': f'{pop_symbol}120 ',
-    r'vSW ': f'{pop_symbol}220 ',
-    r'vTE ': f'{pop_symbol}101 ',
-    r'vTW ': f'{pop_symbol}201 ',
-    r'vBE ': f'{pop_symbol}102 ',
-    r'vBW ': f'{pop_symbol}202 ',
-    r'vTN ': f'{pop_symbol}011 ',
-    r'vTS ': f'{pop_symbol}021 ',
-    r'vBN ': f'{pop_symbol}012 ',
-    r'vBS ': f'{pop_symbol}022 ',
-
-    r'vTNE': f'{pop_symbol}111 ',
-    r'vTNW': f'{pop_symbol}211 ',
-    r'vTSE': f'{pop_symbol}121 ',
-    r'vTSW': f'{pop_symbol}221 ',
-    r'vBNE': f'{pop_symbol}112 ',
-    r'vBNW': f'{pop_symbol}212 ',
-    r'vBSE': f'{pop_symbol}122 ',
-    r'vBSW': f'{pop_symbol}222 ',
 }
