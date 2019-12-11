@@ -5,16 +5,31 @@ import numpy as np
 import pandas as pd
 
 # SETUP
+clip_z_dimension = False
+
 m_seed = [0, 1, 2]
 rmoments_order = get_m_order_as_in_r(m_seed, m_seed, m_seed)
-q, d = rmoments_order.shape
-
-moments_order = np.array(moments_dict[f'D{d}Q{q}'])
-print(f"order of moments | rmoments: \n "
-      f"{pd.concat([pd.DataFrame.from_records(moments_order),pd.DataFrame.from_records(rmoments_order)], axis=1)}")
 
 e_seed = [0, 1, -1]
 ex_D3Q27new, ey_D3Q27new, ez_D3Q27new, e_D3Q27new = get_e_as_in_r(e_seed, e_seed, e_seed)
+
+if clip_z_dimension:
+    rmoments_order = rmoments_order[0:9]
+    q, d = rmoments_order.shape
+    d = 2
+    ex_D3Q27new = ex_D3Q27new[0:9]
+    ey_D3Q27new = ey_D3Q27new[0:9]
+    ez_D3Q27new = ez_D3Q27new[0:9]
+    e_D3Q27new = e_D3Q27new[0:9, :]
+else:
+    q, d = rmoments_order.shape
+
+moments_order = np.array(moments_dict[f'D{d}Q{q}'])
+
+
+print(f"order of moments | rmoments: \n "
+      f"{pd.concat([pd.DataFrame.from_records(moments_order),pd.DataFrame.from_records(rmoments_order)], axis=1)}")
+
 print(f"lattice velocities - e: \n {np.array(e_D3Q27new)}")
 
 # ARRANGE STUFF

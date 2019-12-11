@@ -115,6 +115,36 @@ hardcoded_F_cm_pf_D3Q27 = Matrix([
     0,
 ])
 
+hardcoded_F_cm_hydro_compressible_D3Q27 = Matrix([
+    0,
+    Fx*m00/rho,
+    Fy*m00/rho,
+    Fz*m00/rho,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1 / 3. * Fx*m00/rho,
+    1 / 3. * Fx*m00/rho,
+    1 / 3. * Fy*m00/rho,
+    1 / 3. * Fz*m00/rho,
+    1 / 3. * Fy*m00/rho,
+    1 / 3. * Fz*m00/rho,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1 / 9. * Fx*m00/rho,
+    1 / 9. * Fy*m00/rho,
+    1 / 9. * Fz*m00/rho,
+    0,
+])
+
 hardcoded_F_cm_hydro_incompressible_D2Q9 = Matrix([
     0,
     Fx / rho,

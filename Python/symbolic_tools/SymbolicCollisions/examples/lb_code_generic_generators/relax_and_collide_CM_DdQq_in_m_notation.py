@@ -1,6 +1,6 @@
 from sympy.matrices import eye
 
-from SymbolicCollisions.core.cm_symbols import omega_ade, omega_b, omega_v, m00
+from SymbolicCollisions.core.cm_symbols import omega_ade, omega_b, omega_v, m00, Enthalpy
 from SymbolicCollisions.core.cm_symbols import Force_str as F_str
 from SymbolicCollisions.core.cm_symbols import dynamic_import, moments_dict
 from SymbolicCollisions.core.DiscreteCMTransforms import get_m00
@@ -15,8 +15,8 @@ import pandas as pd
 # "Consistent Forcing Scheme in the cascaded LBM" L. Fei et al. 2017
 # eqs 8-12 : (eye(q)-S)*cm + S*cm_eq + (eye(q)-S/2.)*force_in_cm_space
 
-model = 'cht'  # choose from '['hydro_compressible', 'hydro_incompressible', 'ade', 'ade_with_f', 'cht']
-clip_z_dimension = True
+model = 'hydro_compressible'  # choose from '['hydro_compressible', 'hydro_incompressible', 'ade', 'ade_with_f', 'cht']
+clip_z_dimension = False
 
 m_seed = [0, 1, 2]
 rmoments_order = get_m_order_as_in_r(m_seed, m_seed, m_seed)
@@ -98,7 +98,7 @@ Nraw = matrixGenerator.get_shift_matrix()
 # pprint(Mraw)  # see what you have done
 # pprint(Nraw)
 
-pop_in_str = 'g'  # symbol defining populations
+pop_in_str = 'h'  # symbol defining populations
 temp_pop_str = 'temp'  # symbol defining populations
 cm_eq_pop_str = 'cm_eq'  # symbol defining populations
 
@@ -141,7 +141,10 @@ F_cm = get_print_symbols_in_m_notation(moments_order, F_str)
 if 'hydro_compressible' in model or 'hydro_incompressible' in model:
     print(f"\treal_t {omega_b} = 1.0;")
 
-print(f"\treal_t {m00} = {sum(populations)};")
+if 'cht' in model:
+    print(f"\treal_t {Enthalpy} = {sum(populations)};")
+else:
+    print(f"\treal_t {m00} = {sum(populations)};")
 
 for t, p in zip(temp_populations, populations):
     print(f"\treal_t {t} = {p};")
