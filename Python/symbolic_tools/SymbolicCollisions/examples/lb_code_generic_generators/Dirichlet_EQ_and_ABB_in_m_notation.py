@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 
 # SETUP
-clip_z_dimension = False
+clip_z_dimension = True
 
 m_seed = [0, 1, 2]
 rmoments_order = get_m_order_as_in_r(m_seed, m_seed, m_seed)
