@@ -7,5 +7,6 @@ pytest
 concurrencytest
 pyglet
 pandas
+openpyxl
 vtk
 joblib
