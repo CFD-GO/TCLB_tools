@@ -294,19 +294,16 @@ for root, dirs, files in os.walk(local_logs_folder):
 
 
 print(dfObj)
+
+dfObj = dfObj.sort_values(by=['is3D', 'Collision_Kernel', 'D', 'BC_order'])
+dfObj.to_pickle("./pickled_df.pkl")
+
 # with pd.ExcelWriter('LBM_validation_HotKarman_Benchmark.xlsx') as writer:  # doctest: +SKIP
-#     dfObj = dfObj.sort_values(by=['Collision_Kernel', 'is3D', 'D'])
+#     # dfObj = dfObj.sort_values(by=['is3D', 'D', 'BC_order', 'Collision_Kernel', 'log_length'])
+#
 #     dfObjPr10 = dfObj.loc[dfObj['Pr'] == 10]
 #     dfObjPr10.to_excel(writer, sheet_name='Pr10')
 #     dfObjPr100 = dfObj.loc[dfObj['Pr'] == 100]
 #     dfObjPr100.to_excel(writer, sheet_name='Pr100')
-
-with pd.ExcelWriter('LBM_validation_HotKarman_Benchmark.xlsx') as writer:  # doctest: +SKIP
-    # dfObj = dfObj.sort_values(by=['is3D', 'D', 'BC_order', 'Collision_Kernel', 'log_length'])
-    dfObj = dfObj.sort_values(by=['is3D', 'Collision_Kernel', 'D', 'BC_order'])
-    dfObjPr10 = dfObj.loc[dfObj['Pr'] == 10]
-    dfObjPr10.to_excel(writer, sheet_name='Pr10')
-    dfObjPr100 = dfObj.loc[dfObj['Pr'] == 100]
-    dfObjPr100.to_excel(writer, sheet_name='Pr100')
 
 print("bye")
