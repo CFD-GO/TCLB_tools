@@ -15,7 +15,7 @@ lattice_size_dict = {'small': '1000x150',
                      'large': '4000x600'
                      }
 
-Pr_filters = [10, 100]
+Pr_filters = [10, 100, 1000]
 is_3D_filter = False
 
 new_df = pd.DataFrame()
@@ -86,5 +86,8 @@ with pd.ExcelWriter('LBM_validation_HotKarman_Benchmark.xlsx') as writer:  # doc
     # df_Pr100 = df.loc[df['Pr'] == 100]
     df_Pr100 = df.loc[(df['Pr'] == 100) & (df['is3D'] == False)]
     df_Pr100.to_excel(writer, sheet_name='Pr100raw', index=False)
+
+    df_Pr1000 = df.loc[(df['Pr'] == 1000) & (df['is3D'] == False)]
+    df_Pr1000.to_excel(writer, sheet_name='Pr1000raw', index=False)
 
 print("bye")

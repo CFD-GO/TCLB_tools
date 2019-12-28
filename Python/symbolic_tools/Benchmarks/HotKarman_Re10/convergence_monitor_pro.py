@@ -19,17 +19,16 @@ from fractions import Fraction
 
 home = pwd.getpwuid(os.getuid()).pw_dir
 local_logs_folder = os.path.join(home, 'DATA_FOR_PLOTS', 'HotKarman_Re10')
-# host_folder = os.path.join(f'$FROM_PRO', 'batch_HotKarman_Re10_test', 'batch_HotKarman_Re10_sizer*')
-#
-# if not os.path.exists(local_logs_folder):
-#     os.makedirs(local_logs_folder)
-#
-# cmd = "rsync -zarv  --prune-empty-dirs --include \"*/\"  --include=\"*.csv\" --exclude=\"*\" "\
-#       + f"\"{host_folder}\""\
-#       + f" \"{local_logs_folder}\""
-#
-# print(cmd)
-# os.system(cmd)
+host_folder = os.path.join(f'$FROM_PRO', 'batch_HotKarman_Re10_sizer*')
+if not os.path.exists(local_logs_folder):
+    os.makedirs(local_logs_folder)
+
+cmd = "rsync -zarv  --prune-empty-dirs --include \"*/\"  --include=\"*.csv\" --exclude=\"*\" "\
+      + f"\"{host_folder}\""\
+      + f" \"{local_logs_folder}\""
+
+print(cmd)
+os.system(cmd)
 print("--- rsync complete ---")
 
 
@@ -306,4 +305,4 @@ dfObj.to_pickle("./pickled_df.pkl")
 #     dfObjPr100 = dfObj.loc[dfObj['Pr'] == 100]
 #     dfObjPr100.to_excel(writer, sheet_name='Pr100')
 
-print("bye")
+print("data has been processed and saved, bye")
