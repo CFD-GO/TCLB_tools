@@ -91,27 +91,34 @@ def requireArg(name):
 
 def addSimpleGeomElements(nameList):
     def nif(cls):
-        def inf(name):
+        def inf(name,fname):
             @geometryElement
             def fin(self, **kwargs):
                 kwargs['_xml_node_name'] = name
                 return kwargs
-            cls.__dict__["add"+name] = fin
+            cls.__dict__["add"+fname] = fin
         for n in nameList:
-            inf(n)
+            if  type(n) is tuple:
+                inf(n[0], n[1])
+            else:
+                inf(n,n)
         return cls
     return nif
 
 def addSimpleBCElements(nameList):
     def nif(cls):
-        def inf(name):
+        def inf(name,fname):
             @BCElement
             def fin(self, **kwargs):
                 kwargs['_xml_node_name'] = name
                 return kwargs
-            cls.__dict__["add"+name] = fin
+            cls.__dict__["add"+fname] = fin
         for n in nameList:
-            inf(n)
+            if type(n) is tuple:
+                print n
+                inf(n[0], n[1])
+            else:
+                inf(n,n)
         return cls
     return nif
 
@@ -142,8 +149,8 @@ def _set_by_kw(kw, name, default):
     'HalfSphere',
     'OffgridSphere',
     'OffgridPipe',
-    'Outlet',
-    'Inlet'
+    ('Outlet','OutletElement'),
+    ('Inlet','InletElement'),
     ])
 @addSimpleBCElements([
     'MRT',
@@ -158,19 +165,25 @@ def _set_by_kw(kw, name, default):
     'EVelocity',
     'WVelocity',    
     'SVelocity',
-    'NVelocity',       
+    'NVelocity',     
+    ('Outlet','OutletDef'),
+    ('Inlet','InletDef'),
+    ('SolidBoundary1','SolidBoundary1Def'),
+    ('SolidBoundary2','SolidBoundary2Def'),
+    ('SolidBoundary3','SolidBoundary3Def'),    
     ])
 @addRootElements(
 [   
  'EvalIf',
  'CallPython',
  'VTK',
+ 'Log',
  'Andersen'
  ]        
 )
 class CLBConfigWriter:
 
-    def __init__(self, sign=''):
+    def __init__(self, output="output/", sign=''):
         self.root = ET.Element('CLBConfig')
         if not sign == '':
             self.root.append(ET.Comment(sign))
@@ -180,12 +193,15 @@ class CLBConfigWriter:
         self.model = ET.SubElement(self.root, 'Model')
 
         self.root.set("version", "2.0")
-        self.root.set("output", "output/")
+        self.root.set("output", output)
         self.geometry.set("predef", "none")
         self.geometry.set("model", "MRT")
 
         self.current_geometry = self.geometry
 
+
+    def newModel(self):
+        self.model = ET.SubElement(self.root, 'Model')
 
     def dump(self):
         self.indent(self.root)
@@ -351,7 +367,10 @@ if __name__ == "__main__":
     CLBc.addGeomParam('ny', 256)
     CLBc.addGeomParam('nx', 160)
     
+    CLBc.addModelParam('v',1)
     
+    CLBc.newModel()
+    CLBc.addModelParam('v',2)
     CLBc.addMRT()
     CLBc.addBox()
     
@@ -359,6 +378,11 @@ if __name__ == "__main__":
     
     CLBc.addBox(dy=90, fy=-90)
     
+    CLBc.addEPressure()
+    CLBc.addInletElement()
+    
+    CLBc.addInletDef()
+    CLBc.addBox(nx=1)
 
     CLBc.addSolve(iterations=1, vtk=1)
     CLBc.addSolve(iterations=100, vtk=50, failcheck=1)

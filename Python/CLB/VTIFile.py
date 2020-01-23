@@ -44,18 +44,27 @@ class VTIFile:
                 self.names.append(self.data.GetCellData().GetArrayName(i))
         return name in self.names
 
-    def get(self, name, vector=False, dtype=False):     
+    def get(self, name, vector=None, dtype=False):     
 
+        cellData = VN.vtk_to_numpy( self.data.GetCellData().GetArray(name) )
+        
+        
+        if vector == None:
+            if np.cumprod(cellData.shape)[-1] > np.cumprod(self.s_scal)[-1]:
+                vector = True
+            else:
+                vector = False
+                
         if vector:
             subspace = (np.meshgrid(
                 range(self.trim_0[0],self.trim_1[0]),
                 range(self.trim_0[1],self.trim_1[1]),
                 range(3)
             )) 
-            T = np.transpose(VN.vtk_to_numpy(self.data.GetCellData().GetArray(name)).reshape(self.s_vec), (1,0,2))[subspace]
+            T = np.transpose(cellData.reshape(self.s_vec), (1,0,2))[subspace]
         else:
             subspace = (np.meshgrid(*[range(self.trim_0[i],self.trim_1[i]) for i in range(2) ]))
-            T =  VN.vtk_to_numpy(self.data.GetCellData().GetArray(name)).reshape(self.s_scal).T[subspace]
+            T =  cellData.reshape(self.s_scal).T[subspace]
         if dtype:
             T = np.array(T,dtype=dtype)
         return  T
