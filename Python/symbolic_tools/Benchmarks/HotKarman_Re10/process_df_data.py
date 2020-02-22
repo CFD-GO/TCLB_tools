@@ -2,7 +2,7 @@ import pandas as pd
 
 df = pd.read_pickle("./pickled_df.pkl")
 
-kernel_filters = ['CM_HIGHER', 'Cumulants']
+kernel_filters = ['CM_HIGHER', 'Cumulants', 'CM', 'BGK']
 bc_order_filters = ['1st_order_bc', '2nd_order_bc']
 
 size_filters_dict = {'small': 30,

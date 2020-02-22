@@ -27,8 +27,8 @@ cmd = "rsync -zarv  --prune-empty-dirs --include \"*/\"  --include=\"*.csv\" --e
       + f"\"{host_folder}\""\
       + f" \"{local_logs_folder}\""
 
-print(cmd)
-os.system(cmd)
+# print(cmd)
+# os.system(cmd)
 print("--- rsync complete ---")
 
 
@@ -189,7 +189,7 @@ def get_data_from_path(filepath):
     match = re.search(r'\d([a-z]){2}_order_bc', file, re.IGNORECASE)
     bc_order = match.group(0)
 
-    match = re.search(r'Cumulants|CM_HIGHER', file, re.IGNORECASE)
+    match = re.search(r'Cumulants|CM_HIGHER|CM|BGK', file, re.IGNORECASE)
     collision_kernel = match.group(0)
 
     re.search(r'Cumulants', file, re.IGNORECASE)
