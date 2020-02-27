@@ -43,8 +43,8 @@ ax = fig.gca()
 # ax.plot_surface(xx, yy, T_anal,  cmap='autumn', linewidth=0.5, antialiased=True, zorder=0.1, label='T_anal')
 # ax.contourf(xx, yy, T_num_slice,  cmap='summer', linewidth=0.5, antialiased=True, label='T_num')
 
-# cntr = ax.pcolormesh(xx, yy, T_num_slice, cmap='coolwarm', label='T_num')  # this one has smooth colors
-cntr = ax.contourf(xx, yy, T_num_slice, cmap='coolwarm', antialiased=True)  # this one is has step colors
+cntr = ax.pcolormesh(xx, yy, T_num_slice, cmap='bwr', label='T_num')  # this one has smooth colors
+# cntr = ax.contourf(xx, yy, T_num_slice, cmap='coolwarm', antialiased=True)  # this one is has step colors
 
 ax.set_xlabel('X')
 ax.set_ylabel('Y')

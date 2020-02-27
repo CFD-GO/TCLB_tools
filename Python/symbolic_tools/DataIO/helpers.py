@@ -59,7 +59,10 @@ def find_oldest_iteration(folder, extension='.pvti'):
     if not iterations:
         raise FileNotFoundError(f'Check the path: \n {folder}')
 
-    oldest = max(iterations)
+    # oldest = max(iterations)
+    iterations.sort()
+    # oldest = iterations[-1]
+    oldest = iterations[6]
     return oldest
 
 

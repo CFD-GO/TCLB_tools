@@ -54,10 +54,10 @@ for Pr_filter in Pr_filters:
 
         tmp_df = pd.DataFrame({
             'Case_id': case_id_filter,
-            'Nu_' + kernel_filters[0] + '_' + bc_order_filters[0]: None,
-            'Nu_' + kernel_filters[0] + '_' + bc_order_filters[1]: None,
-            'Nu_' + kernel_filters[1] + '_' + bc_order_filters[0]: None,
-            'Nu_' + kernel_filters[1] + '_' + bc_order_filters[1]: None,
+            # 'Nu_' + kernel_filters[0] + '_' + bc_order_filters[0]: None,
+            # 'Nu_' + kernel_filters[0] + '_' + bc_order_filters[1]: None,
+            # 'Nu_' + kernel_filters[1] + '_' + bc_order_filters[0]: None,
+            # 'Nu_' + kernel_filters[1] + '_' + bc_order_filters[1]: None,
             'Nu_FEM': None
         }, index=[0])
 
