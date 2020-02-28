@@ -27,8 +27,8 @@ cmd = "rsync -zarv  --prune-empty-dirs --include \"*/\"  --include=\"*.csv\" --e
       + f"\"{host_folder}\""\
       + f" \"{local_logs_folder}\""
 
-# print(cmd)
-# os.system(cmd)
+print(cmd)
+os.system(cmd)
 print("--- rsync complete ---")
 #
 

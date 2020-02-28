@@ -1,33 +1,22 @@
 from SymbolicCollisions.core.DiscreteCMTransforms import \
-    DiscreteCMTransforms, get_mom_vector_from_discrete_def, get_mom_vector_from_shift_mat
-
+    DiscreteCMTransforms
 from SymbolicCollisions.core.cm_symbols import \
     F3D, dzeta3D, u3D, rho
 
 from SymbolicCollisions.core.ContinuousCMTransforms import ContinuousCMTransforms, get_mom_vector_from_continuous_def
-
-from sympy import Symbol
-from SymbolicCollisions.core.cm_symbols import ux, uy, u2D, Fx, Fy, F2D, rho
-from SymbolicCollisions.core.printers import print_as_vector
-
-from SymbolicCollisions.core.cm_symbols import omega_ade, omega_b, omega_v, m00, Enthalpy
-from SymbolicCollisions.core.cm_symbols import Force_str as F_str
-
-from SymbolicCollisions.core.DiscreteCMTransforms import get_m00
+from SymbolicCollisions.core.cm_symbols import ux, uy, u2D, Fx, Fy, F2D
 from SymbolicCollisions.core.printers import print_as_vector, get_print_symbols_in_m_notation
-from SymbolicCollisions.core.printers import print_u2, print_sigma_cht
 from SymbolicCollisions.core.MatrixGenerator import get_m_order_as_in_r, get_e_as_in_r, MatrixGenerator
 from sympy.matrices import Matrix
 import numpy as np
 import pandas as pd
+from sympy import Symbol
 
 import time
 
 start = time.process_time()
 
 ########################################
-
-# DYNAMIC IMPORTS
 
 clip_z_dimension = True
 
@@ -78,7 +67,7 @@ matrixGenerator = MatrixGenerator(ex, ey, ez, rmoments_order)
 Mraw = matrixGenerator.get_raw_moments_matrix()
 Nraw = matrixGenerator.get_shift_matrix()
 
-print_as_vector(Mraw.inv() * m_eq.transpose(), outprint_symbol='f_from_anal_mom', output_order_of_moments=rmoments_order)
+print_as_vector(Mraw.inv() * m_eq.transpose(), outprint_symbol='f_eq_from_anal_mom', output_order_of_moments=rmoments_order)
 print("--------------------------------------------------")
 
 dcmt = DiscreteCMTransforms(e_D2Q9, Matrix([ux, uy, 0]), Matrix([Fx, Fy, 0]), rho)
