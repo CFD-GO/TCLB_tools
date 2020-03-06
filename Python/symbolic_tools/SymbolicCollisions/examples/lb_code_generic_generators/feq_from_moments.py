@@ -4,7 +4,7 @@ from SymbolicCollisions.core.cm_symbols import \
     F3D, dzeta3D, u3D, rho
 
 from SymbolicCollisions.core.ContinuousCMTransforms import ContinuousCMTransforms, get_mom_vector_from_continuous_def
-from SymbolicCollisions.core.cm_symbols import ux, uy, u2D, Fx, Fy, F2D
+from SymbolicCollisions.core.cm_symbols import ux, uy, u2D, Fx, Fy, F2D, w_D2Q9
 from SymbolicCollisions.core.printers import print_as_vector, get_print_symbols_in_m_notation
 from SymbolicCollisions.core.MatrixGenerator import get_m_order_as_in_r, get_e_as_in_r, MatrixGenerator
 from sympy.matrices import Matrix
@@ -70,7 +70,7 @@ Nraw = matrixGenerator.get_shift_matrix()
 print_as_vector(Mraw.inv() * m_eq.transpose(), outprint_symbol='f_eq_from_anal_mom', output_order_of_moments=rmoments_order)
 print("--------------------------------------------------")
 
-dcmt = DiscreteCMTransforms(e_D2Q9, Matrix([ux, uy, 0]), Matrix([Fx, Fy, 0]), rho)
+dcmt = DiscreteCMTransforms(e_D2Q9, Matrix([ux, uy, 0]), Matrix([Fx, Fy, 0]), rho, w_D2Q9)
 discrete_edf = [dcmt.get_EDF(i) for i in range(0, 9)]
 print_as_vector(Matrix([discrete_edf]), outprint_symbol=f"f_eq_2nd_order", output_order_of_moments=rmoments_order)
 
