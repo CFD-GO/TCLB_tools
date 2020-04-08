@@ -30,8 +30,9 @@ for ux in [0, 0.1]:
             time_spot = None
 
             for g in range(n):
-                folder = os.path.join(main_folder,
-                                           f"{collision_type}_ux_{ux}_k_{conductivities[g]}_sigma_{Sigma02}_size_{lattice_size}lu")
+                folder = os.path.join(
+                    main_folder,
+                    f"{collision_type}_ux_{ux}_k_{conductivities[g]}_sigma_{Sigma02}_size_{lattice_size}lu")
 
                 oldest = find_oldest_iteration(folder)
                 time_spot = int(oldest)
@@ -49,7 +50,7 @@ for ux in [0, 0.1]:
                                               f'ux_{ux}_k_{conductivities[g]}_sigma_{Sigma02}_size_{lattice_size}_time_spot_{oldest}.npy')
 
                 gha = GaussianHillAnal2D(C0, X0, Sigma02, float(conductivities[g]))
-                xx, yy, T_anal = prepare_anal_data_ADE_Gaussion_Hill(gha, ux, oldest, lattice_size, lattice_size, dump_file_path)
+                xx, yy, T_anal = prepare_anal_data_ADE_Gaussion_Hill(gha, ux, oldest, lattice_size, lattice_size, dump_file_path, shall_recalculate_results=False)
 
                 T_err_field = T_anal - T_num_slice
                 T_L2[g] = calc_L2(T_anal, T_num_slice)
@@ -70,7 +71,10 @@ for ux in [0, 0.1]:
 
         fconductivities = [float(c) for c in conductivities]
         print("------------------------------------ PLOT ------------------------------------")
-        fig_name = f'ADE_GaussianHill_ux={ux:.0e}_sig={Sigma02}_time={time_spot}_lattice={lattice_size}[lu].png'
+        plot_dir = 'k_convergence_plots'
+        if not os.path.exists(plot_dir):
+            os.makedirs(plot_dir)
+        fig_name = f'{plot_dir}/ADE_GaussianHill_ux={ux:.0e}_sig={Sigma02}_time={time_spot}_lattice={lattice_size}[lu].png'
         plt.rcParams.update({'font.size': 14})
         plt.figure(figsize=(14, 8))
         # '{:.0e}'.format(x)

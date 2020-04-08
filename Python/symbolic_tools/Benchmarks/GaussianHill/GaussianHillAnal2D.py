@@ -31,7 +31,7 @@ class GaussianHillAnal2D:
         return C
 
 
-def prepare_anal_data_ADE_Gaussion_Hill(gha, ux, time_spot, ySIZE, xSIZE, dump_file_path, shall_recalculate_results=False):
+def prepare_anal_data_ADE_Gaussion_Hill(gha: GaussianHillAnal2D, ux, time_spot, ySIZE, xSIZE, dump_file_path, shall_recalculate_results=False):
 
     if os.path.isfile(dump_file_path) and not shall_recalculate_results:
         print(f'{dump_file_path} found, loading results from disc')

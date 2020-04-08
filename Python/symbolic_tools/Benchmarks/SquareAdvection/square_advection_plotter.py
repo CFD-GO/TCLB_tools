@@ -60,7 +60,10 @@ def make_plot(data, plot_name):
     # ax.contourf(xx, yy, T_num_slice,  cmap='summer', linewidth=0.5, antialiased=True, label='T_num')
 
     # gist_rainbow, brg, hsv, seismic, RdBu
-    cntr = ax.pcolormesh(xx, yy, T_num_slice, cmap='twilight', label='T_num', vmin=9.95, vmax=11.05)  # this one has smooth colors
+    cntr = ax.pcolormesh(xx, yy, T_num_slice, cmap='Greys', label='T_num', vmin=9.975,
+                         vmax=11.025)  # this one has smooth colors
+
+    # cntr = ax.pcolormesh(xx, yy, T_num_slice, cmap='twilight', label='T_num', vmin=9.95, vmax=11.05)  # this one has smooth colors
     # cntr = ax.contourf(xx, yy, T_num_slice, cmap='coolwarm', antialiased=True)  # this one is has step colors
 
     # ax.set_xlabel('X')

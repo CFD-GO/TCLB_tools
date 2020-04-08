@@ -61,8 +61,8 @@ def find_oldest_iteration(folder, extension='.pvti'):
 
     # oldest = max(iterations)
     iterations.sort()
-    # oldest = iterations[-1]
-    oldest = iterations[6]
+    oldest = iterations[-1]
+    # oldest = iterations[6]
     return oldest
 
 

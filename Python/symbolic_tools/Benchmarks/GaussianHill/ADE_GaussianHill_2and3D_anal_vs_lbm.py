@@ -25,7 +25,7 @@ conductivities = ['0.01', '0.001', '1e-04', '1e-05']
 home = pwd.getpwuid(os.getuid()).pw_dir
 main_folder = os.path.join(home, 'DATA_FOR_PLOTS', 'batch_GaussianHill_advection')
 
-shall_clip_to_2D = False
+shall_clip_to_2D = True
 
 for CollisionType in ["CM", "CM_HIGHER"]:
     for k in conductivities:
@@ -54,14 +54,21 @@ for CollisionType in ["CM", "CM_HIGHER"]:
 
         ###################################################################################################################
 
+        plot_dir = 'ADE_GaussianHill_2and3D_anal_vs_lbm'
+        if not os.path.exists(plot_dir):
+            os.makedirs(plot_dir)
+
         if shall_clip_to_2D:
             T_anal = T_anal[int(ySIZE / 2), :]  # half X slice
             T_num_slice = T_num_slice[int(ySIZE / 2), :]  # half X slice
             T_err_field = T_err_field[int(ySIZE / 2), :]
 
             x_grid = xx[0, :]
-            # -------------------- make dummy plot --------------------
-            fig_name = f'ADE_GaussianHill_lattice={lattice_size}[lu]_sig={Sigma02}_ux={ux}_k={k}_time={int(oldest)}_2Dslice.png'
+            print("---------- PLOTTING -------------")
+            fig_name = os.path.join(
+                plot_dir,
+                f'ADE_GaussianHill_{CollisionType}_lattice={lattice_size}[lu]_sig={Sigma02}_ux={ux}_k={k}_time={int(oldest)}_2Dslice.png')
+
             plt.rcParams.update({'font.size': 14})
             plt.figure(figsize=(14, 8))
 
@@ -81,7 +88,6 @@ for CollisionType in ["CM", "CM_HIGHER"]:
             # plt.plot(u_fd, y_,
             #          color="black", marker="", markevery=1, markersize=15, linestyle=":", linewidth=2,
             #          label=r'$FD \, solution$')
-
 
             # ------ format y axis ------ #
             yll = T_anal.min()
@@ -104,20 +110,21 @@ for CollisionType in ["CM", "CM_HIGHER"]:
                       f'\n' r'$T_{L2}$=' + f'{T_L2:.2e}')
 
             plt.xlabel(r'$x$')
-            plt.ylabel(r'$Temperature$')
+            plt.ylabel(r'$Concentration$')
             plt.legend()
             plt.grid()
 
             fig = plt.gcf()  # get current figure
             fig.savefig(fig_name, bbox_inches='tight')
             plt.show()
-
-            # plt.close(fig)  # close the figure
+            plt.close(fig)  # close the figure
 
         else:
             print("---------- PLOTTING -------------")
 
-            fig_name = f'ADE_GaussianHill_{CollisionType}_ux={ux}_sig={Sigma02}_k={float(k):.0e}_time={int(oldest)}_lattice={lattice_size}[lu]_contour.png'
+            fig_name = os.path.join(
+                plot_dir,
+                f'ADE_GaussianHill_{CollisionType}_ux={ux}_sig={Sigma02}_k={float(k):.0e}_time={int(oldest)}_lattice={lattice_size}[lu]_contour.png')
             plt.rcParams.update({'font.size': 24})
             fig = plt.figure(figsize=(12, 8))
 
@@ -147,10 +154,7 @@ for CollisionType in ["CM", "CM_HIGHER"]:
             # Customize the z axis.
             # ax.set_zlim(-.1, .1)
             # ax.zaxis.set_major_locator(LinearLocator(10))
-
             # ax.zaxis.set_major_formatter(FormatStrFormatter('%.02f'))
-
-
 
             # plt.title(f'Advection - Diffusion of Gaussian Hill at t={int(oldest)}'
             #           f'\n' r'$T_{L2}$=' + f'{T_L2:.2e}')
@@ -162,8 +166,7 @@ for CollisionType in ["CM", "CM_HIGHER"]:
             fig = plt.gcf()  # get current figure
             fig.savefig(fig_name, bbox_inches='tight')
             plt.show()
-
             plt.close(fig)  # close the figure
 
-            print("bye")
+print("bye")
 
