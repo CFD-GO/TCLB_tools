@@ -67,13 +67,17 @@ matrixGenerator = MatrixGenerator(ex, ey, ez, rmoments_order)
 Mraw = matrixGenerator.get_raw_moments_matrix()
 Nraw = matrixGenerator.get_shift_matrix()
 
-print_as_vector(Mraw.inv() * m_eq.transpose(), outprint_symbol='f_eq_from_anal_mom', output_order_of_moments=rmoments_order)
-print_as_vector(Mraw.inv()*Nraw.inv() * cm_eq.transpose(), outprint_symbol='f_eq_from_anal_cmom', output_order_of_moments=rmoments_order)
+feq = Mraw.inv() * m_eq.transpose()
+print_as_vector(feq, outprint_symbol='f_eq_from_anal_mom', output_order_of_moments=rmoments_order)
 print("--------------------------------------------------")
 
 dcmt = DiscreteCMTransforms(e_D2Q9, Matrix([ux, uy, 0]), Matrix([Fx, Fy, 0]), rho, cs2=1./3., w=w_D2Q9)
 discrete_edf = [dcmt.get_EDF(i) for i in range(0, 9)]
 print_as_vector(Matrix([discrete_edf]), outprint_symbol=f"f_eq_2nd_order", output_order_of_moments=rmoments_order)
+print("--------------------------------------------------")
+
+f_eq_diff =feq -Matrix([discrete_edf]).transpose()
+print_as_vector(f_eq_diff, outprint_symbol=f"feq_full_minus_f_eq_2nd_order", output_order_of_moments=rmoments_order)
 
 print(f'\n\n Done in {time.process_time() - start} [s].')
 print('bye')

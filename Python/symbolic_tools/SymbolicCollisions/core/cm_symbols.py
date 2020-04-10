@@ -44,6 +44,7 @@ uxuz = Symbol('uxuz')
 uyuz = Symbol('uyuz')
 
 m00 = Symbol('m000', positive=True)
+# m00 = Symbol(r'k_{00}^H', positive=True)
 rho = Symbol('rho', positive=True)
 Temperature = Symbol('T', positive=True)
 Enthalpy = Symbol('H', positive=True)  # consider it as enthalpy

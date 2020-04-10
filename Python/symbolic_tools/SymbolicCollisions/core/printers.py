@@ -11,7 +11,7 @@ from sympy import simplify, Float, preorder_traversal, Matrix
 from sympy.core.evalf import N as symbol_to_number
 from fractions import Fraction
 from sympy import Symbol
-
+from sympy import latex
 import numpy as np
 import pandas as pd
 
@@ -56,7 +56,7 @@ def round_and_simplify(stuff):
     return rounded_and_simplified_stuff
 
 
-def get_print_symbols_in_m_notation(moments_order, print_symbol='m_', as_list=False):
+def get_print_symbols_in_m_notation(moments_order, print_symbol='m_', as_list=False, withbrackets=False):
     if type(moments_order) != Matrix:
         moments_order = Matrix(moments_order)
 
@@ -68,7 +68,10 @@ def get_print_symbols_in_m_notation(moments_order, print_symbol='m_', as_list=Fa
         direction = [str(d) for d in direction]
         direction = ''.join(direction)
         direction = re.sub(r'-1', '2', direction)
-        print_symbols.append(f"{print_symbol}{direction}")
+        if withbrackets:
+            print_symbols.append(f"{print_symbol}_{{{direction}}}")
+        else:
+            print_symbols.append(f"{print_symbol}{direction}")
 
     if as_list:
         return print_symbols
@@ -182,3 +185,40 @@ def print_as_vector(some_matrix, outprint_symbol='default_symbol1', raw_output=F
 
         print(f"\t{print_symbols[i]} = {row};")
         # print(f"stuff = re.sub(r'{print_symbols[i]}', '{row}', stuff)")
+
+
+def print_as_vector_latex(some_matrix, outprint_symbol='default_symbol1', raw_output=False, withbrackets=True, output_order_of_moments=None):
+    print("\n")
+    rows = some_matrix._mat
+    q = len(rows)
+
+    if output_order_of_moments is not None:
+        print_symbols = get_print_symbols_in_m_notation(output_order_of_moments, outprint_symbol, as_list=True, withbrackets=True)
+    else:
+        print_symbols = get_print_symbols_in_indx_notation(q, outprint_symbol, withbrackets, as_list=True)
+
+    for i in range(q):
+        print(f"\t{print_symbols[i]} \\\\")
+
+    for i in range(q):
+        row = rows[i]
+
+        if raw_output:
+            print(latex(f"{print_symbols[i]} = {row}"))
+        else:
+            row = symbol_to_number(round_and_simplify(row))
+            # row = round_and_simplify(row)
+            row = latex(row)
+            row = re.sub(r"1\.0 ", "", row)  # omg, dont multiply by 1.0
+
+            ugly_fractions = re.findall(r"\d\.\d+", row)   # may return an empty list: []
+            while ugly_fractions:
+                row = re.sub(r"\d\.\d+",  # digit, dot, one or more digits
+                             str(Fraction(ugly_fractions[0]).limit_denominator(max_denominator=1000)),  # get algebraic fractions from decimal ones
+                             row, count=1)  # The optional argument count is the maximum number of pattern occurrences to be replaced
+                ugly_fractions = re.findall(r"\d\.\d+", row)
+
+            row = re.sub(r"u\.x", "u_x", row)
+            row = re.sub(r"u\.y", "u_y", row)
+            # print(f"\t{print_symbols[i]} &= {row} \\\\ \\nonumber")
+            print(f"\t{row} \\\\")

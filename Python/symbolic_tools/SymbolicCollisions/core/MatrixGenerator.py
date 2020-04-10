@@ -63,6 +63,24 @@ def get_e_as_in_r(x, y, z):
     return ex_D3Q27, ey_D3Q27, ez_D3Q27, e_D3Q27
 
 
+def get_reverse_direction_idx(e, index):
+    rev_e = -1*e
+    q, _ = e.shape
+    for i in range(q):
+        if rev_e[i, :] == e[index, :]:
+            return i
+
+
+def get_reverse_indices(e):
+    q, _ = e.shape
+    rev_indices = []
+    for i in range(q):
+        rev_i = get_reverse_direction_idx(e, i)
+        rev_indices.append(rev_i)
+
+    return np.array(rev_indices)
+
+
 class MatrixGenerator:
     def __init__(self, ex, ey, ez, order_of_moments):
         self.ex = ex
