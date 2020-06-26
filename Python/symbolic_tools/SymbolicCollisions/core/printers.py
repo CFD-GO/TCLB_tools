@@ -4,7 +4,8 @@ from SymbolicCollisions.core.cm_symbols import ux, uy, uz, \
     ux2, uy2, uz2,\
     ux3, uy3, uz3,\
     uxuy3,\
-    Sigma2, Sigma2asSymbol
+    Sigma2, Sigma2asSymbol,\
+    rho, cs2, cht_gamma
 
 # from decimal import Decimal
 from sympy import simplify, Float, preorder_traversal, Matrix
@@ -43,6 +44,26 @@ def print_sigma_cht():
     print(f"\t\treal_t {Sigma2asSymbol} = 1./3.;")
     print("\t#endif")
 
+
+def print_sigma_sir():
+    # print(f"\treal_t {Sigma2asSymbol} = {cs2*cht_gamma/rho};")
+    stability_enhancement = Symbol('stability_enhancement', positive=True)  # magic stability enhancement
+    print(f"\treal_t {Sigma2asSymbol} = {cs2 * stability_enhancement / rho};")
+
+
+def get_vector_of_eq_central_moments(what: Symbol, Sigma2: Symbol) -> Matrix:
+    moments = Matrix([
+        what,
+        0,
+        0,
+        Sigma2 * what,
+        Sigma2 * what,
+        0,
+        0,
+        0,
+        Sigma2 * Sigma2 * what,
+    ])
+    return moments
 
 def round_and_simplify(stuff):
     simplified_stuff = simplify(stuff)
@@ -160,7 +181,7 @@ def print_as_vector(some_matrix, outprint_symbol='default_symbol1', raw_output=F
                 for square_pattern in square_patterns:
                     to_be_squared = re.findall(r"(\w+)" + square_pattern, row)
                     if len(to_be_squared) > 1:
-                        msg = 'There is to much square patterns and I dont know not how to simplify them yet.\n ' \
+                        msg = 'There is to much square patterns and it is not sure how to simplify them yet.\n ' \
                               'Please generate and check the raw, unparsed output!'
                         # raise NotImplementedError(msg)
                         print(msg)
@@ -173,7 +194,7 @@ def print_as_vector(some_matrix, outprint_symbol='default_symbol1', raw_output=F
                 for cube_pattern in cube_patterns:
                     to_be_squared = re.findall(r"(\w+)" + cube_pattern, row)
                     if len(to_be_squared) > 1:
-                        msg = 'There is to much cubic patterns and I dont know not how to simplify them yet.\n ' \
+                        msg = 'There is to much cubic patterns and it is not sure how to simplify them yet.\n ' \
                               'Please generate and check the raw, unparsed output!'
                         # raise NotImplementedError(msg)
                         print(msg)

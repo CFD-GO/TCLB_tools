@@ -221,7 +221,7 @@ hardcoded_cm_eq_cht_D2Q9 = Matrix([
     0,
     0,
     0,
-    Sigma2asSymbol* Sigma2asSymbol * H,     # 1/9.*T*cht_gamma*cht_gamma/(cp*rho),
+    Sigma2asSymbol * Sigma2asSymbol * H,     # 1/9.*T*cht_gamma*cht_gamma/(cp*rho),
 ])
 
 

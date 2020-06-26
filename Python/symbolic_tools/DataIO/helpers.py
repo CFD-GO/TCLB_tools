@@ -3,9 +3,11 @@ import re
 import numpy as np
 
 
-def delete_unphysical_data_from_wall_nodes(data):
-    data = np.delete(data, 0, axis=0)
-    data = np.delete(data, -1, axis=0)
+def delete_unphysical_data_from_wall_nodes(data, n_to_strip_per_side):
+    # data = np.delete(data, 0, axis=0)
+    # data = np.delete(data, -1, axis=0)
+    data = np.delete(data, np.s_[:n_to_strip_per_side], axis=0)
+    data = np.delete(data, np.s_[-n_to_strip_per_side:], axis=0)
     return data
 
 

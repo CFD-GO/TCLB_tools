@@ -150,6 +150,7 @@ print("\n\t//collision in moments space")
 # print_as_vector(hardcoded_F_cm, F_cm_str)  # save time, verbosity
 print("\t//collide")
 
+print("\t//TODO: fix the BUG x_in[1] = m000*omega_ade*u.x - temp[1]*(omega_ade - 1.); shall be x_in instead of temp ")
 
 def make_collision(choice):
     model_switcher = {

@@ -15,6 +15,7 @@ from SymbolicCollisions.core.cm_symbols import Temperature, cht_gamma as cht_sta
 from SymbolicCollisions.core.cm_symbols import cp as specific_heat_capacity
 from SymbolicCollisions.core.cm_symbols import Enthalpy, Sigma2asSymbol
 
+
 class ContinuousCMTransforms:
     def __init__(self, dzeta, u, F, rho, cs2=1. / 3.,
                  T=Temperature, cp=specific_heat_capacity, cht_gamma=cht_stability_enhancement, enthalpy=Enthalpy):
