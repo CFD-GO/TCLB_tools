@@ -44,24 +44,19 @@ class Solver:
         """
 
         # back to R Huang notation
+        # coeff = np.sqrt((self.k_left * self.cp_left) / (self.k_right * self.cp_right))
+        coeff = np.sqrt((self.k_left * self.cp_left) / (self.k_right * self.cp_right))
         if x < 0:
             # B - po lewej - eq 45
-            coeff = np.sqrt((self.k_left * self.cp_left) / (self.k_right * self.cp_right))
-
-            err_arg = -x
-            err_arg /= (2 * np.sqrt(t * self.k_left / self.cp_left))
+            err_arg = -x/(2 * np.sqrt(t * self.k_left / self.cp_left))
             err_result = special.erfc(err_arg)  # special.erfc(err_arg) =  1 - special.erf(err_arg)
-            T = self.T_left + (self.T_right-self.T_left) * err_result / (1 + coeff)
-            return T
         else:
             # A - po prawej - eq 44
-            coeff = np.sqrt((self.k_left * self.cp_left) / (self.k_right * self.cp_right))
-
-            err_arg = x
-            err_arg /= (2 * np.sqrt(t * self.k_right / self.cp_right))
+            err_arg = x/(2 * np.sqrt(t * self.k_right / self.cp_right))
             err_result = 1 + coeff * special.erf(err_arg)
-            T = self.T_left + (self.T_right-self.T_left) * err_result / (1 + coeff)
-            return T
+
+        T = self.T_left + err_result * (self.T_right - self.T_left) / (1 + coeff)
+        return T
 
     def calc_transient_T_profile_RHuang(self, t, x):
         """

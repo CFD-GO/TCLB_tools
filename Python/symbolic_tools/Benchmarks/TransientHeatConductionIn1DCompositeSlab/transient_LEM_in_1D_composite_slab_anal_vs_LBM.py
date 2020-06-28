@@ -14,8 +14,8 @@ T_left = 1
 T_right = 0
 k_right = 0.1
 cp_right = 1
-R_cp = 1  # R_cp = cp_left/cp_right
-R_k = 1.  # R_k = k_left/k_right
+R_cp = 1./4  # R_cp = cp_left/cp_right
+R_k = 8.  # R_k = k_left/k_right
 # R_cp = [1./16, 1./4, 1, 4, 16]  # R_cp = cp_left/cp_right
 # R_k = [1./8, 1, 8]  # R_k = k_left/k_right
 k_left = R_k*k_right
@@ -40,21 +40,20 @@ def read_data_from_LBM(case_folder, iteration_of_interest):
     # ny, nx, nz = T_num.shape
     # uz_num_slice = uz_num[:, :, 1]
 
-    fs_num_slice = fs_num[int(fs_num.shape[1]/2), :]
+    fs_num_slice = fs_num[int(fs_num.shape[0]/2), :]
     # y = np.linspace(start=0, stop=1, num=ny, endpoint=False)
     return fs_num_slice
 
 
 # folder_hard = f"lem_R_k_1.00e+00_R_cp_1.00e+00_k_right_0.1_cp_right_1_size_64lu"
-folder = f"lem_R_k_{R_k:.2e}_R_cp_{R_cp:.2e}_k_right_{k_right}_cp_right_{cp_right}_size_64lu"
+folder = f"lem_R_k_{R_k:.2e}_R_cp_{R_cp:.2e}_k_right_{k_right}_cp_right_{cp_right}_size_2048lu"
 case_folder = os.path.join(main_folder, folder)
 
-# str_iteration = "00000501"
-str_iteration = "00001001"
+str_iteration = "00010001"
 temperature_lbm = read_data_from_LBM(case_folder, str_iteration)
 
 # The Dirichlet BC is imposed as wet node BC (equilibrium) in LBM simulation
-nodes_to_strip_per_side = 1  # number of extra BC nodes in domain per side
+nodes_to_strip_per_side = 925  # number of extra BC nodes in domain per side
 temperature_lbm = delete_unphysical_data_from_wall_nodes(temperature_lbm, nodes_to_strip_per_side)
 
 xSIZE = temperature_lbm.shape[0]
@@ -69,9 +68,7 @@ x_grid = np.linspace(start=-1+dx/2., stop=1-dx/2., num=xSIZE, endpoint=True) # +
 k_right_lbm = k_right
 time_step = (dx*dx)*k_right_lbm/k_right  # describes how many second is in one lbm timestep
 
-#  time_spot = 1200*1/(60*60) = 0.33333333
 time_spot = (int(str_iteration)-0) * time_step
-# time_spot += 1.615
 temperature_anal = [solver.calc_transient_T_profile(time_spot, x_i) for x_i in x_grid]
 
 
