@@ -49,26 +49,53 @@ def read_data_from_LBM(case_folder, iteration_of_interest):
 def prepare_LBM_and_anal_data_pair(R_k, R_cp, T_left, T_right, k_right, cp_right):
     k_left = R_k*k_right
     cp_left = R_cp*cp_right
-    solver = Solver(T_left, T_right, k_left, k_right, cp_left, cp_right)
+
 
     folder = f"lem_R_k_{R_k:.2e}_R_cp_{R_cp:.2e}_k_right_{k_right}_cp_right_{cp_right}_size_2048lu"
     case_folder = os.path.join(main_folder, folder)
 
     temperature_lbm = read_data_from_LBM(case_folder, str_iteration)
     # The Dirichlet BC is imposed as wet node BC (equilibrium) in LBM simulation
-    temperature_lbm = delete_unphysical_data_from_wall_nodes(temperature_lbm, nodes_to_strip_per_side)
-    effective_domain = temperature_lbm.shape[0]
+    temperature_lbm_stripped = delete_unphysical_data_from_wall_nodes(temperature_lbm, nodes_to_strip_per_side)
+    effective_domain = temperature_lbm_stripped.shape[0]
 
     # -------- analytical solution ---------------
     dx = (1+1) / effective_domain  # (physical domain is from -1 to 1)/(LBM domain length)
     x_grid = np.linspace(start=-1+dx/2., stop=1-dx/2., num=effective_domain, endpoint=True)
 
-    k_right_lbm = k_right  # for simplicity, diffusivity_physical matches diffusivity_LBM
-    time_step = (dx*dx)*k_right_lbm/k_right  # describes how many second is in one lbm timestep
+    # WAY 0
+    k_right_SI = k_right  # for simplicity, diffusivity_physical matches diffusivity_LBM
+    k_left_SI = R_k * k_right_SI
+    time_step = (dx*dx)*k_right/k_right_SI  # describes how many second is in one lbm timestep
     time_spot = int(str_iteration) * time_step
-    temperature_anal = [solver.calc_transient_T_profile(time_spot, x_i) for x_i in x_grid]
+    solver = Solver(T_left, T_right, k_left_SI, k_right_SI, cp_left, cp_right)
+    temperature_anal = np.array([solver.calc_transient_T_profile(time_spot, x_i) for x_i in x_grid])
 
-    return x_grid, temperature_lbm, temperature_anal, time_spot
+
+    # WAY 1
+    gamma = 2*cp_left*cp_right/(cp_left + cp_right)
+    tau = (3*k_right/gamma) + 1./2
+    k_right_SI = k_right
+    time_step2 = k_right_SI/(gamma*(tau-1./2)*1./3.)
+    time_spot2 = int(str_iteration) * time_step2
+
+    # WAY 2 - alternatively - impose time spot
+    # time_spot2 = 1.
+    # time_step2 = time_spot2/int(str_iteration)
+    # k_right_SI = time_step2*k_right
+
+
+    k_left_SI = R_k*k_right_SI
+    temperature_lbm_stripped2 = delete_unphysical_data_from_wall_nodes(temperature_lbm, 925)
+    effective_domain2 = temperature_lbm_stripped2.shape[0]
+    x_grid2 = np.linspace(start=0.5 -effective_domain2 / 2., stop=-0.5 + effective_domain2 / 2.,
+                          num=effective_domain2, endpoint=True)
+
+    solver2 = Solver(T_left, T_right, k_left_SI, k_right_SI, cp_left, cp_right)
+    temperature_anal2 = np.array([solver.calc_transient_T_profile(time_spot2, x_i) for x_i in x_grid2])
+    # plt.plot(x_grid, temperature_lbm_stripped, x_grid, temperature_anal)
+    # plt.plot(x_grid2, temperature_lbm_stripped2, x_grid2, temperature_anal2)
+    return x_grid, temperature_lbm_stripped, temperature_anal, time_spot
 
 def prepare_plot():
     if not os.path.exists('plots'):
@@ -121,15 +148,15 @@ def add_data_to_plot(axes, marker, x_grid, temperature_lbm, temperature_anal, ti
     axes.grid()
 
 
-axes, fig = prepare_plot()
+# axes, fig = prepare_plot()
 
 plt_markers = ["<", "v", ">", "x", "o"]
 for R_cp, plt_marker in zip(R_cps, plt_markers):
     x_grid, temperature_lbm, temperature_anal, time_spot = \
         prepare_LBM_and_anal_data_pair(R_k, R_cp, T_left, T_right, k_right, cp_right)
-    add_data_to_plot(axes, plt_marker, x_grid, temperature_lbm, temperature_anal, time_spot, R_cp)
+    # add_data_to_plot(axes, plt_marker, x_grid, temperature_lbm, temperature_anal, time_spot, R_cp)
 
-R_k_tex = eat_dots_for_texmaker(R_k)
-fig_name = f'plots/TransientHeatConductionInCompositeSlab_Rk{R_k_tex}.png'
-fig.savefig(fig_name, bbox_inches='tight')
+# R_k_tex = eat_dots_for_texmaker(R_k)
+# fig_name = f'plots/TransientHeatConductionInCompositeSlab_Rk{R_k_tex}.png'
+# fig.savefig(fig_name, bbox_inches='tight')
 
