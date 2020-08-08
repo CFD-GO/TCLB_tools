@@ -6,7 +6,7 @@ from SymbolicCollisions.core.cm_symbols import \
 from SymbolicCollisions.core.DiscreteCMTransforms import DiscreteCMTransforms, get_mom_vector_from_discrete_def
 from SymbolicCollisions.core.ContinuousCMTransforms import ContinuousCMTransforms, get_mom_vector_from_continuous_def
 from SymbolicCollisions.core.cm_symbols import ux, uy, u2D, Fx, Fy, F2D, w_D2Q9, moments_dict
-from SymbolicCollisions.core.printers import print_as_vector, print_as_vector_latex, get_print_symbols_in_m_notation
+from SymbolicCollisions.core.printers import print_as_vector, print_as_vector_latex, get_print_symbols_in_m_notation, get_print_symbols_in_indx_notation
 from SymbolicCollisions.core.MatrixGenerator import get_m_order_as_in_r, get_e_as_in_r, MatrixGenerator, get_reverse_direction_idx, get_reverse_indices
 from sympy.matrices import Matrix
 import numpy as np
@@ -91,6 +91,8 @@ dcmt = DiscreteCMTransforms(e_D2Q9, u3D, None, None)
 #
 
 print("TRT cm antisymmetric - moments: full velocity expansion.")
+# notice that the moments of non-eq DF is splited into sym and antisymmetric moments in the same way.
+# feq = get_print_symbols_in_m_notation(rmoments_order, "f")
 
 feq_symm = lambda i: (feq[i] + feq[rev_i[i]]) / 2
 feq_antisymm = lambda i: (feq[i] - feq[rev_i[i]]) / 2

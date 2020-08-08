@@ -8,6 +8,11 @@ from DataIO.VTIFile import VTIFile
 
 import matplotlib.pylab as pylab
 
+# R()
+# var = seq(0,2,len=100)
+# ret=cbind(1,0,var)%*%solve(matrix(c(1,1,1,-1,0,1,1,0,1),3,3))
+# matplot(var,ret)
+
 
 # Notation
 # Follows Fig.1. from 'Phase interface effects in the total enthalpy-based lattice Boltzmann model for solid–liquid phase change'
@@ -19,6 +24,7 @@ cp_right = 1
 R_k = 8  # R_k = k_left/k_right
 R_cps = [1./16, 1./4, 1, 4, 16]  # R_cp = cp_left/cp_right
 # R_ks = [1./8, 1, 8]  # R_k = k_left/k_right
+
 
 
 # gamma = 1  # stability enhancement
