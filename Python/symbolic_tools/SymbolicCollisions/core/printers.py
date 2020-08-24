@@ -243,3 +243,4 @@ def print_as_vector_latex(some_matrix, outprint_symbol='default_symbol1', raw_ou
             row = re.sub(r"u\.y", "u_y", row)
             # print(f"\t{print_symbols[i]} &= {row} \\\\ \\nonumber")
             print(f"\t{row} \\\\")
+
