@@ -5,7 +5,7 @@ from sympy import symbols, Eq, Matrix, solve, lambdify
 import numpy as np
 import matplotlib.pyplot as plt
 from SymbolicCollisions.core.eq_solver import block_simpler, extract_real_solution
-
+import os
 # phi = symbols('\phi', real=True) # nieprzesuniete
 # Lam = symbols('\lambda', real=True, positive=True, nonzero=True)
 # DT = symbols('\delta{t}', real=True, positive=True, nonzero=True)
@@ -25,7 +25,7 @@ tilde_phi = symbols(f'\\{str_tilde_phi}', real=True)
 
 given = [tilde_phi]
 unknown = [phi]
-Q = [Lambda * phi * (1 - phi ** 2)]
+Q = [Lambda * phi * (1 - phi * phi)]
 
 
 EQs = Eq(Matrix(given), Matrix(unknown) - DT*Matrix(Q)/2)
@@ -43,13 +43,39 @@ inputs_as_str = symbols([str_tilde_phi, str_lambda, str_dt])
 calc_numerical_solution = lambdify(
     inputs_as_str, symbolic_solutions_as_matrix.subs(dict(zip(inputs_as_symbols, inputs_as_str))),modules="numpy")
 
-calc_numerical_solution(2, 1, 0.5)  # tilde_phi, Lam, DT
+calc_numerical_solution(2, 1, 0.5)  # tilde_phi, Lamda, DT
 extract_real_solution(calc_numerical_solution, 2, 1, 0.5)
 
 x = np.linspace(-2, 2, 100)
-# plt.plot(x, np.vectorize(lambda t_: extract_real_solution(calc_numerical_solution, t_, 1, 1))(x))
-#
+lambda_num = 1.
+phi_num = np.vectorize(lambda t_: extract_real_solution(calc_numerical_solution, t_, lambda_num, 1))(x)
+q_num = lambda_num * phi_num * (1 - phi_num*phi_num)
 
+if not os.path.exists('plots'):
+    os.makedirs('plots')
+fig_name = f'plots/phi_and_Q_lambda_num{lambda_num}.png'
+
+# -------------------- make dummy plot --------------------
+plt.rcParams.update({'font.size': 28})
+plt.figure(figsize=(14, 8))
+
+axes = plt.gca()
+plt.plot(x, phi_num,
+         color="black", marker="", markevery=1, markersize=15, linestyle="--", linewidth=3,
+         label=r'$\phi$')
+
+plt.plot(x, q_num,
+         color="black", marker="", markevery=1, markersize=15, linestyle=":", linewidth=3,
+         label=r'$Q$')
+
+plt.xlabel(r'$\tilde{\phi}$', fontsize=28)
+plt.legend()
+plt.grid()
+fig = plt.gcf()  # get current figure
+fig.tight_layout()  # otherwise the right y-label is slightly clipped
+plt.pause(1e-9)  # there is a race condition somewhere in the matplotlib code.
+fig.savefig(fig_name, bbox_inches='tight')
+plt.show()
 
 # for inp, dum in zip(inputs_as_symbols, inputs_as_str):
 #     print(f"{inp} = {dum}")

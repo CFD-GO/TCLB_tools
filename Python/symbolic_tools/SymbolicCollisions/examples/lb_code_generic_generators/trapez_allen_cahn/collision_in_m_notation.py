@@ -42,8 +42,8 @@ print(f"order of moments | rmoments: \n "
 print(f"lattice velocities - e: \n {np.array(e_D3Q27new)}")
 
 ### PREPARE ENVIROMENT ###
-Relaxation_matrix = diag(1, omega_ade, omega_ade, 1, 1, 1, omega_ade, omega_ade, 1)
-# Relaxation_matrix = diag(omega_ade, omega_ade, omega_ade, omega_ade, omega_ade, omega_ade, omega_ade, omega_ade, omega_ade)
+# Relaxation_matrix = diag(1, omega_ade, omega_ade, 1, 1, 1, omega_ade, omega_ade, 1)
+Relaxation_matrix = diag(omega_ade, omega_ade, omega_ade, omega_ade, omega_ade, omega_ade, omega_ade, omega_ade, omega_ade)
 Q = Symbol('Q', positive=True)
 
 tilde_phi = Symbol('tilde_phi', positive=True)  # number
@@ -102,8 +102,9 @@ for source, pop_in_str in zip([source_term], ['f']):
     # print_as_vector(m_after_collision, outprint_symbol="real_t " + collided_populations_str, output_order_of_moments=moments_order)
     #
     # Relax 1,3,5 moments for ADE, SOI without force
-    print("\n\t//collide-SOI")
+    # print("\n\t//collide-SOI")
     m_after_collision = (eye(q) - Relaxation_matrix) * populations + Relaxation_matrix * (m_eq+source/2.) + (eye(q) - Relaxation_matrix/2.)*source
+    # m_after_collision = (eye(q) - Relaxation_matrix) * populations + Relaxation_matrix * m_eq + source
     print_as_vector(m_after_collision, outprint_symbol="real_t " + collided_populations_str, output_order_of_moments=moments_order)
 
     print("\n\t//back to density-probability functions")
