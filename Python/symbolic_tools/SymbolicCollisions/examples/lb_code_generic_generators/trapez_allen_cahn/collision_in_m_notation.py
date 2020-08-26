@@ -42,8 +42,8 @@ print(f"order of moments | rmoments: \n "
 print(f"lattice velocities - e: \n {np.array(e_D3Q27new)}")
 
 ### PREPARE ENVIROMENT ###
-# Relaxation_matrix = diag(1, omega_ade, omega_ade, 1, 1, 1, omega_ade, omega_ade, 1)
-Relaxation_matrix = diag(omega_ade, omega_ade, omega_ade, omega_ade, omega_ade, omega_ade, omega_ade, omega_ade, omega_ade)
+Relaxation_matrix = diag(1, omega_ade, omega_ade, 1, 1, 1, omega_ade, omega_ade, 1)
+# Relaxation_matrix = diag(omega_ade, omega_ade, omega_ade, omega_ade, omega_ade, omega_ade, omega_ade, omega_ade, omega_ade)
 Q = Symbol('Q', positive=True)
 
 tilde_phi = Symbol('tilde_phi', positive=True)  # number
