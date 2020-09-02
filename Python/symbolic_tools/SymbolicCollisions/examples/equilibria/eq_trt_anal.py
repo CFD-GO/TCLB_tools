@@ -92,7 +92,7 @@ dcmt = DiscreteCMTransforms(e_D2Q9, u3D, None, None)
 
 print("TRT cm antisymmetric - moments: full velocity expansion.")
 # notice that the moments of non-eq DF is splited into sym and antisymmetric moments in the same way.
-# feq = get_print_symbols_in_m_notation(rmoments_order, "f")
+feq = get_print_symbols_in_m_notation(rmoments_order, "h")
 
 feq_symm = lambda i: (feq[i] + feq[rev_i[i]]) / 2
 feq_antisymm = lambda i: (feq[i] - feq[rev_i[i]]) / 2
@@ -102,12 +102,14 @@ pop_eq_full = get_mom_vector_from_discrete_def(feq_symm,
                                           moments_order=rmoments_order)
 # print_as_vector(pop_eq_full, 'm_eq_full_symmetric', output_order_of_moments=rmoments_order)
 print_as_vector_latex(pop_eq_full, 'k^{H,seq}', output_order_of_moments=rmoments_order)
+# print_as_vector_latex(pop_eq_full, 'm_s', output_order_of_moments=rmoments_order)
 
 pop_eq_full = get_mom_vector_from_discrete_def(feq_antisymm,
                                           discrete_transform=dcmt.get_m,
                                           moments_order=rmoments_order)
 # print_as_vector(pop_eq_full, 'm_eq_full_antisymmetric', output_order_of_moments=rmoments_order)
 print_as_vector_latex(pop_eq_full, 'k^{H,aeq}', output_order_of_moments=rmoments_order)
+# print_as_vector_latex(pop_eq_full, 'm_a', output_order_of_moments=rmoments_order)
 
 pop_eq_full = get_mom_vector_from_discrete_def(feq_symm,
                                           discrete_transform=dcmt.get_cm,
@@ -120,3 +122,23 @@ pop_eq_full = get_mom_vector_from_discrete_def(feq_antisymm,
                                           moments_order=rmoments_order)
 # print_as_vector(pop_eq_full, 'cm_eq_full_antisymmetric', output_order_of_moments=rmoments_order)
 print_as_vector_latex(pop_eq_full, '\\tilde{k}^{H,aeq}', output_order_of_moments=rmoments_order)
+
+print("central moments: from raw moments: N*m")
+m = get_print_symbols_in_m_notation(rmoments_order, "m")
+print_as_vector(Nraw * m, outprint_symbol="cm", output_order_of_moments=rmoments_order)
+m_symm = get_print_symbols_in_m_notation(rmoments_order, "m_s")
+m_symm[1] = 0
+m_symm[2] = 0
+m_symm[6] = 0
+m_symm[7] = 0
+print("symmetric central moments: from raw moments: N*m_symm")
+print_as_vector(Nraw * m_symm, outprint_symbol="cm_symm", output_order_of_moments=rmoments_order)
+
+m_asymm = get_print_symbols_in_m_notation(rmoments_order, "m_a")
+m_asymm[0] = 0
+m_asymm[3] = 0
+m_asymm[4] = 0
+m_asymm[5] = 0
+m_asymm[8] = 0
+print("anti symmetric central moments: from raw moments: N*m_asymm")
+print_as_vector(Nraw * m_asymm, outprint_symbol="cm_asymm", output_order_of_moments=rmoments_order)
