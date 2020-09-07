@@ -9,7 +9,7 @@ def geometryElement(func):
         nargs = func(self, *args, **kwargs)
 
         if len(nargs) < 1 or \
-        not nargs.has_key('_xml_node_name') \
+        not  '_xml_node_name' in nargs  \
         :
             raise BaseException("NOT ENOUGHT ARGS FOR GEOM ELEMENT")
 
@@ -25,11 +25,11 @@ def rootElement(func):
         nargs = func(self, *args, **kwargs)
 
         if len(nargs) < 1 or \
-        not nargs.has_key('_xml_node_name') \
+        not '_xml_node_name' in nargs.keys() \
         :
             raise BaseException("NOT ENOUGHT ARGS FOR ROOT ELEMENT")
 
-        if nargs.has_key('parent'):
+        if 'parent' in nargs.keys():
             n = ET.SubElement(nargs['parent'],nargs['_xml_node_name'])
         else:
             n = ET.SubElement(self.root,nargs['_xml_node_name'])
@@ -55,7 +55,7 @@ def BCElement(func):
         nargs = func(self, *args, **kwargs)
 
         if len(nargs) < 1 or \
-        not nargs.has_key('_xml_node_name') \
+        not '_xml_node_name' in nargs \
         :
             raise BaseException("NOT ENOUGHT ARGS FOR BC ELEMENT")
 
@@ -72,7 +72,7 @@ def BCElement(func):
 def defaultArg(name, value):
     def nif(func):
         def fin(self, *args, **kwargs):
-            if not kwargs.has_key(name):
+            if not name in kwargs:
                 kwargs[name] = value
             return func(self, *args, **kwargs)
         return fin
@@ -81,7 +81,7 @@ def defaultArg(name, value):
 def requireArg(name):
     def nif(func):
         def fin(self, *args, **kwargs):
-            if not kwargs.has_key(name):
+            if not name in kwargs:
                 raise BaseException("Argument "+str(name)+ " is required")
             return func(self, *args, **kwargs)
         return fin
@@ -91,53 +91,53 @@ def requireArg(name):
 
 def addSimpleGeomElements(nameList):
     def nif(cls):
-        def inf(name,fname):
+        def inf(name,fname,cls):
             @geometryElement
             def fin(self, **kwargs):
                 kwargs['_xml_node_name'] = name
                 return kwargs
-            cls.__dict__["add"+fname] = fin
+            setattr(cls, "add"+fname, fin)                
         for n in nameList:
-            if  type(n) is tuple:
-                inf(n[0], n[1])
+            if type(n) is tuple:
+                inf(n[0], n[1],cls)
             else:
-                inf(n,n)
+                inf(n,n,cls)
         return cls
     return nif
 
 def addSimpleBCElements(nameList):
     def nif(cls):
-        def inf(name,fname):
+        def inf(name,fname,cls):
             @BCElement
             def fin(self, **kwargs):
                 kwargs['_xml_node_name'] = name
                 return kwargs
-            cls.__dict__["add"+fname] = fin
+            setattr(cls, "add"+fname, fin)                
         for n in nameList:
             if type(n) is tuple:
-                print n
-                inf(n[0], n[1])
+                inf(n[0], n[1],cls)
             else:
-                inf(n,n)
+                inf(n,n,cls)
         return cls
     return nif
 
 def addRootElements(nameList):
     def nif(cls):
-        def inf(name):
+        def inf(name,csl):
             @rootElement
             def fin(self, **kwargs):
                 kwargs['_xml_node_name'] = name
                 return kwargs
-            cls.__dict__["add"+name] = fin
+#            cls.__dict__["add"+name] = fin
+            setattr(cls, "add"+name, fin)                
         for n in nameList:
-            inf(n)
+            inf(n,cls)
         return cls
     return nif
 
     
 def _set_by_kw(kw, name, default):
-    if kw.has_key(name):
+    if name in kw:
         return kw[name]
     else:
         return default
@@ -154,6 +154,8 @@ def _set_by_kw(kw, name, default):
     ])
 @addSimpleBCElements([
     'MRT',
+    'TRT_SOI',    
+    'Smoothing',
     'Cumulant',    
     'ESymmetry',
     'NSymmetry',
@@ -227,27 +229,48 @@ class CLBConfigWriter:
         tree = ET.ElementTree(element=self.root) 
         tree.write(filename,  pretty_print=True)
 
-    def addModelParam(self, name, value):
-        n = ET.SubElement(self.model,'Params')
-        n.set(str(name), str(value))
-    
-    def addModelParams(self, params_dict):
-        for n in params_dict:
-            self.addModelParam(n, params_dict[n])      
+    def addModelParam(self, name, value,zone=''):
+        n = ET.SubElement(self.model,'Param')
+        try: 
+            n.set("name", str(name))
+            n.set("value", str('%.16f'%value))
+            if zone != '':
+                n.set("zone", str(zone))
 
+        except TypeError as e:
+            print(name, '==>', value)
+            raise e
+    
+    def addModelParams(self, params_dict,zone=''):
+        for n in params_dict:
+            self.addModelParam(n, params_dict[n],zone)
+            
+    def addModelParams_old(self, params_dict):
+        for n in params_dict:
+            self.addModelParam_old(n, params_dict[n])      
+
+
+    def addModelParam_old(self, name, value):
+        n = ET.SubElement(self.model,'Params')
+        try: 
+            n.set(str(name), str('%.16f'%value))
+        except TypeError as e:
+            print(name, '==>', value)
+            raise e
+        
     def addRootParams(self, params_dict):
         for n in params_dict:
             self.addParamRoot(n, params_dict[n])      
 
     def addRootParam(self, name, value):
         n = ET.SubElement(self.root,'Params')
-        n.set(str(name), str(value))
+        n.set(str(name), str('%.16f'%value))
         
     def addParamRoot(self, name, value):
         self.addRootParam(name,value)
         
     def addGeomParam(self, name, value):
-        self.geometry.set(str(name), str(value))
+        self.geometry.set(str(name),  str('%.16f'%value))
 
     def setCG(self, cg):
         self.current_geometry = cg
@@ -288,7 +311,7 @@ class CLBConfigWriter:
         
         iterations = _set_by_kw(kwargs, 'iterations', 1)
         vtk = _set_by_kw(kwargs, 'vtk', 0)
-        vtk_what = _set_by_kw(kwargs, 'vtk_fields', 0)
+        vtk_what = _set_by_kw(kwargs, 'vtk_fields', '')
         log = _set_by_kw(kwargs, 'log', 0)
         failcheck = _set_by_kw(kwargs, 'failcheck', 0)
 
@@ -307,7 +330,7 @@ class CLBConfigWriter:
         if vtk > 0:
             n2 = ET.SubElement(n, 'VTK')
             n2.set('Iterations', str(vtk))
-            if vtk_what > 0:
+            if len(vtk_what) > 0:
                 n2.set('what', str(vtk_what))       
                         
         if log > 0:
@@ -387,6 +410,6 @@ if __name__ == "__main__":
     CLBc.addSolve(iterations=1, vtk=1)
     CLBc.addSolve(iterations=100, vtk=50, failcheck=1)
     
-    print CLBc.dump()
+    print(CLBc.dump())
    # CLBc.write('/home/michal/tach-17/mnt/fhgfs/users/mdzikowski/yang-laplace-sphere-matrix/test.xml')
    

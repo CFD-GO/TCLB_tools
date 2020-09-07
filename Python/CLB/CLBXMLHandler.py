@@ -53,7 +53,7 @@ class CLBXMLHandler(xml.sax.ContentHandler):
                     if len(g) == 1:
                         a['gauge'] = toFloat(g[0])
                     else:
-                        print "No gauge value: ", a, v
+                        print("No gauge value: ", a, v)
                         a['float'] = np.nan                        
                 else:
                     a['name'] = k
@@ -62,20 +62,49 @@ class CLBXMLHandler(xml.sax.ContentHandler):
                     if len(g) >= 1:
                         a['float'] = toFloat(g[0])                    
                     else:
-                        print "No value: ", k, v
+                        print("No value: ", k, v)
                         a['float'] = np.nan
             
             ###catch overwrite
-            if self.config.has_key(a['name']) and self.config[a['name']].has_key('gauge') :
+            if (a['name'] in self.config) and ('gauge' in self.config[a['name']]) :
                 tmp = self.config[a['name']]
                 for k in a.keys():
                     if not tmp.has_key(k):
                         tmp[k] = a[k]                        
                 a = tmp
-                print "Safe-Overwriting ", a['name']
+                print("Safe-Overwriting ", a['name'])
                 
             self.config[a['name']] = a
             self.config[a['name']]['time'] = self.iterations
+            
+        if name == "Param":
+            a = dict()
+
+            v = attrs['value']
+            a['name'] = attrs['name']
+
+            if 'zone' in attrs.keys():
+                a['name'] = a['name'] + '-'  + attrs['zone']
+                
+            g = re.findall('[-,\.,e,0-9]+', v)
+            if len(g) >= 1:
+                a['float'] = toFloat(g[0])                    
+            else:
+                print("No value: ", k, v)
+                a['float'] = np.nan
+            
+            ###catch overwrite
+            if (a['name'] in self.config) and ('gauge' in self.config[a['name']]) :
+                tmp = self.config[a['name']]
+                for k in a.keys():
+                    if not tmp.has_key(k):
+                        tmp[k] = a[k]                        
+                a = tmp
+                print("Safe-Overwriting ", a['name'])
+                
+            self.config[a['name']] = a
+            self.config[a['name']]['time'] = self.iterations
+            
         if name == "Geometry":
             
             for (k,v) in attrs.items():
@@ -103,7 +132,7 @@ class CLBXMLHandler(xml.sax.ContentHandler):
                     if len(g) == 1:
                         a['gauge'] = toFloat(g[0])
                     else:
-                        print "No gauge value: ", k, v
+                        print("No gauge value: ", k, v)
                         a['float'] = np.nan                              
                 else:
                     a['name'] = k
@@ -112,7 +141,7 @@ class CLBXMLHandler(xml.sax.ContentHandler):
                     if len(g) >= 1:
                         a['float'] = toFloat(g[0])                    
                     else:
-                        print "No value: ", k, v
+                        print("No value: ", k, v)
                         a['float'] = np.nan
                 self.config[a['name']] = a
         if name == "Geometry":
@@ -134,12 +163,12 @@ class CLBXMLHandler(xml.sax.ContentHandler):
 def parseConfig(fconfig, **kwargs):
     CLBc = dict()
     parser = xml.sax.make_parser()
-    if kwargs.has_key('multiparams') and kwargs['multiparams']:
+    if 'multiparams' in kwargs and kwargs['multiparams']:
         mp = True
     else:
         mp = False
         
-    if kwargs.has_key('time'):
+    if 'time' in kwargs:
         time = kwargs['time']
     else:
         time = 0
@@ -169,3 +198,4 @@ def parseConfig(fconfig, **kwargs):
        # print c, " = ", CLBc[c]['float']
         
     return CLBc, CLBcf, CLBcg
+

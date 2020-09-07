@@ -19,8 +19,8 @@ class VTIFile:
         self.reader.Update()
         self.data = self.reader.GetOutput()  
         self.dim = self.data.GetDimensions()   
-        self.s_scal = [self.dim[1]-1, self.dim[0]-1]
-        self.s_vec = [self.dim[1]-1, self.dim[0]-1,3]
+        self.s_scal = (self.dim[1]-1, self.dim[0]-1)
+        self.s_vec = (self.dim[1]-1, self.dim[0]-1,3)
         
         self.trim_0 = [0,0]
         self.trim_1 = [x-1 for x in self.dim]
@@ -56,14 +56,15 @@ class VTIFile:
                 vector = False
                 
         if vector:
-            subspace = (np.meshgrid(
+            subspace = tuple(np.meshgrid(
                 range(self.trim_0[0],self.trim_1[0]),
                 range(self.trim_0[1],self.trim_1[1]),
                 range(3)
             )) 
-            T = np.transpose(cellData.reshape(self.s_vec), (1,0,2))[subspace]
+            T = np.transpose(cellData.reshape(self.s_vec), (1,0,2))#[subspace]
+            T = T[subspace]
         else:
-            subspace = (np.meshgrid(*[range(self.trim_0[i],self.trim_1[i]) for i in range(2) ]))
+            subspace = tuple(np.meshgrid(*[range(self.trim_0[i],self.trim_1[i]) for i in range(2) ]))
             T =  cellData.reshape(self.s_scal).T[subspace]
         if dtype:
             T = np.array(T,dtype=dtype)
@@ -87,10 +88,10 @@ class VTIFile:
 
     def trim(self, **kwargs):
             for i,k in enumerate(['x0', 'y0']):
-                if kwargs.has_key(k):
+                if k in kwargs:
                     self.trim_0[i] = int(kwargs[k])
             for i,k in enumerate(['x1', 'y1']):
-                if kwargs.has_key(k):
+                if k in kwargs:
                     if kwargs[k] < 0:
                         self.trim_1[i] = self.trim_1[i] + int(kwargs[k])
                     else:
@@ -150,10 +151,10 @@ class VTIFile3D:
 
     def trim(self, **kwargs):
             for i,k in enumerate(['x0', 'y0', 'z0']):
-                if kwargs.has_key(k):
+                if k in kwargs:
                     self.trim_0[i] = int(kwargs[k])
             for i,k in enumerate(['x1', 'y1','z0']):
-                if kwargs.has_key(k):
+                if k in kwargs:
                     if kwargs[k] < 0:
                         self.trim_1[i] = self.trim_1[i] + int(kwargs[k])
                     else:
