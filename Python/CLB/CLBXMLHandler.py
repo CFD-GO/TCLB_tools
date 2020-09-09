@@ -8,6 +8,13 @@ Created on Tue Apr 28 15:55:33 2015
 import xml.sax
 import re
 import numpy as np
+
+def toFloat(val):
+    try:
+        return float(val)
+    except ValueError:
+        return np.nan
+        
 class CLBXMLHandler(xml.sax.ContentHandler):
     
     def __init__(self, config_ref, mp, time):
@@ -29,8 +36,11 @@ class CLBXMLHandler(xml.sax.ContentHandler):
                 self.rewind = True
             for (k,v) in iters:
                 if k == 'Iterations':
-                    self.iterations = self.iterations + int(v)
-            
+                    try:
+                        self.iterations = self.iterations + int(v)
+                    except ValueError:
+                        self.iterations = self.iterations + 0
+            #print self.iterations
                 
         if self.rewind:
                 return
@@ -41,29 +51,71 @@ class CLBXMLHandler(xml.sax.ContentHandler):
                 if k == 'gauge':
                     g = re.findall('[-,\.,e,0-9]+', v)
                     if len(g) == 1:
-                        a['gauge'] = float(g[0])
+                        a['gauge'] = toFloat(g[0])
+                    else:
+                        print("No gauge value: ", a, v)
+                        a['float'] = np.nan                        
                 else:
                     a['name'] = k
                     a['value'] = v
                     g = re.findall('[-,\.,e,0-9]+', v)
                     if len(g) >= 1:
-                        a['float'] = float(g[0])                    
+                        a['float'] = toFloat(g[0])                    
                     else:
-                        print "No value: ", k, v
+                        print("No value: ", k, v)
                         a['float'] = np.nan
+            
+            ###catch overwrite
+            if (a['name'] in self.config) and ('gauge' in self.config[a['name']]) :
+                tmp = self.config[a['name']]
+                for k in a.keys():
+                    if not tmp.has_key(k):
+                        tmp[k] = a[k]                        
+                a = tmp
+                print("Safe-Overwriting ", a['name'])
+                
             self.config[a['name']] = a
             self.config[a['name']]['time'] = self.iterations
+            
+        if name == "Param":
+            a = dict()
+
+            v = attrs['value']
+            a['name'] = attrs['name']
+
+            if 'zone' in attrs.keys():
+                a['name'] = a['name'] + '-'  + attrs['zone']
+                
+            g = re.findall('[-,\.,e,0-9]+', v)
+            if len(g) >= 1:
+                a['float'] = toFloat(g[0])                    
+            else:
+                print("No value: ", k, v)
+                a['float'] = np.nan
+            
+            ###catch overwrite
+            if (a['name'] in self.config) and ('gauge' in self.config[a['name']]) :
+                tmp = self.config[a['name']]
+                for k in a.keys():
+                    if not tmp.has_key(k):
+                        tmp[k] = a[k]                        
+                a = tmp
+                print("Safe-Overwriting ", a['name'])
+                
+            self.config[a['name']] = a
+            self.config[a['name']]['time'] = self.iterations
+            
         if name == "Geometry":
             
             for (k,v) in attrs.items():
                 
-                if k in ('nx', 'ny'):
+                if k in ('nx', 'ny', 'nz'):
                     a = dict()
                     a['name'] = k
                     a['value'] = v
                     g = re.findall('[-,\.,e,0-9]+', v)
                     if len(g) == 1:
-                        a['float'] = float(g[0])         
+                        a['float'] = toFloat(g[0])         
                     else:
                         a['float'] = np.nan                            
                     self.config[a['name']] = a
@@ -78,15 +130,18 @@ class CLBXMLHandler(xml.sax.ContentHandler):
                 if k == 'gauge':
                     g = re.findall('[-,\.,e,0-9]+', v)
                     if len(g) == 1:
-                        a['gauge'] = float(g[0])
+                        a['gauge'] = toFloat(g[0])
+                    else:
+                        print("No gauge value: ", k, v)
+                        a['float'] = np.nan                              
                 else:
                     a['name'] = k
                     a['value'] = v
                     g = re.findall('[-,\.,e,0-9]+', v)
                     if len(g) >= 1:
-                        a['float'] = float(g[0])                    
+                        a['float'] = toFloat(g[0])                    
                     else:
-                        print "No value: ", k, v
+                        print("No value: ", k, v)
                         a['float'] = np.nan
                 self.config[a['name']] = a
         if name == "Geometry":
@@ -99,27 +154,40 @@ class CLBXMLHandler(xml.sax.ContentHandler):
                     a['value'] = v
                     g = re.findall('[-,\.,e,0-9]+', v)
                     if len(g) == 1:
-                        a['float'] = float(g[0])         
+                        a['float'] = toFloat(g[0])         
                     else:
                         a['float'] = np.nan                            
                     self.config[a['name']] = a        
+
             
 def parseConfig(fconfig, **kwargs):
     CLBc = dict()
     parser = xml.sax.make_parser()
-    if kwargs.has_key('multiparams') and kwargs['multiparams']:
+    if 'multiparams' in kwargs and kwargs['multiparams']:
         mp = True
     else:
         mp = False
         
-    if kwargs.has_key('time'):
+    if 'time' in kwargs:
         time = kwargs['time']
     else:
         time = 0
     parser.setContentHandler(CLBXMLHandler(CLBc, mp, time))
-    parser.parse(open(fconfig,"r"))
-
     
+    
+    try:
+        parser.parse(open(fconfig,"r"))
+    except xml.sax._exceptions.SAXParseException:
+        # this may be due <Run> element at the end
+        parser.reset()
+        f = file(fconfig,"r")
+        temp = list()
+        for l in f:
+            temp.append(str(l))  
+        t = '\n'.join(temp[:-3])
+        parser.feed(t)
+        
+        
     CLBcf = dict()
     CLBcg = dict()
     for c in  CLBc:
@@ -130,3 +198,4 @@ def parseConfig(fconfig, **kwargs):
        # print c, " = ", CLBc[c]['float']
         
     return CLBc, CLBcf, CLBcg
+
