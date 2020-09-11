@@ -19,6 +19,8 @@ import CLB.VTIFile
 import pandas as pd
 import matplotlib.pyplot as plt
 
+from sympy.matrices import Matrix
+from symbolic_tools.Benchmarks.GaussianHill.GaussianHillAnal2D import GaussianHillAnal2D
 idx = 0
 #R0 = 2.2  # Basic Reproduction Number - the number of secondary infections each infected individual produces.
 #T_rec = 5.3  # days to recovery
@@ -28,38 +30,62 @@ lambda_ph = 0.1
 
 L2 = list()
 
-domain_size=128
+lattice_size=32
 box_size=50
 
-blocks_up = list()
-blocks_down = list()
-
-np.random.seed(seed=1)
-
-nrand = 1 # doesn't converge nice for nrand 100
-for xi in range(nrand):
-    x = np.random.randint(0,domain_size)
-    y = np.random.randint(0,domain_size)
-    blocks_up.append((x,y))
-    # CLBc.addSmoothing()
+init_blocks = list()
 
 
-for xi in range(nrand):
-    x = np.random.randint(0,domain_size)
-    y = np.random.randint(0,domain_size)
-    blocks_down.append((x,y))
+
+# prepare anal solutions
+C0 = 1.
+X0 = Matrix([lattice_size/2, lattice_size/2])
+U = Matrix([0., 0.])
+Sigma02 = 4
+k = 0.166666
+gha = GaussianHillAnal2D(C0, X0, Sigma02, k, U)
+
+
+total_time = 2
+time_spot = 0
+
+ySIZE = lattice_size
+xSIZE = lattice_size
+
+x_grid = np.linspace(0, xSIZE, xSIZE, endpoint=False) + 0.5
+y_grid = np.linspace(0, ySIZE, ySIZE, endpoint=False) + 0.5
+xx, yy = np.meshgrid(x_grid, y_grid)
+
+T_anal = np.zeros((ySIZE, xSIZE, total_time))
+
+for i in range(ySIZE):
+    print(f"i={i}")
+    for j in range(xSIZE):
+        init_blocks.append((x_grid[i]-0.5, y_grid[j] - 0.5))
+        # T_anal[i][j][0] = gha.get_concentration(Matrix([xx[i][j], yy[i][j]]), time_spot)  # lets cheat
+        for t in range(total_time):
+            T_anal[i][j][t] = gha.get_concentration(Matrix([xx[i][j], yy[i][j]]), t)
+
+
+T_anal_init = T_anal[:, :, 0]  # take initial time slice
+T_anal_final = T_anal[:, :, -1]  # take last time slice
+## END of anal preparations
+
+# // Gaussian Hill Benchmark
+# real_t dx = X - CylinderCenterX_GH;
+# real_t dy = Y - CylinderCenterY_GH;
+# real_t L = dx*dx + dy*dy;
+# H *= exp(-L/(2*Sigma_GH));
 
 
 # for lbdt in 2.**-np.arange(1,8):
 # for lbdt in 1./np.linspace(1, 10, 10): # (start, stop, num)
-
-# x1 = 1./np.logspace(0, 1, 10, base=10)   
-# x2 = 1./np.linspace(1, 10, 10)   
+# for lbdt in  1./np.logspace(0, 1, 10, base=10)   : # (start, stop, num)
+x1 = 1./np.logspace(0, 1, 10, base=10)   
+x2 = 1./np.linspace(1, 10, 10)   
 
 # all_together = np.concatenate([x1,x2]) 
-# for lbdt in all_together: # (start, stop, num)
-
-for lbdt in  1./np.logspace(0, 1, 25, base=10)   : # (start, stop, num)
+for lbdt in 1./np.linspace(1, 10, 10): # (start, stop, num)
     tc = 100
     def getXML(**kwars):
             print(f"running case: lbdt={lbdt}")
@@ -75,25 +101,30 @@ for lbdt in  1./np.logspace(0, 1, 25, base=10)   : # (start, stop, num)
         
             CLBc = CLBXML.CLBConfigWriter( )
             fname = prefix+"run"
-            CLBc.addGeomParam('nx', domain_size)
-            CLBc.addGeomParam('ny', domain_size)
+            CLBc.addGeomParam('nx', lattice_size)
+            CLBc.addGeomParam('ny', lattice_size)
             
             
             CLBc.addTRT_SOI()
             # CLBc.addSRT_SOI()
             CLBc.addBox()
             
-            CLBc.addZoneBlock(name='up')
-           
-            for x,y in blocks_up:
-                CLBc.addBox(dx=x,dy=y,nx=box_size,ny=box_size)
-                # CLBc.addSmoothing()
-            
-            CLBc.addZoneBlock(name='down')
+            for i in range(ySIZE):
+                for j in range(xSIZE):
+                    x_start = x_grid[i] - 0.5 
+                    y_start = y_grid[j] - 0.5
+                    if not float(x_start).is_integer() or not float(y_start).is_integer():
+                        raise Exception('Start of the block shall be an int')
+                    
+                    x_start=int(x_start)
+                    y_start=int(y_start)
 
-            for x,y in blocks_down:
-                CLBc.addBox(dx=x,dy=y,nx=box_size,ny=box_size)
-        
+                    block_name=f'initial_concentration_no_x{x_start}_y{y_start}'
+                    CLBc.addZoneBlock(name=block_name)
+                    CLBc.addBox(dx=x_start,dy=y_start,nx=1,ny=1)
+                    CLBc.addModelParam("Init_PhaseField",T_anal_init[i][j],block_name)
+                    # CLBc.addSmoothing()
+     
             params = {
             		"diffusivity_phi":0.1666666*lbdt,
                     "magic_parameter": 0.25,
@@ -104,10 +135,7 @@ for lbdt in  1./np.logspace(0, 1, 25, base=10)   : # (start, stop, num)
             
             CLBc.addModelParams(params)
 
-            CLBc.addModelParam("Init_PhaseField",0.9,'up' )
-            CLBc.addModelParam("Init_PhaseField",-0.9,'down' )
-                     
-            current = 0
+            # current = 0
             #for stop in np.logspace(0, np.log10(tc/lbdt), 100):    
             # for stop in np.linspace(1, tc/lbdt, 101): # watch out for fractions    
             #     CLBc.addSolve(iterations=stop-current)
@@ -191,21 +219,18 @@ for i in range(len(L2)-1):
     L2[i]['err_L2'] = calc_L2(reference, L2[i]['LBM_final'])
 
     plt.figure()
-    fig = plt.gcf()  # get current figure
     plt.imshow(L2[i]['LBM_final'])
     plt.savefig(f'{plot_dir}/AC_LBM_2D_final_{L2[i][r"LBMdt"]:.1e}.png', dpi=300)
-    plt.close(fig)
 
     plt.figure()
-    fig = plt.gcf()  # get current figure
     plt.imshow(L2[i]['err_field'])
     plt.savefig(f'{plot_dir}/AC_LBM_2D_err_field_{L2[i][r"LBMdt"]:.1e}.png', dpi=300)
-    plt.close(fig)
+
     # plt.show()
     
 
 plt.figure()
-fig = plt.gcf()  # get current figure
+
 L2dr = pd.DataFrame.from_records(L2)
 
 plt.loglog(L2dr.LBMdt, L2dr.err_L2, 'ko', 'LBM_point')
@@ -227,4 +252,3 @@ plt.ylabel('$L_2(\phi(t,dt), \phi(t,dt_{min})$')
 plt.legend()
 
 plt.savefig('AC_LBM_2D_conv.png', dpi=200)
-plt.close(fig)
