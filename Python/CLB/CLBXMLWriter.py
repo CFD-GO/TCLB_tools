@@ -380,6 +380,14 @@ class CLBConfigWriter:
         kwargs['_xml_node_name'] = 'PythonInline'
         del kwargs['eval']
         return kwargs
+    
+
+    @addCDATA('eval')
+    @rootElement
+    def addRunR(self, **kwargs):
+        kwargs['_xml_node_name'] = 'RunR'
+        del kwargs['eval']
+        return kwargs
 ##############
 #  END ELEMENT FUNCTIONS, END CLASS
 #############
