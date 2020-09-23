@@ -42,8 +42,10 @@ print(f"order of moments | rmoments: \n "
 print(f"lattice velocities - e: \n {np.array(e_D3Q27new)}")
 
 ### PREPARE ENVIROMENT ###
-Relaxation_matrix = diag(1, omega_ade, omega_ade, 1, 1, 1, omega_ade, omega_ade, 1)
+# Relaxation_matrix = diag(1, omega_ade, omega_ade, 1, 1, 1, omega_ade, omega_ade, 1)
 # Relaxation_matrix = diag(omega_ade, omega_ade, omega_ade, omega_ade, omega_ade, omega_ade, omega_ade, omega_ade, omega_ade)
+omega_even = Symbol('omega_even', positive=True)
+Relaxation_matrix = diag(omega_even, omega_ade, omega_ade, omega_even, omega_even, omega_even, omega_ade, omega_ade, omega_even)
 Q = Symbol('Q', positive=True)
 
 tilde_phi = Symbol('tilde_phi', positive=True)  # number
@@ -111,3 +113,4 @@ for source, pop_in_str in zip([source_term], ['f']):
     print_as_vector(Mraw.inv() * collided_populations, outprint_symbol=pop_in_str, output_order_of_moments=rmoments_order)
 
 print("}\n")
+

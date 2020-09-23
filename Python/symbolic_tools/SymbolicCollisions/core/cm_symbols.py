@@ -81,9 +81,9 @@ F_phi_x = Symbol(Force_str + '.x')
 F_phi_y = Symbol(Force_str + '.y')
 F_phi_z = Symbol(Force_str + '.z')
 
-omega_ade = Symbol('omega_ade')
-omega_v = Symbol('omega_nu')
-omega_b = Symbol('omega_bulk')  # omega_bulk='1.0/(3*bulk_visc+0.5)'
+omega_ade = Symbol('omega_ade', positive=True)
+omega_v = Symbol('omega_nu', positive=True)
+omega_b = Symbol('omega_bulk', positive=True)  # omega_bulk='1.0/(3*bulk_visc+0.5)'
 
 ####################################################### END OF SYMBOLS #######################################################
 # D2Q9 notation from TCLB
