@@ -31,7 +31,7 @@ class GaussianHillAnal2D:
         return C
 
 
-def prepare_anal_data_ADE_Gaussion_Hill(gha: GaussianHillAnal2D, ux, time_spot, ySIZE, xSIZE, dump_file_path, shall_recalculate_results=False):
+def prepare_anal_data_ADE_Gaussion_Hill(gha: GaussianHillAnal2D, ux, time_spot, ySIZE, xSIZE, dump_file_path, shall_recalculate_results=False, reference_level=0):
 
     if os.path.isfile(dump_file_path) and not shall_recalculate_results:
         print(f'{dump_file_path} found, loading results from disc')
@@ -44,13 +44,12 @@ def prepare_anal_data_ADE_Gaussion_Hill(gha: GaussianHillAnal2D, ux, time_spot, 
         y_grid = np.linspace(0, ySIZE, ySIZE, endpoint=False) + 0.5
         xx, yy = np.meshgrid(x_grid, y_grid)
 
-        total_time = 1
-        T_anal = np.zeros((ySIZE, xSIZE, total_time))
+        T_anal = np.zeros((ySIZE, xSIZE, 1))
 
         for i in range(ySIZE):
             print(f"running i/ySIZE = {i}/{ySIZE}...")
             for j in range(xSIZE):
-                T_anal[i][j][0] = gha.get_concentration(Matrix([xx[i][j], yy[i][j]]), int(time_spot))  # lets cheat
+                T_anal[i][j][0] = reference_level + gha.get_concentration(Matrix([xx[i][j], yy[i][j]]), int(time_spot))  # lets cheat
 
         T_anal = T_anal[:, :, 0]  # take time slice
 

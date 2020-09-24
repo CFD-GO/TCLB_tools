@@ -154,15 +154,15 @@ def add_data_to_plot(axes, marker, x_grid, temperature_lbm, temperature_anal, ti
     axes.grid()
 
 
-# axes, fig = prepare_plot()
+axes, fig = prepare_plot()
 
 plt_markers = ["<", "v", ">", "x", "o"]
 for R_cp, plt_marker in zip(R_cps, plt_markers):
     x_grid, temperature_lbm, temperature_anal, time_spot = \
         prepare_LBM_and_anal_data_pair(R_k, R_cp, T_left, T_right, k_right, cp_right)
-    # add_data_to_plot(axes, plt_marker, x_grid, temperature_lbm, temperature_anal, time_spot, R_cp)
+    add_data_to_plot(axes, plt_marker, x_grid, temperature_lbm, temperature_anal, time_spot, R_cp)
 
-# R_k_tex = eat_dots_for_texmaker(R_k)
-# fig_name = f'plots/TransientHeatConductionInCompositeSlab_Rk{R_k_tex}.png'
-# fig.savefig(fig_name, bbox_inches='tight')
+R_k_tex = eat_dots_for_texmaker(R_k)
+fig_name = f'plots/TransientHeatConductionInCompositeSlab_Rk{R_k_tex}.png'
+fig.savefig(fig_name, bbox_inches='tight')
 
