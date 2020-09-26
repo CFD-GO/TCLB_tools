@@ -15,10 +15,12 @@ wd = os.getcwd()
 wd = os.path.dirname(wd)  # go level up
 
 
-time_SI = 10
-conductivity_SI = 2.0
-# iterations = 2*10*np.array([1000])
-iterations = 2*10*np.array([6, 10, 100, 1000, 10000])
+# time_SI = 10
+# conductivity_SI = 2.0
+# iterations = 2*10*np.array([6, 10, 100, 1000, 10000])
+time_SI = 100
+conductivity_SI = 4.0
+iterations = 4*100*np.array([6, 10, 100, 1000, 10000])
 domain_size_SI = 256.0
 lattice_size = 256
 
@@ -126,6 +128,27 @@ def plot_t_convergence_acoustic_scalling(conductivities, T_err_L2_BGK, T_err_L2_
 
     # plt.title(f'Advection - Diffusion of a Gaussian Hill at t={time_spot}')
 
+
+    # normalnie
+    # dk = np.logspace(np.log10(conductivities[0]), np.log10(conductivities[-1]), 100)
+    # y = dk ** 1
+    # y = y / y[0] * T_err_L2_BGK[0]
+    # plt.loglog(dk, y, label=r'${x}$')
+    #
+    # y2 = dk ** 2
+    # y2 = y2 / y2[0] * T_err_L2_BGK[0]
+    # plt.loglog(dk, y2, label=r'${x^2}$')
+
+    # odwrotnie
+    dk = np.logspace(np.log10(conductivities[-1]), np.log10(conductivities[0]), 100)
+    initial_error_1st = max(T_err_L2_CM)
+    y = min(dk) * initial_error_1st / dk
+    plt.loglog(dk, y, label=r'${-x}$')
+
+    initial_error_2nd = max(T_err_L2_CM)
+    y2 = min(dk) * min(dk) * initial_error_2nd / (dk * dk)
+    plt.loglog(dk, y2, label=r'${-(x^2)}$')
+
     plt.xlabel(r'$conductivity$', fontsize=18)
     plt.ylabel(r'$T: \; L_2 \, error \, norm $', fontsize=18)
     plt.legend()
@@ -188,17 +211,18 @@ for ux in [0, 0.1]:
 
                 print("------------------------------------ PLOT err field------------------------------------")
                 fig_name = f'{plot_dir}/acoustic_scaling_GaussianHill_{collision_type}_ux={ux:.0e}_k_{str_conductivities[g]}_iterations_{iterations[g]}_sig={Sigma02}_time_SI={time_SI}_lattice={lattice_size}[lu]_err_field_contour.png'
-                plot_err_field(T_err_field, xx, yy, fig_name)
+                # plot_err_field(T_err_field, xx, yy, fig_name)
 
             return T_L2
             # return T_mse
 
         home = pwd.getpwuid(os.getuid()).pw_dir
-
-        T_err_L2_BGK = get_t_err(os.path.join(home, 'DATA_FOR_PLOTS', 'batch_GaussianHill_acoustic_scalling'), 'BGK')
-        T_err_L2_CM =  get_t_err(os.path.join(home, 'DATA_FOR_PLOTS', 'batch_GaussianHill_acoustic_scalling'), 'CM')
-        T_err_L2_CM_HIGHER = get_t_err(os.path.join(home, 'DATA_FOR_PLOTS', 'batch_GaussianHill_acoustic_scalling'), 'CM_HIGHER')
-        T_err_L2_Cumulants = get_t_err(os.path.join(home, 'DATA_FOR_PLOTS', 'batch_GaussianHill_acoustic_scalling'), 'Cumulants')
+        # main_dir = os.path.join(home, 'DATA_FOR_PLOTS', 'batch_GaussianHill_acoustic_scalling', '120-200000_iterations')
+        main_dir = os.path.join(home, 'DATA_FOR_PLOTS', 'batch_GaussianHill_acoustic_scalling', '2400-4000000_iterations')
+        T_err_L2_BGK = get_t_err(main_dir, 'BGK')
+        T_err_L2_CM = get_t_err(main_dir, 'CM')
+        T_err_L2_CM_HIGHER = get_t_err(main_dir, 'CM_HIGHER')
+        T_err_L2_Cumulants = get_t_err(main_dir, 'Cumulants')
         print("------------------------------------ PLOT t convergence------------------------------------")
         fig_name = f'{plot_dir}/acoustic_scalling_GaussianHill_ux={ux:.0e}_sig={Sigma02}_time_SI={time_SI}_conductivity_SI_{conductivity_SI}_lattice={lattice_size}[lu]_t_convergence.png'
         plot_t_convergence_acoustic_scalling(conductivities, T_err_L2_BGK, T_err_L2_CM, T_err_L2_CM_HIGHER, T_err_L2_Cumulants, fig_name)

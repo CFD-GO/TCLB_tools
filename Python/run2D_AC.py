@@ -59,8 +59,9 @@ for xi in range(nrand):
 # all_together = np.concatenate([x1,x2]) 
 # for lbdt in all_together: # (start, stop, num)
 
-for lbdt in  1./np.logspace(0, 1, 25, base=10)   : # (start, stop, num)
-    tc = 100
+
+for lbdt in  1./np.linspace(1, 10, 10)    : # (start, stop, num)
+    tc = 5000
     def getXML(**kwars):
             print(f"running case: lbdt={lbdt}")
             global idx
