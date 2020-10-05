@@ -1,11 +1,9 @@
 
+import os
+import re
+
 from SymbolicCollisions.core.cm_symbols import e_D3Q27, moments_dict
 from SymbolicCollisions.core.printers import print_as_vector, get_print_symbols_in_indx_notation
-from sympy import Matrix
-
-import re
-import os
-import pwd
 
 # SETUP
 d = 3
