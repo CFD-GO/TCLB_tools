@@ -1,8 +1,9 @@
 import matplotlib.pyplot as plt
+import matplotlib.colors as colors
 import numpy as np
 import os
 from DataIO.VTIFile import VTIFile
-from DataIO.helpers import find_oldest_iteration, get_vti_from_iteration
+from DataIO.helpers import find_oldest_iteration, get_vti_from_iteration, eat_dots_for_texmaker
 import os
 import pandas as pd
 import numpy as np
@@ -59,9 +60,12 @@ def make_plot(data, plot_name):
     # ax.plot_surface(xx, yy, T_anal,  cmap='autumn', linewidth=0.5, antialiased=True, zorder=0.1, label='T_anal')
     # ax.contourf(xx, yy, T_num_slice,  cmap='summer', linewidth=0.5, antialiased=True, label='T_num')
 
-    # gist_rainbow, brg, hsv, seismic, RdBu
-    cntr = ax.pcolormesh(xx, yy, T_num_slice, cmap='Greys', label='T_num', vmin=9.975,
-                         vmax=11.025)  # this one has smooth colors
+    # gist_rainbow, brg, hsv, seismic, RdBu, Greys
+    cntr = ax.pcolormesh(xx, yy, T_num_slice, cmap='coolwarm', label='T_num', shading='auto',
+                         # norm=colors.LogNorm(vmin=9.975, vmax=11.025)
+                         vmin=9.98,
+                         vmax=11.02
+                         )  # this one has smooth colors
 
     # cntr = ax.pcolormesh(xx, yy, T_num_slice, cmap='twilight', label='T_num', vmin=9.95, vmax=11.05)  # this one has smooth colors
     # cntr = ax.contourf(xx, yy, T_num_slice, cmap='coolwarm', antialiased=True)  # this one is has step colors
@@ -109,7 +113,7 @@ def make_plot(data, plot_name):
     subdir = os.path.join('plots', f'{k_dir}')
     if not os.path.exists(subdir):
         os.makedirs(subdir)
-    fig_name = f'{subdir}/{plot_name}.png'
+    fig_name = f'{subdir}/{eat_dots_for_texmaker(plot_name)}.png'
 
     fig.savefig(fig_name, bbox_inches='tight')
     plt.show()

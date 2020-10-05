@@ -6,6 +6,7 @@ import pwd
 import re
 from fractions import Fraction
 from DataIO.VTIFile import VTIFile
+from DataIO.helpers import peel_the_skin_v2
 from Benchmarks.GaussianHill.GaussianHillAnal2D import GaussianHillAnal2D, prepare_anal_data_ADE_Gaussion_Hill
 
 from sympy.matrices import Matrix
@@ -13,14 +14,23 @@ from sympy.matrices import Matrix
 # -------- numerical solution ---------------
 wd = os.getcwd()
 wd = os.path.dirname(wd)  # go level up
-
+home = pwd.getpwuid(os.getuid()).pw_dir
 
 # time_SI = 10
 # conductivity_SI = 2.0
 # iterations = 2*10*np.array([6, 10, 100, 1000, 10000])
-time_SI = 100
-conductivity_SI = 4.0
-iterations = 4*100*np.array([6, 10, 100, 1000, 10000])
+# main_dir = os.path.join(home, 'DATA_FOR_PLOTS', 'batch_GaussianHill_acoustic_scalling', '120-200000_iterations')
+
+time_SI = 50
+conductivity_SI = 7.0
+iterations = 7*50*np.array([6, 10, 100, 1000, 10000])
+main_dir = os.path.join(home, 'DATA_FOR_PLOTS', 'batch_GaussianHill_acoustic_scalling', '2100-3500000_iterations')
+
+# time_SI = 100
+# conductivity_SI = 4.0
+# iterations = 4*100*np.array([6, 10, 100, 1000, 10000])
+# main_dir = os.path.join(home, 'DATA_FOR_PLOTS', 'batch_GaussianHill_acoustic_scalling', '2400-4000000_iterations')
+
 domain_size_SI = 256.0
 lattice_size = 256
 
@@ -85,7 +95,7 @@ def plot_err_field(T_err_field, xx, yy, fig_name):
 
 
 def plot_t_convergence_acoustic_scalling(conductivities, T_err_L2_BGK, T_err_L2_CM, T_err_L2_CM_HIGHER, T_err_L2_Cumulants, fig_name):
-    plt.rcParams.update({'font.size': 14})
+    plt.rcParams.update({'font.size': 20})
     plt.figure(figsize=(14, 8))
     # '{:.0e}'.format(x)
     axes = plt.gca()
@@ -140,17 +150,19 @@ def plot_t_convergence_acoustic_scalling(conductivities, T_err_L2_BGK, T_err_L2_
     # plt.loglog(dk, y2, label=r'${x^2}$')
 
     # odwrotnie
-    dk = np.logspace(np.log10(conductivities[-1]), np.log10(conductivities[0]), 100)
-    initial_error_1st = max(T_err_L2_CM)
-    y = min(dk) * initial_error_1st / dk
-    plt.loglog(dk, y, label=r'${-x}$')
+    # dk = np.logspace(np.log10(conductivities[-1]), np.log10(conductivities[0]), 100)
+    # initial_error_1st = max(T_err_L2_CM)
+    # y = min(dk) * initial_error_1st / dk
+    # plt.loglog(dk, y, label=r'${-x}$')
+    #
+    # initial_error_2nd = max(T_err_L2_CM)
+    # y2 = min(dk) * min(dk) * initial_error_2nd / (dk * dk)
+    # plt.loglog(dk, y2, label=r'${-(x^2)}$')
 
-    initial_error_2nd = max(T_err_L2_CM)
-    y2 = min(dk) * min(dk) * initial_error_2nd / (dk * dk)
-    plt.loglog(dk, y2, label=r'${-(x^2)}$')
 
-    plt.xlabel(r'$conductivity$', fontsize=18)
-    plt.ylabel(r'$T: \; L_2 \, error \, norm $', fontsize=18)
+
+    plt.xlabel(r'$k$', fontsize=22)
+    plt.ylabel(r'$T: \; L_2 \, error \, norm $', fontsize=22)
     plt.legend()
     plt.grid()
 
@@ -202,6 +214,11 @@ for ux in [0, 0.1]:
                 #                                                      shall_recalculate_results=True,
                 #                                                      reference_level=10.)
                 # T_err_field2 = T_anal2 - T_num_slice
+                # xx = peel_the_skin_v2(xx, int(0.25 * lattice_size), int(0.75 * lattice_size))
+                # yy = peel_the_skin_v2(yy, int(0.25 * lattice_size), int(0.75 * lattice_size))
+                # T_anal = peel_the_skin_v2(T_anal, int(0.25*lattice_size), int(0.75*lattice_size))
+                # T_num_slice = peel_the_skin_v2(T_num_slice, int(0.25 * lattice_size), int(0.75 * lattice_size))
+                # T_err_field = T_anal - T_num_slice
 
                 T_L2[g] = calc_L2(T_anal, T_num_slice)
                 T_mse[g] = calc_mse(T_anal, T_num_slice)
@@ -211,14 +228,13 @@ for ux in [0, 0.1]:
 
                 print("------------------------------------ PLOT err field------------------------------------")
                 fig_name = f'{plot_dir}/acoustic_scaling_GaussianHill_{collision_type}_ux={ux:.0e}_k_{str_conductivities[g]}_iterations_{iterations[g]}_sig={Sigma02}_time_SI={time_SI}_lattice={lattice_size}[lu]_err_field_contour.png'
-                # plot_err_field(T_err_field, xx, yy, fig_name)
+                plot_err_field(T_err_field, xx, yy, fig_name)
 
             return T_L2
             # return T_mse
 
-        home = pwd.getpwuid(os.getuid()).pw_dir
-        # main_dir = os.path.join(home, 'DATA_FOR_PLOTS', 'batch_GaussianHill_acoustic_scalling', '120-200000_iterations')
-        main_dir = os.path.join(home, 'DATA_FOR_PLOTS', 'batch_GaussianHill_acoustic_scalling', '2400-4000000_iterations')
+
+
         T_err_L2_BGK = get_t_err(main_dir, 'BGK')
         T_err_L2_CM = get_t_err(main_dir, 'CM')
         T_err_L2_CM_HIGHER = get_t_err(main_dir, 'CM_HIGHER')

@@ -22,6 +22,10 @@ def peel_the_skin(some_2d_array):
 
     return some_2d_array
 
+def peel_the_skin_v2(some_2d_array, start, end):
+    # clip the array from each side
+    some_2d_array = some_2d_array[start:end, start:end]
+    return some_2d_array
 
 def get_r_from_xy(x, y, x0=0, y0=0):
     r = np.sqrt(pow(x0 - x, 2) + pow(y0 - y, 2))
