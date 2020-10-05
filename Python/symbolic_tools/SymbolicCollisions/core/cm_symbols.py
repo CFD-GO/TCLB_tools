@@ -44,6 +44,7 @@ uxuz = Symbol('uxuz')
 uyuz = Symbol('uyuz')
 
 m00 = Symbol('m000', positive=True)
+# m00 = Symbol(r'k_{00}^H', positive=True)
 rho = Symbol('rho', positive=True)
 Temperature = Symbol('T', positive=True)
 Enthalpy = Symbol('H', positive=True)  # consider it as enthalpy
@@ -80,9 +81,9 @@ F_phi_x = Symbol(Force_str + '.x')
 F_phi_y = Symbol(Force_str + '.y')
 F_phi_z = Symbol(Force_str + '.z')
 
-omega_ade = Symbol('omega_ade')
-omega_v = Symbol('omega_nu')
-omega_b = Symbol('omega_bulk')  # omega_bulk='1.0/(3*bulk_visc+0.5)'
+omega_ade = Symbol('omega_ade', positive=True)
+omega_v = Symbol('omega_nu', positive=True)
+omega_b = Symbol('omega_bulk', positive=True)  # omega_bulk='1.0/(3*bulk_visc+0.5)'
 
 ####################################################### END OF SYMBOLS #######################################################
 # D2Q9 notation from TCLB
@@ -283,7 +284,8 @@ S_relax_hydro_D2Q9 = diag(1, 1, 1, s_plus_D2Q9, s_plus_D2Q9, omega_v, 1, 1, 1)
 S_relax_hydro_D2Q9[3, 4] = s_minus_D2Q9
 S_relax_hydro_D2Q9[4, 3] = s_minus_D2Q9
 
-S_relax_ADE_D2Q9 = diag(1, omega_ade, omega_ade, 1, 1, 1, 1, 1, 1)
+# S_relax_ADE_D2Q9 = diag(1, omega_ade, omega_ade, 1, 1, 1, 1, 1, 1)
+S_relax_ADE_D2Q9 = diag(1, omega_ade, omega_ade, 1, 1, 1, omega_ade, omega_ade, 1)
 
 # Both S_relax_D3Q27 and order of 3D (central) moments as in
 # `Three-dimensional cascaded lattice Boltzmann method:

@@ -1,5 +1,7 @@
 """
 See 'On transient heat conduction in a one-dimensional composite slab.' by Y.Sun and S.Wichman, 2004
+
+Check easier version: 'Phase interface effects in the total enthalpy-based lattice Boltzmann model for solid–liquid phase change' Rongzong Huang, Huiying Wu, 2015
 """
 
 

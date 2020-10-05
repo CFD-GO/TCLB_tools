@@ -4,14 +4,15 @@ from SymbolicCollisions.core.cm_symbols import ux, uy, uz, \
     ux2, uy2, uz2,\
     ux3, uy3, uz3,\
     uxuy3,\
-    Sigma2
+    Sigma2, Sigma2asSymbol,\
+    rho, cs2, cht_gamma
 
 # from decimal import Decimal
 from sympy import simplify, Float, preorder_traversal, Matrix
 from sympy.core.evalf import N as symbol_to_number
 from fractions import Fraction
 from sympy import Symbol
-
+from sympy import latex
 import numpy as np
 import pandas as pd
 
@@ -36,11 +37,33 @@ def print_u3():
 
 
 def print_sigma_cht():
-    # print(f"{Sigma2}")
-    print_as_vector(Matrix([Sigma2]), outprint_symbol="real_t Sigma2")
-    # print(f"real_t Sigma2 = (h_stability_enhancement*1./3.)/(cp*rho);")
-    # print(f"real_t Sigma2 = {Sigma2};")
+    print("\t#ifdef OPTIONS_CHT")
+    # print_as_vector(Matrix([Sigma2]), outprint_symbol="real_t Sigma2")
+    print(f"\t\treal_t {Sigma2asSymbol} = {Sigma2};")
+    print("\t#else")
+    print(f"\t\treal_t {Sigma2asSymbol} = 1./3.;")
+    print("\t#endif")
 
+
+def print_sigma_sir():
+    # print(f"\treal_t {Sigma2asSymbol} = {cs2*cht_gamma/rho};")
+    stability_enhancement = Symbol('stability_enhancement', positive=True)  # magic stability enhancement
+    print(f"\treal_t {Sigma2asSymbol} = {cs2 * stability_enhancement / rho};")
+
+
+def get_vector_of_eq_central_moments(what: Symbol, Sigma2: Symbol) -> Matrix:
+    moments = Matrix([
+        what,
+        0,
+        0,
+        Sigma2 * what,
+        Sigma2 * what,
+        0,
+        0,
+        0,
+        Sigma2 * Sigma2 * what,
+    ])
+    return moments
 
 def round_and_simplify(stuff):
     simplified_stuff = simplify(stuff)
@@ -54,7 +77,7 @@ def round_and_simplify(stuff):
     return rounded_and_simplified_stuff
 
 
-def get_print_symbols_in_m_notation(moments_order, print_symbol='m_', as_list=False):
+def get_print_symbols_in_m_notation(moments_order, print_symbol='m_', as_list=False, withbrackets=False):
     if type(moments_order) != Matrix:
         moments_order = Matrix(moments_order)
 
@@ -66,7 +89,10 @@ def get_print_symbols_in_m_notation(moments_order, print_symbol='m_', as_list=Fa
         direction = [str(d) for d in direction]
         direction = ''.join(direction)
         direction = re.sub(r'-1', '2', direction)
-        print_symbols.append(f"{print_symbol}{direction}")
+        if withbrackets:
+            print_symbols.append(f"{print_symbol}_{{{direction}}}")
+        else:
+            print_symbols.append(f"{print_symbol}{direction}")
 
     if as_list:
         return print_symbols
@@ -155,7 +181,7 @@ def print_as_vector(some_matrix, outprint_symbol='default_symbol1', raw_output=F
                 for square_pattern in square_patterns:
                     to_be_squared = re.findall(r"(\w+)" + square_pattern, row)
                     if len(to_be_squared) > 1:
-                        msg = 'There is to much square patterns and I dont know not how to simplify them yet.\n ' \
+                        msg = 'There is to much square patterns and it is not sure how to simplify them yet.\n ' \
                               'Please generate and check the raw, unparsed output!'
                         # raise NotImplementedError(msg)
                         print(msg)
@@ -168,7 +194,7 @@ def print_as_vector(some_matrix, outprint_symbol='default_symbol1', raw_output=F
                 for cube_pattern in cube_patterns:
                     to_be_squared = re.findall(r"(\w+)" + cube_pattern, row)
                     if len(to_be_squared) > 1:
-                        msg = 'There is to much cubic patterns and I dont know not how to simplify them yet.\n ' \
+                        msg = 'There is to much cubic patterns and it is not sure how to simplify them yet.\n ' \
                               'Please generate and check the raw, unparsed output!'
                         # raise NotImplementedError(msg)
                         print(msg)
@@ -180,3 +206,41 @@ def print_as_vector(some_matrix, outprint_symbol='default_symbol1', raw_output=F
 
         print(f"\t{print_symbols[i]} = {row};")
         # print(f"stuff = re.sub(r'{print_symbols[i]}', '{row}', stuff)")
+
+
+def print_as_vector_latex(some_matrix, outprint_symbol='default_symbol1', raw_output=False, withbrackets=True, output_order_of_moments=None):
+    print("\n")
+    rows = some_matrix._mat
+    q = len(rows)
+
+    if output_order_of_moments is not None:
+        print_symbols = get_print_symbols_in_m_notation(output_order_of_moments, outprint_symbol, as_list=True, withbrackets=True)
+    else:
+        print_symbols = get_print_symbols_in_indx_notation(q, outprint_symbol, withbrackets, as_list=True)
+
+    for i in range(q):
+        print(f"\t{print_symbols[i]} \\\\")
+
+    for i in range(q):
+        row = rows[i]
+
+        if raw_output:
+            print(latex(f"{print_symbols[i]} = {row}"))
+        else:
+            row = symbol_to_number(round_and_simplify(row))
+            # row = round_and_simplify(row)
+            row = latex(row)
+            row = re.sub(r"1\.0 ", "", row)  # omg, dont multiply by 1.0
+
+            ugly_fractions = re.findall(r"\d\.\d+", row)   # may return an empty list: []
+            while ugly_fractions:
+                row = re.sub(r"\d\.\d+",  # digit, dot, one or more digits
+                             str(Fraction(ugly_fractions[0]).limit_denominator(max_denominator=1000)),  # get algebraic fractions from decimal ones
+                             row, count=1)  # The optional argument count is the maximum number of pattern occurrences to be replaced
+                ugly_fractions = re.findall(r"\d\.\d+", row)
+
+            row = re.sub(r"u\.x", "u_x", row)
+            row = re.sub(r"u\.y", "u_y", row)
+            # print(f"\t{print_symbols[i]} &= {row} \\\\ \\nonumber")
+            print(f"\t{row} \\\\")
+

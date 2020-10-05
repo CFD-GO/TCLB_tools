@@ -3,9 +3,11 @@ import re
 import numpy as np
 
 
-def delete_unphysical_data_from_wall_nodes(data):
-    data = np.delete(data, 0, axis=0)
-    data = np.delete(data, -1, axis=0)
+def delete_unphysical_data_from_wall_nodes(data, n_to_strip_per_side):
+    # data = np.delete(data, 0, axis=0)
+    # data = np.delete(data, -1, axis=0)
+    data = np.delete(data, np.s_[:n_to_strip_per_side], axis=0)
+    data = np.delete(data, np.s_[-n_to_strip_per_side:], axis=0)
     return data
 
 
@@ -20,6 +22,10 @@ def peel_the_skin(some_2d_array):
 
     return some_2d_array
 
+def peel_the_skin_v2(some_2d_array, start, end):
+    # clip the array from each side
+    some_2d_array = some_2d_array[start:end, start:end]
+    return some_2d_array
 
 def get_r_from_xy(x, y, x0=0, y0=0):
     r = np.sqrt(pow(x0 - x, 2) + pow(y0 - y, 2))
@@ -59,7 +65,10 @@ def find_oldest_iteration(folder, extension='.pvti'):
     if not iterations:
         raise FileNotFoundError(f'Check the path: \n {folder}')
 
-    oldest = max(iterations)
+    # oldest = max(iterations)
+    iterations.sort()
+    oldest = iterations[-1]
+    # oldest = iterations[6]
     return oldest
 
 

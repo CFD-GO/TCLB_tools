@@ -19,14 +19,16 @@ wd = os.getcwd()
 wd = os.path.dirname(wd)  # go level up
 home = pwd.getpwuid(os.getuid()).pw_dir
 
-solver = 'walberla'  # 'TCLB' or 'walberla'
+solver = 'TCLB'  # 'TCLB' or 'walberla'
+collision_type = 'CM_HIGHER'
+output_format = 'png'
 
 if solver == 'walberla':
     main_folder = os.path.join(home, 'DATA_FOR_PLOTS', 'walberla_IABB_ruraWrurze')  # walberla
-    collision_type = None
+    # collision_type = None
 elif solver == 'TCLB':
     main_folder = os.path.join(home, 'DATA_FOR_PLOTS', 'batch_IABB_ruraWrurze')
-    collision_type = 'Cumulants'
+    # collision_type = 'CM_HIGHER' #'Cumulants'
 else:
     raise Exception("Choose solver [\'TCLB\' or \'walberla\'] ")
 
@@ -37,13 +39,12 @@ else:
 
 eff_pipe_diam = np.array([30, 46, 66, 94, 118])
 eff_cyl_diam = np.array([15, 23, 33, 47, 59])
-conductivities = np.array([0.1])
+conductivities = np.array([0.1, 0.01])
 kin_visc = 0.1
 
 x0 = 64.  # center of the cylinder/pipe
 y0 = 64.  # center of the cylinder/pipe
 
-output_format = "png"
 
 # prepare storage
 n_diam = len(eff_pipe_diam)
@@ -149,7 +150,7 @@ def make_plot_for_given_conductivity(_k):
     print("------------------------------------ Convergence  PLOT ------------------------------------")
     if not os.path.exists('plots'):
         os.makedirs('plots')
-    fig_name = f'plots/grid_convergence_iabb_ruraWrurze_anal_vs_lbm_k{eat_dots_for_texmaker(conductivities[_k])}.{output_format}'
+    fig_name = f'plots/grid_convergence_{collision_type}_iabb_ruraWrurze_anal_vs_lbm_k{eat_dots_for_texmaker(conductivities[_k])}.{output_format}'
 
     params = {'legend.fontsize': 'xx-large',
               'figure.figsize': (14, 8),
@@ -165,6 +166,7 @@ def make_plot_for_given_conductivity(_k):
     if solver == 'TCLB':
         # initial_error_1st = 0.18
         initial_error_1st = 3.15*max(np.concatenate((T_iabb_L2[_k, :], T_abb_L2[_k, :])))
+        # initial_error_1st = 0.5*(max(T_eq_L2[_k, :]) + max(T_abb_L2[_k, :]))
         y_1st = eff_pipe_diam.min()*initial_error_1st/eff_pipe_diam
         # initial_error_2nd = 0.05
         initial_error_2nd = 0.85 * min((max(T_iabb_L2[_k, :]), max(T_abb_L2[_k, :])))
@@ -189,7 +191,7 @@ def make_plot_for_given_conductivity(_k):
         ax1.plot(eff_pipe_diam, T_abb_L2[_k, :],
                  color="black", marker="o", markevery=1, markersize=5, linestyle="", linewidth=2,
                  label='ABB')
-
+    #
         ax1.plot(eff_pipe_diam, T_eq_L2[_k, :],
                  color="black", marker="v", markevery=1, markersize=5, linestyle="", linewidth=2,
                  label='EQ')

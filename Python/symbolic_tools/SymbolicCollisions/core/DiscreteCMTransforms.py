@@ -117,6 +117,30 @@ class DiscreteCMTransforms:
 
         return gamma[0]
 
+    def get_gamma_TRT_antisymmetric(self, i):
+
+        eu = self.e[i, :] * self.u
+        u2 = Matrix([self.u.dot(self.u)])
+        gamma = self.w[i] * (Matrix([1]) + eu / self.cs2 + eu * eu / (2 * self.cs2 * self.cs2) - u2 / (2 * self.cs2))
+
+        _eu = -self.e[i, :] * self.u
+        _gamma = self.w[i] * (Matrix([1]) + _eu / self.cs2 + _eu * _eu / (2 * self.cs2 * self.cs2) - u2 / (2 * self.cs2))
+
+        gamma_antisymmetric = (gamma - _gamma)/2
+        return gamma_antisymmetric[0]
+
+    def get_gamma_TRT_symmetric(self, i):
+
+        eu = self.e[i, :] * self.u
+        u2 = Matrix([self.u.dot(self.u)])
+        gamma = self.w[i] * (Matrix([1]) + eu / self.cs2 + eu * eu / (2 * self.cs2 * self.cs2) - u2 / (2 * self.cs2))
+
+        _eu = -self.e[i, :] * self.u
+        _gamma = self.w[i] * (Matrix([1]) + _eu / self.cs2 + _eu * _eu / (2 * self.cs2 * self.cs2) - u2 / (2 * self.cs2))
+
+        gamma_antisymmetric = (gamma + _gamma)/2
+        return gamma_antisymmetric[0]
+
     def get_gamma_stabilized(self, i):
         """
          OMG, sympy...
