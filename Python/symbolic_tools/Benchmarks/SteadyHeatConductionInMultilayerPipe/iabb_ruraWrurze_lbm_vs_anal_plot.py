@@ -11,23 +11,49 @@ import os
 import pwd
 import numpy as np
 
-eff_pipe_diam = 120
-eff_cyl_diam = 60
+# eff_pipe_diam = np.array([30, 46, 66, 94, 118])
+# eff_cyl_diam = np.array([15, 23, 33, 47, 59])
+
+# eff_pipe_diam = 118
+# eff_cyl_diam = 59
+
+eff_pipe_diam = 66
+eff_cyl_diam = 33
 conductivity = 0.1
 kin_visc = 0.1
+
+solver = 'walberla'  # 'TCLB' or 'walberla
 
 wd = os.getcwd()
 wd = os.path.dirname(wd)  # go level up
 home = pwd.getpwuid(os.getuid()).pw_dir
-main_folder = os.path.join(home, 'DATA_FOR_PLOTS', 'batch_IABB_ruraWrurze')
-case_folder = f'abb_ruraWrurze_Dirichlet_Cumulants_k_{conductivity}_nu_{kin_visc}_effdiam_{eff_pipe_diam}'
+
+if solver == 'walberla':
+    main_folder = os.path.join(home, 'DATA_FOR_PLOTS', 'walberla_IABB_ruraWrurze')
+    # case_folder = os.path.join('vtk_test', 'thermal_field')
+    # case_folder = os.path.join('vtk_test_old', 'thermal_field')
+    case_folder = os.path.join(f'vtk_eff_pipe_diam_{eff_pipe_diam}', 'thermal_field')
+elif solver == 'TCLB':
+    main_folder = os.path.join(home, 'DATA_FOR_PLOTS', 'batch_IABB_ruraWrurze')
+    case_folder = f'abb_ruraWrurze_Dirichlet_Cumulants_k_{conductivity}_nu_{kin_visc}_effdiam_{eff_pipe_diam}'
+else:
+    raise Exception("Choose solver [\'TCLB\' or \'walberla\'] ")
 
 
 def read_data_from_lbm(_case_folder):
-    oldest = find_oldest_iteration(_case_folder)
-    filename_vtk = get_vti_from_iteration(_case_folder, oldest, extension='.pvti')
-    filepath_vtk = os.path.join(_case_folder, filename_vtk)
-    vti_reader = VTIFile(filepath_vtk, parallel=True)
+    if solver == 'walberla':
+        oldest = find_oldest_iteration(_case_folder, extension='.vti')
+        filename_vtk = get_vti_from_iteration(_case_folder, oldest, extension='.vti', prefix='simulation_step_')  # walberla
+        filepath_vtk = os.path.join(_case_folder, filename_vtk)
+        vti_reader = VTIFile(filepath_vtk, parallel=False)  # walberla
+    elif solver == 'TCLB':
+        oldest = find_oldest_iteration(_case_folder)  # TCLB
+        filename_vtk = get_vti_from_iteration(_case_folder, oldest, extension='.pvti') # TCLB
+        filepath_vtk = os.path.join(_case_folder, filename_vtk)
+        vti_reader = VTIFile(filepath_vtk, parallel=True)  # TCLB
+    else:
+        raise Exception("Choose solver [\'TCLB\' or \'walberla\'] ")
+
     T_num = vti_reader.get("T")
     T_num_slice = T_num[:, :, 1]
 
@@ -43,8 +69,8 @@ ny, nx = T_num_slice.shape
 
 # -------- anal solution ---------------
 
-x0 = 64.  # center of the cylinder/pipe
-y0 = 64.  # center of the cylinder/pipe
+x0 = 64  # center of the cylinder/pipe
+y0 = 64  # center of the cylinder/pipe
 
 r0 = eff_cyl_diam/2.  # inner radius
 r2 = eff_pipe_diam/2.  # outer radius
@@ -59,8 +85,12 @@ xx, yy = np.meshgrid(x_grid, y_grid)
 T_anal = np.zeros((ny, nx))
 r_anal = np.zeros((ny, nx))
 
+# cuttoff_r2 = eff_pipe_diam / 2. - 1
+# cuttoff_r0 = eff_cyl_diam / 2. + 1
+
 cuttoff_r2 = eff_pipe_diam / 2. - 1
 cuttoff_r0 = eff_cyl_diam / 2. + 1
+
 for i in range(ny):
     for j in range(nx):
         r = get_r_from_xy(xx[i][j], yy[i][j], x0, y0)

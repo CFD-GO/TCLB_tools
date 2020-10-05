@@ -117,9 +117,9 @@ class TestRegexPrinters(TestCase):
             "\ttest = rho;\n",
             "\ttest = T*cp*rho;\n",
             "\ttest = 1/9.*T*gamma*gamma/(cp*rho);\n",
-            "\ttest = RT*RT*m00;\n",
-            "\ttest = -RT*m00*uy2;\n",
-            "\ttest = RT*RT*m00;\n",
+            "\ttest = RT*RT*m000;\n",
+            "\ttest = -RT*m000*uy2;\n",
+            "\ttest = RT*RT*m000;\n",
             ## "\ttest[0] = m00*(-RT*uy2 + RT*uy2 + RT*RT);\n",   # it seems that the order is sometimes swapped and the test fails Oo
         ]
 
@@ -170,3 +170,32 @@ class TestRegexPrinters(TestCase):
         out = f.getvalue()
 
         assert out == expected_results
+
+    def test_latex_printer(self):
+        pass
+        # from sympy.matrices import Matrix
+        # from SymbolicCollisions.core.printers import print_as_vector, print_as_vector_latex
+        # from SymbolicCollisions.core.cm_symbols import e_D2Q9, u2D, F2D, rho, moments_dict
+        # from SymbolicCollisions.core.DiscreteCMTransforms import DiscreteCMTransforms
+        #
+        # lattice = 'D2Q9'
+        # dcmt = DiscreteCMTransforms(e_D2Q9, u2D, F2D, rho)
+        # discrete_edf = [dcmt.get_EDF(i) for i in range(0, 9)]
+        # discrete_edf = Matrix(discrete_edf)
+        #
+        # expected_results = "\tf^{eq}_{000} = m_{000} \left(- 2/3 u.x^{2} - 2/3 u.y^{2} + 4/9\\right) \\\\\n" \
+        #                    "\tf^{eq}_{100} = m_{000} \left(1/3 u.x^{2} + 1/3 u.x - 1/6 u.y^{2} + 1/9\\right) \\\\\n" \
+        #                    "\tf^{eq}_{010} = m_{000} \left(- 1/6 u.x^{2} + 1/3 u.y^{2} + 1/3 u.y + 1/9\\right) \\\\\n" \
+        #                    "\tf^{eq}_{200} = m_{000} \left(1/3 u.x^{2} - 1/3 u.x - 1/6 u.y^{2} + 1/9\\right) \\\\\n" \
+        #                    "\tf^{eq}_{020} = m_{000} \left(- 1/6 u.x^{2} + 1/3 u.y^{2} - 1/3 u.y + 1/9\\right) \\\\\n" \
+        #                    "\tf^{eq}_{110} = m_{000} \left(1/12 u.x^{2} + 1/4 u.x u.y + 1/12 u.x + 1/12 u.y^{2} + 1/12 u.y + 1/36\\right) \\\\\n" \
+        #                    "\tf^{eq}_{210} = m_{000} \left(1/12 u.x^{2} - 1/4 u.x u.y - 1/12 u.x + 1/12 u.y^{2} + 1/12 u.y + 1/36\\right) \\\\\n" \
+        #                    "\tf^{eq}_{120} = m_{000} \left(1/12 u.x^{2} + 1/4 u.x u.y - 1/12 u.x + 1/12 u.y^{2} - 1/12 u.y + 1/36\\right) \\\\\n" \
+        #                    "\tf^{eq}_{220} = m_{000} \left(1/12 u.x^{2} - 1/4 u.x u.y + 1/12 u.x + 1/12 u.y^{2} - 1/12 u.y + 1/36\\right) \\\\\n" \
+        #
+        # f = io.StringIO()
+        # with redirect_stdout(f):
+        #     print_as_vector_latex(discrete_edf, outprint_symbol='f^{eq}', output_order_of_moments=moments_dict[lattice])
+        # out = f.getvalue()
+        #
+        # assert out == expected_results

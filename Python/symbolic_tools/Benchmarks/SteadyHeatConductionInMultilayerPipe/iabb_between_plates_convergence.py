@@ -5,6 +5,7 @@ from Benchmarks.SteadyHeatConductionInMultilayerPipe.contour_and_slice_plot impo
 from Benchmarks.SteadyHeatConductionInMultilayerPipe.steady_two_layer_cylinder_analytical_2D import HeatConductionBetweenTwoPlates
 from DataIO.helpers import find_oldest_iteration, get_vti_from_iteration, calc_mse, calc_L2, strip_folder_name, eat_dots_for_texmaker
 import pwd
+from Benchmarks.SteadyHeatConductionInMultilayerPipe.contour_and_slice_plot import cntr_plot, slice_plot
 from DataIO.VTIFile import VTIFile
 
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
@@ -12,23 +13,26 @@ from DataIO.VTIFile import VTIFile
 import matplotlib.pyplot as plt
 import matplotlib.ticker
 import matplotlib.pylab as pylab
+
+
 rho = 1
-conductivity = '0.01'
+conductivity = '0.1'
 mu = rho * float(conductivity)
 
+# diameters = np.array([15, 31, 63, 127])
 diameters = np.array([15, 31, 63])
-qs = [0.25, 0.5, 0.75]
-uc = 0.01
+qs = [0.5]
 
+collision_type = 'CM_HIGHER'
 
 # -------- numerical solution ---------------
 wd = os.getcwd()
 wd = os.path.dirname(wd)  # go level up
 home = pwd.getpwuid(os.getuid()).pw_dir
-main_folder = os.path.join(home, 'DATA_FOR_PLOTS', 'batch_(I)BB_Poiseuille')
+main_folder = os.path.join(home, 'DATA_FOR_PLOTS', 'batch_IABB_plates')
 
 
-def read_ux(folder):
+def read_data_from_LBM(folder):
     folder = strip_folder_name(folder)
     case_folder = os.path.join(main_folder, folder)
     oldest = find_oldest_iteration(case_folder)
@@ -42,53 +46,78 @@ def read_ux(folder):
     return T_num_slice
 
 
-def delete_unphysical_data_from_wall_nodes(data):
-    data = np.delete(data, 0, axis=0)
-    data = np.delete(data, -1, axis=0)
-    return data
-
-
 for q in qs:
     n_diam = len(diameters)
     T_iabb_mse = np.zeros(n_diam)
     T_iabb_L2 = np.zeros(n_diam)
     T_abb_mse = np.zeros(n_diam)
     T_abb_L2 = np.zeros(n_diam)
+    T_eq_mse = np.zeros(n_diam)
+    T_eq_L2 = np.zeros(n_diam)
 
     for d in range(n_diam):
         expected_wall_location = 1.5 - q
         effdiam = diameters[d] - 2 * expected_wall_location
 
-        T_iabb_num_slice = read_ux(f"iabb_Poiseuille_k_{conductivity}_effdiam_{effdiam}")
-        T_abb_num_slice = read_ux(f"abb_Poiseuille_k_{conductivity}_effdiam_{effdiam}")
-        # ux_bb_num_slice = read_ux(f"bb_Poiseuille_nu_{kin_visc}_effdiam_{diameters[d] - 2}")
+        iabb_case_folder = f"iabb_plates_Dirichlet_{collision_type}_k_{conductivity}_effdiam_{effdiam}"
+        T_iabb_num_slice = read_data_from_LBM(iabb_case_folder)
+        abb_case_folder = f"abb_plates_Dirichlet_{collision_type}_k_{conductivity}_effdiam_{effdiam}"
+        T_abb_num_slice = read_data_from_LBM(abb_case_folder)
+        eq_case_folder = f"eq_plates_Dirichlet_{collision_type}_k_{conductivity}_effdiam_{effdiam}"
+        T_eq_num_slice = read_data_from_LBM(eq_case_folder)
 
-        ySIZE = T_iabb_num_slice.shape[0]
-        y_grid = np.linspace(0, ySIZE, ySIZE, endpoint=False) + 0.5
+        hcbp = HeatConductionBetweenTwoPlates(T0=11, T2=10, Heff=effdiam, y0=expected_wall_location)
 
-        T_iabb_num_slice = delete_unphysical_data_from_wall_nodes(T_iabb_num_slice)
-        T_abb_num_slice = delete_unphysical_data_from_wall_nodes(T_abb_num_slice)
-        y_grid = delete_unphysical_data_from_wall_nodes(y_grid)
+        ny, nx = T_iabb_num_slice.shape
+        x_grid = np.linspace(0, nx, nx, endpoint=False) + 0.5
+        y_grid = np.linspace(0, ny, ny, endpoint=False) + 0.5
+        xx, yy = np.meshgrid(x_grid, y_grid)
 
-        # -------- anal solution ---------------
-        y_anal = np.arange(q, effdiam, 1)
-        # y_anal = np.concatenate(([0], y_anal, [effdiam])) # unphysical wall nodes
-        hcbp = HeatConductionBetweenTwoPlates(T0=11, T2=10, Heff=effdiam)
+        T_anal = np.zeros((ny, nx))
 
-        T_anal = np.array([hcbp.get_T_profile(y_anal[i]) for i in range(len(y_anal))])
+        cuttoff_y2 = effdiam - 1
+        cuttoff_y0 = 0 + 1
+        for i in range(ny):
+            for j in range(nx):
+                y = yy[i][j]
+                T_anal[i, j] = hcbp.get_T_profile(y)
+                if i < cuttoff_y0 or i > cuttoff_y2:
+                    T_anal[i, j] = np.nan
 
-        T_iabb_mse[d] = calc_mse(T_anal, T_iabb_num_slice)
-        T_iabb_L2[d] = calc_L2(T_anal, T_iabb_num_slice)
-        T_abb_mse[d] = calc_mse(T_anal, T_abb_num_slice)
-        T_abb_L2[d] = calc_L2(T_anal, T_abb_num_slice)
+        not_nan_mask = ~np.isnan(T_anal)
+        T_anal_masked = T_anal[not_nan_mask]
+        T_iabb_num_slice_masked = T_iabb_num_slice[not_nan_mask]
+        T_abb_num_slice_masked = T_abb_num_slice[not_nan_mask]
+        T_eq_num_slice_masked = T_eq_num_slice[not_nan_mask]
+        yy_masked = yy[not_nan_mask]
 
-        print(f"ux_mse={T_iabb_mse[d]:.2e} for k{conductivity}_q{q}_effdiam_{effdiam}")
-        print(f"ux_L2={T_iabb_L2[d]:.2e} for k{conductivity}_q{q}_effdiam_{effdiam}")
+        T_iabb_mse[d] = calc_mse(T_anal_masked, T_iabb_num_slice_masked)
+        T_iabb_L2[d] = calc_L2(T_anal_masked, T_iabb_num_slice_masked)
+        T_abb_mse[d] = calc_mse(T_anal_masked, T_abb_num_slice_masked)
+        T_abb_L2[d] = calc_L2(T_anal_masked, T_abb_num_slice_masked)
+        T_eq_mse[d] = calc_mse(T_anal_masked, T_eq_num_slice_masked)
+        T_eq_L2[d] = calc_L2(T_anal_masked, T_eq_num_slice_masked)
+
+        # cntr_plot(T_anal, T_num_slice, xx, yy, conductivity, effdiam, title=iabb_case_folder)
+
+        # # 2D clipy_grid
+        # yy_masked = yy_masked[:,  int(nx / 2)]
+        T_anal_slice = T_anal[:, int(nx / 2)]
+        T_iabb_num_slice = T_iabb_num_slice[:, int(nx / 2)]
+        not_nan_mask = ~np.isnan(T_anal_slice)
+        T_anal_masked = T_anal_slice[not_nan_mask]
+        T_iabb_num_slice_masked = T_iabb_num_slice[not_nan_mask]
+        y_masked = y_grid[not_nan_mask]
+
+        # slice_plot(T_anal_masked, T_iabb_num_slice_masked, y_masked, title=f'{iabb_case_folder}_q{q}')
+
+        print(f"T_iabb_mse={T_iabb_mse[d]:.2e} T_abb_mse={T_abb_mse[d]:.2e} T_eq_mse={T_eq_L2[d]:.2e}\t for k{conductivity}_q{q}_effdiam_{effdiam}")
+        print(f"T_iabb_L2={T_iabb_L2[d]:.2e} T_abb_L2={T_abb_L2[d]:.2e} T_eq_L2={T_eq_L2[d]:.2e}  \tfor k{conductivity}_q{q}_effdiam_{effdiam}")
 
     print("------------------------------------ Convergence  PLOT ------------------------------------")
     if not os.path.exists('plots'):
         os.makedirs('plots')
-    fig_name = f'plots/grid_convergence_conduction_between_plates_anal_vs_lbm_k{eat_dots_for_texmaker(conductivity)}_q{eat_dots_for_texmaker(q)}.png'
+    fig_name = f'plots/iabb_grid_convergence_conduction_between_plates_k{eat_dots_for_texmaker(conductivity)}_q{eat_dots_for_texmaker(q)}.png'
 
     params = {'legend.fontsize': 'xx-large',
               'figure.figsize': (14, 8),
@@ -101,11 +130,15 @@ for q in qs:
     initial_error_05st = 0.070
     y_05st = np.sqrt(diameters.min())*initial_error_05st/np.sqrt(diameters)
 
-    # initial_error_1st = 0.18
+
     initial_error_1st = 1.15*max(np.concatenate((T_iabb_L2, T_abb_L2)))
+    # initial_error_1st = 1.15*max((T_iabb_L2))
+    # initial_error_1st = 1.15 * max((T_abb_L2))
     y_1st = diameters.min()*initial_error_1st/diameters
-    # initial_error_2nd = 0.05
+
     initial_error_2nd = 0.85*min((max(T_iabb_L2), max(T_abb_L2)))
+    # initial_error_2nd = 0.85 * (max(T_iabb_L2))
+    # initial_error_2nd = 0.85 * (max(T_abb_L2))
     y_2nd = diameters.min()*diameters.min()*initial_error_2nd/(diameters*diameters)
 
     fig1, ax1 = plt.subplots(figsize=(14, 8))
@@ -115,9 +148,15 @@ for q in qs:
              color="black", marker="x", markevery=1, markersize=8, linestyle="", linewidth=2,
              label='IABB')
 
+    if q == 0.5:
+        T_abb_L2 = np.flip(T_abb_L2)
     ax1.plot(diameters, T_abb_L2,
              color="black", marker="o", markevery=1, markersize=5, linestyle="", linewidth=2,
              label='ABB')
+
+    ax1.plot(diameters, T_eq_L2,
+             color="black", marker="v", markevery=1, markersize=5, linestyle="", linewidth=2,
+             label='EQ')
 
     ax1.plot(diameters, y_1st,
              color="black", marker="", markevery=1, markersize=5, linestyle="--", linewidth=2,
@@ -135,7 +174,7 @@ for q in qs:
     # plt.title(f'Pipe within pipe Benchmark - Grid Convergence Study\n '
     #           r'$k$=' + f'{k} \t')
     plt.xlabel(r'lattice size [lu]', fontsize=18)
-    plt.ylabel(r'$u_{x}: \; L_2 \, error \, norm $', fontsize=18)
+    plt.ylabel(r'$T: \; L_2 \, error \, norm $', fontsize=18)
     plt.tick_params(axis='both', which='major', labelsize=14)
     plt.tick_params(axis='both', which='minor', labelsize=1E-16)
     plt.legend()
@@ -145,68 +184,3 @@ for q in qs:
     fig.savefig(fig_name, bbox_inches='tight')
     plt.show()
     plt.close(fig)  # close the figure
-
-
-###################################################################################################################
-def see_ux_plot(d):
-    print("------------------------------------ ux  PLOT ------------------------------------")
-    fig_name = f'Conduction_between_plates_anal_vs_lbm_k{conductivity}_q{q}_effdiam_{effdiam}.png'
-
-    # -------------------- make dummy plot --------------------
-    plt.rcParams.update({'font.size': 14})
-    plt.figure(figsize=(14, 8))
-
-    axes = plt.gca()
-
-    plt.plot(T_anal, y_anal + expected_wall_location,
-             color="black", marker="o", markevery=1, markersize=5, linestyle=":", linewidth=2,
-             label=r'$analytical \, solution$')
-
-    # plt.plot(u_anal, y_anal + len(y_grid) / 2,
-    #          color="black", marker="o", markevery=1, markersize=5, linestyle=":", linewidth=2,
-    #          label=r'$analytical \, solution$')
-
-    # plt.plot(u_fd, y_fd + len(y_grid) / 2,
-    #          color="black", marker="", markevery=1, markersize=5, linestyle="-", linewidth=2,
-    #          label=r'$FD \, solution$')
-
-    plt.plot(T_iabb_num_slice, y_grid,
-             color="black", marker="x", markevery=1, markersize=7, linestyle="", linewidth=2,
-             label=r'$LBM \, IBB$')
-
-    plt.plot(T_abb_num_slice, y_grid,
-             color="black", marker="v", markevery=1, markersize=6, linestyle="", linewidth=2,
-             label=r'$LBM \, BB$')
-
-    # ------ format y axis ------ #
-    yll = y_grid.min()
-    yhl = y_grid.max()
-    # axes.set_ylim([yll, yhl])
-    # axes.set_yticks(np.linspace(yll, yhl, 8))
-    # axes.set_yticks(np.arange(yll, yhl, 1E-2))
-    # axes.set_yticks([1E-4, 1E-6, 1E-8, 1E-10, 1E-12])
-    # axes.set_yticks([0.5, 1.5, 2.5, 31.5, 32, 32.5, 61.5, 62.5, 63.5])
-    # axes.yaxis.set_major_formatter(xfmt)
-
-    # plt.yscale('log')
-    # ------ format x axis ------ #
-    # plt.xlim(0, int(xSIZE / 2))
-    # plt.xlim(int(xSIZE / 2), xSIZE)
-
-    # plt.ticklabel_format(style='sci', axis='x', scilimits=(0, 0))
-    # plt.ticklabel_format(style='sci', axis='y', scilimits=(0, 0))  # scilimits=(-8, 8)
-
-
-    plt.title(f'IABB conductucion_between_plates:\n' +
-              r'$ \nu = $' + f'{conductivity} ' + r'$D_{eff}=$' + f'{effdiam}, q={q}')
-
-    plt.xlabel(r'$u_x$')
-    plt.ylabel(r'$y$')
-    plt.legend()
-    plt.grid()
-
-    fig = plt.gcf()  # get current figure
-    fig.savefig(fig_name, bbox_inches='tight')
-    plt.show()
-
-    # plt.close(fig)  # close the figure

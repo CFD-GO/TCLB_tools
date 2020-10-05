@@ -33,6 +33,7 @@ plt.title(f'Sample log plot\n '
           r'$x_{range}$' + f'={(x.max()-x.min())}'
           f'; \t'
           r'$x_{step}$' + f'={len(x):.4f}')
+
 plt.xlabel(r'$x_{label}$', fontsize=18)
 plt.ylabel(r'$y_{label}$', fontsize=18)
 plt.tick_params(axis='both', which='major', labelsize=14)

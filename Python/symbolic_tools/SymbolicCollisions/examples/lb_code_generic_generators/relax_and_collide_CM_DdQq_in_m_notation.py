@@ -1,6 +1,6 @@
 from sympy.matrices import eye
 
-from SymbolicCollisions.core.cm_symbols import omega_ade, omega_b, omega_v, m00
+from SymbolicCollisions.core.cm_symbols import omega_ade, omega_b, omega_v, m00, Enthalpy
 from SymbolicCollisions.core.cm_symbols import Force_str as F_str
 from SymbolicCollisions.core.cm_symbols import dynamic_import, moments_dict
 from SymbolicCollisions.core.DiscreteCMTransforms import get_m00
@@ -15,18 +15,31 @@ import pandas as pd
 # "Consistent Forcing Scheme in the cascaded LBM" L. Fei et al. 2017
 # eqs 8-12 : (eye(q)-S)*cm + S*cm_eq + (eye(q)-S/2.)*force_in_cm_space
 
-model = 'cht'  # choose from '['hydro_compressible', 'hydro_incompressible', 'ade', 'ade_with_f', 'cht']
+model = 'hydro_compressible'  # choose from '['hydro_compressible', 'hydro_incompressible', 'ade', 'ade_with_f', 'cht']
+clip_z_dimension = False
 
 m_seed = [0, 1, 2]
 rmoments_order = get_m_order_as_in_r(m_seed, m_seed, m_seed)
-q, d = rmoments_order.shape
-
-moments_order = np.array(moments_dict[f'D{d}Q{q}'])
-print(f"order of moments | rmoments: \n "
-      f"{pd.concat([pd.DataFrame.from_records(moments_order),pd.DataFrame.from_records(rmoments_order)], axis=1)}")
 
 e_seed = [0, 1, -1]
 ex_D3Q27new, ey_D3Q27new, ez_D3Q27new, e_D3Q27new = get_e_as_in_r(e_seed, e_seed, e_seed)
+
+if clip_z_dimension:
+    rmoments_order = rmoments_order[0:9]
+    q, d = rmoments_order.shape
+    d = 2
+    ex_D3Q27new = ex_D3Q27new[0:9]
+    ey_D3Q27new = ey_D3Q27new[0:9]
+    ez_D3Q27new = ez_D3Q27new[0:9]
+    e_D3Q27new = e_D3Q27new[0:9, :]
+else:
+    q, d = rmoments_order.shape
+
+moments_order = np.array(moments_dict[f'D{d}Q{q}'])
+
+print(f"order of moments | rmoments: \n "
+      f"{pd.concat([pd.DataFrame.from_records(moments_order),pd.DataFrame.from_records(rmoments_order)], axis=1)}")
+
 print(f"lattice velocities - e: \n {np.array(e_D3Q27new)}")
 
 
@@ -58,9 +71,9 @@ def get_cm_eq_and_F_cm_switcher(choice):
 
     F_cm_switcher = {
         'hydro_compressible': (
-        "SymbolicCollisions.core.hardcoded_results", f"hardcoded_F_cm_hydro_density_based_D{d}Q{q}"),
+        "SymbolicCollisions.core.hardcoded_results", f"hardcoded_F_cm_hydro_compressible_D{d}Q{q}"),
         'hydro_incompressible': (
-        "SymbolicCollisions.core.hardcoded_results", f"hardcoded_F_cm_hydro_velocity_based_D{d}Q{q}"),
+        "SymbolicCollisions.core.hardcoded_results", f"hardcoded_F_cm_hydro_incompressible_D{d}Q{q}"),
         'ade_with_f': ("SymbolicCollisions.core.hardcoded_results", f"hardcoded_F_cm_pf_D{d}Q{q}"),
         'ade': None,
         'cht': None,
@@ -125,7 +138,13 @@ temp_populations = get_print_symbols_in_m_notation(moments_order, temp_pop_str)
 cm_eq = get_print_symbols_in_m_notation(moments_order, cm_eq_pop_str)
 F_cm = get_print_symbols_in_m_notation(moments_order, F_str)
 
-print(f"\treal_t H = {sum(populations)};")
+if 'hydro_compressible' in model or 'hydro_incompressible' in model:
+    print(f"\treal_t {omega_b} = 1.0;")
+
+if 'cht' in model:
+    print(f"\treal_t {Enthalpy} = {sum(populations)};")
+else:
+    print(f"\treal_t {m00} = {sum(populations)};")
 
 for t, p in zip(temp_populations, populations):
     print(f"\treal_t {t} = {p};")

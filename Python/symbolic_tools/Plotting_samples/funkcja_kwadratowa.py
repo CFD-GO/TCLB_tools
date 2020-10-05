@@ -65,8 +65,9 @@ plt.legend()
 plt.grid()
 
 fig = plt.gcf()  # get current figure
+fig.tight_layout()  # otherwise the right y-label is slightly clipped
+plt.pause(1e-9)  # there is a race condition somewhere in the matplotlib code.
 fig.savefig(fig_name, bbox_inches='tight')
 plt.show()
-
 # plt.close(fig)  # close the figure
 

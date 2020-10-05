@@ -18,18 +18,33 @@ from DataIO.VTIFile import VTIFile
 wd = os.getcwd()
 wd = os.path.dirname(wd)  # go level up
 home = pwd.getpwuid(os.getuid()).pw_dir
-main_folder = os.path.join(home, 'DATA_FOR_PLOTS', 'batch_IABB_ruraWrurze')
 
+solver = 'TCLB'  # 'TCLB' or 'walberla'
+collision_type = 'CM_HIGHER'
+output_format = 'png'
 
-eff_pipe_diam = np.array([30, 46, 60, 92, 120])
-eff_cyl_diam = np.array([15, 23, 30, 46, 60])
-conductivities = np.array([0.1])
+if solver == 'walberla':
+    main_folder = os.path.join(home, 'DATA_FOR_PLOTS', 'walberla_IABB_ruraWrurze')  # walberla
+    # collision_type = None
+elif solver == 'TCLB':
+    main_folder = os.path.join(home, 'DATA_FOR_PLOTS', 'batch_IABB_ruraWrurze')
+    # collision_type = 'CM_HIGHER' #'Cumulants'
+else:
+    raise Exception("Choose solver [\'TCLB\' or \'walberla\'] ")
+
+# eff_pipe_diam = np.array([30, 46, 60, 92, 120])
+# eff_cyl_diam = np.array([15, 23, 30, 46, 60])
+# eff_pipe_diam = np.array([60, 92, 120])
+# eff_cyl_diam = np.array([30, 46, 60])
+
+eff_pipe_diam = np.array([30, 46, 66, 94, 118])
+eff_cyl_diam = np.array([15, 23, 33, 47, 59])
+conductivities = np.array([0.1, 0.01])
 kin_visc = 0.1
 
 x0 = 64.  # center of the cylinder/pipe
 y0 = 64.  # center of the cylinder/pipe
 
-output_format = "png"
 
 # prepare storage
 n_diam = len(eff_pipe_diam)
@@ -39,16 +54,27 @@ T_iabb_mse = np.zeros([n_conductivities, n_diam])
 T_iabb_L2 = np.zeros([n_conductivities, n_diam])
 T_abb_mse = np.zeros([n_conductivities, n_diam])
 T_abb_L2 = np.zeros([n_conductivities, n_diam])
+T_eq_mse = np.zeros([n_conductivities, n_diam])
+T_eq_L2 = np.zeros([n_conductivities, n_diam])
 
 
 def read_data_from_LBM(case_folder):
-    oldest = find_oldest_iteration(case_folder)
-    filename_vtk = get_vti_from_iteration(case_folder, oldest, extension='.pvti')
-    filepath_vtk = os.path.join(case_folder, filename_vtk)
-    vti_reader = VTIFile(filepath_vtk, parallel=True)
+    if solver == 'walberla':
+        oldest = find_oldest_iteration(case_folder, extension='.vti')  # walberla
+        filename_vtk = get_vti_from_iteration(case_folder, oldest, extension='.vti', prefix='simulation_step_')  # walberla
+        filepath_vtk = os.path.join(case_folder, filename_vtk)
+        vti_reader = VTIFile(filepath_vtk, parallel=False)  # walberla
+    elif solver == 'TCLB':
+        oldest = find_oldest_iteration(case_folder)  # TCLB
+        filename_vtk = get_vti_from_iteration(case_folder, oldest, extension='.pvti') # TCLB
+        filepath_vtk = os.path.join(case_folder, filename_vtk)
+        vti_reader = VTIFile(filepath_vtk, parallel=True)  # TCLB
+    else:
+        raise Exception("Choose solver [\'TCLB\' or \'walberla\'] ")
+
     T_num = vti_reader.get("T")
-    [ux_num, uy_num, uz_num] = vti_reader.get("U", is_vector=True)
     T_num_slice = T_num[:, :, 1]
+    #[ux_num, uy_num, uz_num] = vti_reader.get("U", is_vector=True)
     # ny, nx, nz = T_num.shape
     # uz_num_slice = uz_num[:, :, 1]
     # y = np.linspace(start=0, stop=1, num=ny, endpoint=False)
@@ -72,8 +98,8 @@ def calculate_error_norms(_case_folder):
     T_anal = np.zeros((ny, nx))
     r_anal = np.zeros((ny, nx))
 
-    cuttoff_r2 = eff_pipe_diam[d] / 2. - 1
-    cuttoff_r0 = eff_cyl_diam[d] / 2. + 1
+    cuttoff_r2 = eff_pipe_diam[d] / 2. - 2
+    cuttoff_r0 = eff_cyl_diam[d] / 2. + 2
 
     for i in range(ny):
         for j in range(nx):
@@ -88,7 +114,7 @@ def calculate_error_norms(_case_folder):
     T_num_slice_masked = T_num_slice[not_nan_mask]
     r_anal_masked = r_anal[not_nan_mask]
 
-    cntr_plot(T_anal, T_num_slice, xx, yy, conductivities[k], eff_pipe_diam[d])
+    # cntr_plot(T_anal, T_num_slice, xx, yy, conductivities[k], eff_pipe_diam[d])
 
     # u_anal_masked = np.array([max(u_anal_masked)])
     # uz_num_slice_masked = np.array([max(uz_num_slice_masked)])
@@ -99,25 +125,32 @@ def calculate_error_norms(_case_folder):
 
 for k in range(n_conductivities):
     for d in range(n_diam):
-        case_folder = f'iabb_ruraWrurze_Dirichlet_Cumulants_k_{conductivities[k]}_nu_{kin_visc}_effdiam_{eff_pipe_diam[d]}'
+        if solver == 'TCLB':
+            case_folder = f'iabb_ruraWrurze_Dirichlet_{collision_type}_k_{conductivities[k]}_nu_{kin_visc}_effdiam_{eff_pipe_diam[d]}'
+        elif solver == 'walberla':
+            case_folder = os.path.join(f'vtk_eff_pipe_diam_{eff_pipe_diam[d]}', 'thermal_field')
 
         T_iabb_mse[k, d], T_iabb_L2[k, d] = calculate_error_norms(os.path.join(main_folder, case_folder))
 
-        print(f"uz_ibb_mse={T_iabb_mse[k, d]:.2e} for k{conductivities[k]}_effdiam_{eff_pipe_diam[d]}")
-        print(f"uz_ibb_L2={T_iabb_L2[k, d]:.2e} for v{conductivities[k]}_effdiam_{eff_pipe_diam[d]}")
+        if solver == 'TCLB':
+            print(f"uz_ibb_mse={T_iabb_mse[k, d]:.2e} for k{conductivities[k]}_effdiam_{eff_pipe_diam[d]}")
+            print(f"uz_ibb_L2={T_iabb_L2[k, d]:.2e} for v{conductivities[k]}_effdiam_{eff_pipe_diam[d]}")
 
-        case_folder = f'abb_ruraWrurze_Dirichlet_Cumulants_k_{conductivities[k]}_nu_{kin_visc}_effdiam_{eff_pipe_diam[d]}'
-        T_abb_mse[k, d], T_abb_L2[k, d] = calculate_error_norms(os.path.join(main_folder, case_folder))
+            case_folder = f'abb_ruraWrurze_Dirichlet_{collision_type}_k_{conductivities[k]}_nu_{kin_visc}_effdiam_{eff_pipe_diam[d]}'
+            T_abb_mse[k, d], T_abb_L2[k, d] = calculate_error_norms(os.path.join(main_folder, case_folder))
 
-        print(f"uz_bb_mse={T_abb_mse[k, d]:.2e} for k{conductivities[k]}_effdiam_{eff_pipe_diam[d]}")
-        print(f"uz_bb_L2={T_abb_L2[k, d]:.2e} for k{conductivities[k]}_effdiam_{eff_pipe_diam[d]}")
+            print(f"uz_bb_mse={T_abb_mse[k, d]:.2e} for k{conductivities[k]}_effdiam_{eff_pipe_diam[d]}")
+            print(f"uz_bb_L2={T_abb_L2[k, d]:.2e} for k{conductivities[k]}_effdiam_{eff_pipe_diam[d]}")
+
+            case_folder = f'eq_ruraWrurze_Dirichlet_{collision_type}_k_{conductivities[k]}_nu_{kin_visc}_effdiam_{eff_pipe_diam[d]}'
+            T_eq_mse[k, d], T_eq_L2[k, d] = calculate_error_norms(os.path.join(main_folder, case_folder))
 
 
 def make_plot_for_given_conductivity(_k):
     print("------------------------------------ Convergence  PLOT ------------------------------------")
     if not os.path.exists('plots'):
         os.makedirs('plots')
-    fig_name = f'plots/grid_convergence_iabb_ruraWrurze_anal_vs_lbm_k{eat_dots_for_texmaker(conductivities[_k])}.{output_format}'
+    fig_name = f'plots/grid_convergence_{collision_type}_iabb_ruraWrurze_anal_vs_lbm_k{eat_dots_for_texmaker(conductivities[_k])}.{output_format}'
 
     params = {'legend.fontsize': 'xx-large',
               'figure.figsize': (14, 8),
@@ -130,13 +163,22 @@ def make_plot_for_given_conductivity(_k):
     initial_error_05st = 0.070
     y_05st = np.sqrt(eff_pipe_diam.min())*initial_error_05st/np.sqrt(eff_pipe_diam)
 
-    # initial_error_1st = 0.18
-    initial_error_1st = 1.15*max(np.concatenate((T_iabb_L2[_k, :], T_abb_L2[_k, :])))
-    y_1st = eff_pipe_diam.min()*initial_error_1st/eff_pipe_diam
-    # initial_error_2nd = 0.05
-    initial_error_2nd = 0.85 * min((max(T_iabb_L2[_k, :]), max(T_abb_L2[_k, :])))
-    # initial_error_2nd = 0.85 * max((max(uz_ibb_L2[_v, :]), max(uz_bb_L2[_v, :])))
-    y_2nd = eff_pipe_diam.min()*eff_pipe_diam.min()*initial_error_2nd/(eff_pipe_diam*eff_pipe_diam)
+    if solver == 'TCLB':
+        # initial_error_1st = 0.18
+        initial_error_1st = 3.15*max(np.concatenate((T_iabb_L2[_k, :], T_abb_L2[_k, :])))
+        # initial_error_1st = 0.5*(max(T_eq_L2[_k, :]) + max(T_abb_L2[_k, :]))
+        y_1st = eff_pipe_diam.min()*initial_error_1st/eff_pipe_diam
+        # initial_error_2nd = 0.05
+        initial_error_2nd = 0.85 * min((max(T_iabb_L2[_k, :]), max(T_abb_L2[_k, :])))
+        # initial_error_2nd = 0.85 * max((max(uz_ibb_L2[_v, :]), max(uz_bb_L2[_v, :])))
+        y_2nd = eff_pipe_diam.min()*eff_pipe_diam.min()*initial_error_2nd/(eff_pipe_diam*eff_pipe_diam)
+    elif solver == 'walberla':
+        # initial_error_1st = 0.18
+        initial_error_1st = 1.15*max(T_iabb_L2[_k, :])
+        y_1st = eff_pipe_diam.min()*initial_error_1st/eff_pipe_diam
+        # initial_error_2nd = 0.05
+        initial_error_2nd = 0.9 * max(T_iabb_L2[_k, :])
+        y_2nd = eff_pipe_diam.min()*eff_pipe_diam.min()*initial_error_2nd/(eff_pipe_diam*eff_pipe_diam)
 
     fig1, ax1 = plt.subplots(figsize=(14, 8))
     plt.rcParams.update({'font.size': 14})
@@ -145,9 +187,14 @@ def make_plot_for_given_conductivity(_k):
              color="black", marker="x", markevery=1, markersize=8, linestyle="", linewidth=2,
              label='IABB')
 
-    ax1.plot(eff_pipe_diam, T_abb_L2[_k, :],
-             color="black", marker="o", markevery=1, markersize=5, linestyle="", linewidth=2,
-             label='ABB')
+    if solver == 'TCLB':
+        ax1.plot(eff_pipe_diam, T_abb_L2[_k, :],
+                 color="black", marker="o", markevery=1, markersize=5, linestyle="", linewidth=2,
+                 label='ABB')
+    #
+        ax1.plot(eff_pipe_diam, T_eq_L2[_k, :],
+                 color="black", marker="v", markevery=1, markersize=5, linestyle="", linewidth=2,
+                 label='EQ')
 
     ax1.plot(eff_pipe_diam, y_1st,
              color="black", marker="", markevery=1, markersize=5, linestyle="--", linewidth=2,
@@ -164,8 +211,8 @@ def make_plot_for_given_conductivity(_k):
     ax1.get_xaxis().set_major_formatter(matplotlib.ticker.ScalarFormatter())
     # plt.title(f'Pipe within pipe Benchmark - Grid Convergence Study\n '
     #           r'$k$=' + f'{k} \t')
-    plt.xlabel(r'lattice size [lu]', fontsize=18)
-    plt.ylabel(r'$u_{x}: \; L_2 \, error \, norm $', fontsize=18)
+    plt.xlabel(r'$D_{outer}$ [lu]', fontsize=18)
+    plt.ylabel(r'$T: \; L_2 \, error \, norm $', fontsize=18)
     plt.tick_params(axis='both', which='major', labelsize=14)
     plt.tick_params(axis='both', which='minor', labelsize=1E-16)
     plt.legend()
@@ -177,7 +224,7 @@ def make_plot_for_given_conductivity(_k):
     plt.close(fig)  # close the figure
 
 
-def make_plot_for_all_viscosities():
+def make_plot_for_all_conductivities():
     print("------------------------------------ Convergence  PLOT 2 ------------------------------------")
 
     if not os.path.exists('plots'):
@@ -233,8 +280,8 @@ def make_plot_for_all_viscosities():
     ax1.get_xaxis().set_major_formatter(matplotlib.ticker.ScalarFormatter())
     # plt.title(f'Pipe within pipe Benchmark - Grid Convergence Study\n '
     #           r'$k$=' + f'{k} \t')
-    plt.xlabel(r'lattice size [lu]', fontsize=20)
-    plt.ylabel(r'$u_{x}: \; L_2 \, error \, norm $', fontsize=20)
+    plt.xlabel(r'D_{outer} [lu]', fontsize=20)
+    plt.ylabel(r'T: \; L_2 \, error \, norm $', fontsize=20)
     plt.tick_params(axis='both', which='major', labelsize=18)
     plt.tick_params(axis='both', which='minor', labelsize=1E-16)
     plt.legend()

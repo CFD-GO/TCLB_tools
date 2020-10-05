@@ -51,12 +51,12 @@ print_as_vector(m_eq, 'm_raw_eq', raw_output=False)
 print("--------------------------------------------------")
 print_as_vector(m_eq, 'm_raw_eq', raw_output=True)
 
-m_eq = get_mom_vector_from_continuous_def(ccmt.get_Maxwellian_DF,
+cm_eq = get_mom_vector_from_continuous_def(ccmt.get_Maxwellian_DF,
                                           continuous_transformation=ccmt.get_cm,
                                           moments_order=moments_dict[lattice])
-print_as_vector(m_eq, 'cm_raw_eq', raw_output=False)
+print_as_vector(cm_eq, 'cm_raw_eq', raw_output=False)
 print("--------------------------------------------------")
-print_as_vector(m_eq, 'cm_cht_eq', raw_output=True)
+print_as_vector(cm_eq, 'cm_cht_eq', raw_output=True)
 
 # print('\n//population_eq -> m_eq - from continous definition: \n'
 #       'k_mn = integrate(fun, (x, -oo, oo), (y, -oo, oo)) \n'

@@ -5,9 +5,10 @@ import matplotlib.ticker
 import matplotlib.pyplot as plt
 import os
 import numpy as np
+from DataIO.helpers import find_oldest_iteration, get_vti_from_iteration, strip_folder_name, eat_dots_for_texmaker, get_r_from_xy
 
 
-def cntr_plot(anal_field, num_field, xx, yy, conductivity, eff_pipe_diam):
+def cntr_plot(anal_field, num_field, xx, yy, conductivity, eff_pipe_diam, title='dummy_tittle'):
     print("---------- PLOTTING -------------")
     fig = plt.figure(figsize=(12, 8))
     # ax = fig.gca(projection='3d')
@@ -18,7 +19,7 @@ def cntr_plot(anal_field, num_field, xx, yy, conductivity, eff_pipe_diam):
     # ax.plot_surface(xx, yy, T_anal,  cmap='autumn', linewidth=0.5, antialiased=True, zorder=0.1, label='T_anal')
     # ax.contourf(xx, yy, T_num_slice,  cmap='summer', linewidth=0.5, antialiased=True, label='T_num')
 
-    cntr = ax.pcolormesh(xx, yy, num_field - anal_field, cmap='coolwarm', label='T_num')  # this one has smooth colors
+    cntr = ax.pcolormesh(xx, yy, num_field - anal_field, cmap='coolwarm', label='T_err')  # this one has smooth colors
     # cntr = ax.contourf(xx, yy, T_num_slice, cmap='coolwarm', antialiased=True)  # this one is has step colors
 
     ax.set_xlabel('X')
@@ -35,9 +36,7 @@ def cntr_plot(anal_field, num_field, xx, yy, conductivity, eff_pipe_diam):
 
     fig.colorbar(cntr, shrink=0.5, aspect=5)
 
-    title = f'iabb_ruraWrurze\n' \
-            f'_conducivity={conductivity} eff_pipe_diam={eff_pipe_diam}'
-    plt.title(title)
+    plt.title(f'error field: {title}')
 
     # # Major ticks every 20, minor ticks every 5
     # major_ticks = np.arange(0, nx, nx/5)
@@ -61,9 +60,85 @@ def cntr_plot(anal_field, num_field, xx, yy, conductivity, eff_pipe_diam):
 
     if not os.path.exists('plots'):
         os.makedirs('plots')
-    fig_name = f'plots/{title}.png'
+    fig_name = f'plots/cntr_{title}.png'
 
     fig.savefig(fig_name, bbox_inches='tight')
     plt.show()
-    plt.close(fig)  # close the figure
+    # plt.close(fig)  # close the figure
     # print('bye')
+
+
+def slice_plot(anal_field, num_field, y, title='dummy_title'):
+
+        params = {'legend.fontsize': 'xx-large',
+                  'figure.figsize': (14, 8),
+                  'axes.labelsize': 'xx-large',
+                  'axes.titlesize': 'xx-large',
+                  'xtick.labelsize': 'xx-large',
+                  'ytick.labelsize': 'xx-large'}
+        pylab.rcParams.update(params)
+
+        # -------------------- make dummy plot --------------------
+        plt.rcParams.update({'font.size': 14})
+        plt.figure(figsize=(14, 8))
+
+        axes = plt.gca()
+
+        plt.plot(anal_field, y,
+                 color="black", marker="o", markevery=1, markersize=5, linestyle=":", linewidth=2,
+                 label=r'$analytical \, solution$')
+
+        # plt.plot(u_anal, y_anal + len(y_grid) / 2,
+        #          color="black", marker="o", markevery=1, markersize=5, linestyle=":", linewidth=2,
+        #          label=r'$analytical \, solution$')
+
+        # plt.plot(u_fd, y_fd + len(y_grid) / 2,
+        #          color="black", marker="", markevery=1, markersize=5, linestyle="-", linewidth=2,
+        #          label=r'$FD \, solution$')
+
+        plt.plot(num_field, y,
+                 color="black", marker="x", markevery=1, markersize=7, linestyle="", linewidth=2,
+                 label=r'$numerical \, solution$')
+        #
+        # plt.plot(U_bb_num_x_slice, y_grid,
+        #          color="black", marker="v", markevery=1, markersize=6, linestyle="", linewidth=2,
+        #          label=r'$LBM \, BB$')
+        #
+        # # ------ format y axis ------ #
+        # yll = y_grid.min()
+        # yhl = y_grid.max()
+
+        # axes.set_ylim([0, 2. + effdiam / 2.])
+
+        # axes.set_yticks(np.linspace(yll, yhl, 8))
+        # axes.set_yticks(np.arange(yll, yhl, 1E-2))
+        # axes.set_yticks([1E-4, 1E-6, 1E-8, 1E-10, 1E-12])
+        # axes.set_yticks([0.5, 1.5, 2.5, 31.5, 32, 32.5, 61.5, 62.5, 63.5])
+        # axes.yaxis.set_major_formatter(xfmt)
+
+        # plt.yscale('log')
+        # ------ format x axis ------ #
+        # plt.xlim(0, 0.011)
+        # plt.xlim(int(xSIZE / 2), xSIZE)
+
+        # plt.ticklabel_format(style='sci', axis='x', scilimits=(0, 0))
+        # plt.ticklabel_format(style='sci', axis='y', scilimits=(0, 0))  # scilimits=(-8, 8)
+
+        # title = f'IBB Poiseuille flow:\n' + r'$ \nu = $' + f'{kin_visc:.2e} ' + r'$D_{eff}=$' + f'{effdiam:.2e}'
+        # title = ''  # skip title for .tex
+        plt.title(title)
+
+        plt.xlabel(r'$T$')
+        plt.ylabel(r'$h$')
+        plt.legend()
+        plt.grid()
+
+        fig = plt.gcf()  # get current figure
+        if not os.path.exists('plots'):
+            os.makedirs('plots')
+
+        fig_name = f'plots/slice_{title}.png'
+        fig.savefig(fig_name, bbox_inches='tight')
+        plt.show()
+
+        # plt.close(fig)  # close the figure

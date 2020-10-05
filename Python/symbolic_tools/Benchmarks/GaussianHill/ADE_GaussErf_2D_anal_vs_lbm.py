@@ -1,6 +1,7 @@
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FormatStrFormatter
+from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 import os
 from Benchmarks.GaussianHill.GaussianHillAnal2D import GaussianHillAnal2D
@@ -23,7 +24,7 @@ X0 = Matrix([lattice_size/2, lattice_size/2])
 U = Matrix([0.1, 0])
 Sigma02 = 4
 k = 0.166666
-gha = GaussianHillAnal2D(C0, X0, U, Sigma02, k)
+gha = GaussianHillAnal2D(C0, X0, Sigma02, k, U)
 
 
 
@@ -48,16 +49,11 @@ for i in range(ySIZE):
 
 T_anal = T_anal[:, :, time_spot]  # take time slice
 ###################################################################################################################
-shall_clip_to_2D = True
+shall_clip_to_2D = False
 
 if shall_clip_to_2D:
-
     T_anal = T_anal[:, int(ySIZE / 2)]  # half X slice
-
-
-
     fig_name = f'ADE_GaussianHill_lattice={lattice_size}[lu]_sig={Sigma02}_Ux={U[0]}_k={k}_time={time_spot}_2D.png'
-
     # -------------------- make dummy plot --------------------
     plt.rcParams.update({'font.size': 14})
     plt.figure(figsize=(14, 8))
@@ -106,11 +102,14 @@ if shall_clip_to_2D:
 
 else:
     print("---------- PLOTTING -------------")
-
-    fig_name = f'ADE_GaussianHill_lattice={lattice_size}[lu]_sig={Sigma02}_Ux={U[0]}_k={k}_time={time_spot}_3D.png'
+    plot_dir = 'k_convergence_plots'
+    if not os.path.exists(plot_dir):
+        os.makedirs(plot_dir)
+    fig_name = os.path.join(plot_dir, f'ADE_GaussianHill_lattice={lattice_size}[lu]_sig={Sigma02}_Ux={U[0]}_k={k}_time={time_spot}_3D.png')
 
     fig = plt.figure(figsize=(12, 8))
-    ax = fig.gca(projection='3d')
+    # ax = fig.gca(projection='3D') # old syntax
+    ax = Axes3D(fig)
 
     # alpha=1, rstride=1, cstride=1)
     # ax.plot_surface(xx, yy, T_err_field, cmap='winter', linewidth=0.5, antialiased=True, zorder=0.5,
@@ -138,5 +137,5 @@ else:
     ax.legend([fake2Dline], [r'$Err_{T} = T_{anal} - T_{num}$'], numpoints=1)
     plt.show()
 
-    print("bye")
+print("bye")
 

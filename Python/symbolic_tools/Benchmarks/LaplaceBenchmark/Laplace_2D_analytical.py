@@ -26,16 +26,7 @@ import os
 import pwd
 
 
-def peel_the_skin(some_2d_array):
-    # clip the from each side, so that both EQ and ABB scheme would have the same 'measurement' nodes
-    some_2d_array = np.delete(some_2d_array, 0, axis=0)
-    some_2d_array = np.delete(some_2d_array, 0, axis=1)
 
-    # n_rows, n_columns = some_2d_array.shape
-    some_2d_array = np.delete(some_2d_array, (some_2d_array.shape[0] - 1), axis=0)  # delete last row
-    some_2d_array = np.delete(some_2d_array, (some_2d_array.shape[1] - 1), axis=1)  # delete last column
-
-    return some_2d_array
 
 
 def prepare_anal_data_new(ySIZE, xSIZE, folder, shall_recalculate_results=False):

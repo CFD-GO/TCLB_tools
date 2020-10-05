@@ -1,6 +1,5 @@
 import numpy as np
-from Benchmarks.HotKarman_Correlations.HT_Nu_Correlations import get_Nu_cylinder_by_Churchill_Bernstein, get_Nu_cylinder_by_Zukauskas_Jacob
-
+from Benchmarks.HotKarman_Correlations.HT_Nu_Correlations import get_Nu_cylinder_by_Churchill_Bernstein
 
 # input in LB units
 Re = 10
