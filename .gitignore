@@ -4,3 +4,6 @@
 .Ruserdata
 .spyder*
 *pyc
+.idea/*
+*.png
+*.pdf

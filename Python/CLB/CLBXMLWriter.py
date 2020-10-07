@@ -179,6 +179,7 @@ def _set_by_kw(kw, name, default):
  'EvalIf',
  'CallPython',
  'VTK',
+ 'RunR',
  'Log',
  'Andersen'
  ]        

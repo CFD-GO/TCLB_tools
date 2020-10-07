@@ -1,0 +1,77 @@
+# Python CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-python/ for more details
+#
+version: 2.1
+jobs:
+  build:
+    docker:
+      # specify the version you desire here
+      # use `-browsers` prefix for selenium tests, e.g. `3.6.1-browsers`
+      - image: circleci/python:3.7.2
+      
+      # Specify service dependencies here if necessary
+      # CircleCI maintains a library of pre-built images
+      # documented at https://circleci.com/docs/2.0/circleci-images/
+      # - image: circleci/postgres:9.4
+
+    working_directory: ~/repo/
+
+    steps:
+      - checkout
+
+      - run:
+          name: "What branch am I on?"
+          command: echo ${CIRCLE_BRANCH}
+
+      - run:
+          name: Setup Environment Variables
+          command: |
+            echo 'export PYTHON_TOOLS_DIR="Python/symbolic_tools"' >> $BASH_ENV
+
+      - run:
+          name: "What are my custom environment variable?"
+          command: |
+            echo ${PYTHON_TOOLS_DIR}
+            echo ${BASH_ENV}
+
+      # Download and cache dependencies
+      - restore_cache:
+          # working_directory: ${PYTHON_TOOLS_DIR}
+          keys:
+          - v1-dependencies-{{ checksum "Python/symbolic_tools/requirements.txt" }}
+          # fallback to using the latest cache if no exact match is found
+          - v1-dependencies-
+
+      - run:
+          name: install dependencies
+          # working_directory: ${PYTHON_TOOLS_DIR}
+          command: |
+            pwd
+            python3 -m venv venv
+            . venv/bin/activate
+            cd Python/symbolic_tools/
+            pip install -r ./requirements.txt
+
+      - save_cache:
+          paths:
+            - ./venv
+          key: v1-dependencies-{{ checksum "Python/symbolic_tools/requirements.txt" }}
+        
+      # run tests!
+      # https://pytest.org
+      - run:
+          name: run tests
+          no_output_timeout: 120m
+          # working_directory: ${PYTHON_TOOLS_DIR}
+          command: |
+            pwd
+            . venv/bin/activate
+            cd Python/symbolic_tools
+            pwd
+            coverage run -m unittest discover -s ./tests/
+            codecov
+
+      - store_artifacts:
+          path: test-reports
+          destination: test-reports
