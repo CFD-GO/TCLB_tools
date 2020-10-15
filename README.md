@@ -1,13 +1,18 @@
 # TCLB tools
 
+<!---
+
 [![CircleCI](https://circleci.com/gh/ggruszczynski/TCLB_tools.svg?style=shield&circle-token=:circle-token)](https://circleci.com/gh/ggruszczynski/TCLB_tools)
 [![codecov](https://codecov.io/gh/ggruszczynski/TCLB_tools/badge.svg)](https://codecov.io/gh/ggruszczynski/TCLB_tools)
 
+-->
 
-Various tools for the [TCLB](/CFD-GO/TCLB/) project.
+Various tools and extended examples for the [TCLB](/CFD-GO/TCLB/) project.
 
 ## Structure
 All tools are divided by language: [R](R/), [Python](Python/), etc. In each directory, the subdirectories should be specific packages related to different aspects of interaction with TCLB
+
+[Examples and Papers](Examples_And_Papers/) include scripts used to obtain data used in "real world" cases. Be carefoul - they might be computationally intensive. See [Readmi](Examples_And_Papers/Readme.md) for details
 
 ## Installation
 ### R
