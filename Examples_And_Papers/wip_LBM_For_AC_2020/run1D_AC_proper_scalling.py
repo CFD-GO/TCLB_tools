@@ -8,6 +8,9 @@ Created on Sat Aug  1 12:10:10 2020
 
 import CLB.CLBXMLWriter as CLBXML
 import CLB.CLBXMLHandler
+
+#assert(CLB.CLBXMLWriter.version >= 100)
+
 import CLB.VTIFile
 import os
 import numpy as np
@@ -18,26 +21,28 @@ import re
 import CLB.VTIFile
 import pandas as pd
 import matplotlib.pyplot as plt
-
-idx = 0
-
-lambda_ph = 1E-2
-tc = 50 # number of timesteps for dt=1 aka Time
-
-L2 = list()
-
-domain_size0=16
-
-
 def accoustic_scalling(dtn):
     return dtn
 
 def diffusive_scalling(dtn):
     return dtn*2
 
-scalling = diffusive_scalling
 
-for dtn in np.arange(0,6)  : # (start, stop, num)
+################################################
+# CONFIG
+scalling = diffusive_scalling 
+
+lambda_ph = 1E-3 # 1E-12 for pure diffusion
+tc = 50 # number of timesteps for dt=1 aka Time
+domain_size0=16
+nsamples = 6 # number of resolutions
+ny = 3 #numebr of nodes in second dimension, min 2 for CPU, min 3 for GPU
+################################################
+
+L2 = list()
+idx = 0
+
+for dtn in np.arange(0,nsamples)  : # (start, stop, num)
     lbdt = 1./(2**dtn)
     
     domain_size = domain_size0 * 2**scalling(dtn)
@@ -61,7 +66,7 @@ for dtn in np.arange(0,6)  : # (start, stop, num)
             CLBc = CLBXML.CLBConfigWriter( )
             fname = prefix+"run"
             CLBc.addGeomParam('nx', domain_size)
-            CLBc.addGeomParam('ny', 2)
+            CLBc.addGeomParam('ny', ny)
             
             
             CLBc.addTRT_SOI()
@@ -82,7 +87,7 @@ for dtn in np.arange(0,6)  : # (start, stop, num)
 		x = Solver$Geometry$X 
 		x = (x -0.5)/ ({domain_size}) * 2 * pi
 		y = Solver$Geometry$Y		
-		Solver$Fields$Init_PhaseField_External[] = sin(x)
+		Solver$Fields$Init_PhaseField_External[] = exp(sin(x))
 		Solver$Actions$InitFromFields() 
         
 """.format(domain_size=domain_size)
@@ -152,8 +157,8 @@ reference = L2[-1]['LBM_final'][:,::2**scalling(dtn)]
 
 def calc_L2(anal, num):
     # Eq. 4.57
-    #return np.sqrt(np.sum((anal - num) * (anal - num)) / np.sum(anal * anal))    
-    return  np.max(np.abs(anal - num))
+    return np.sqrt(np.sum((anal - num) * (anal - num)) / np.sum(anal * anal))    
+    #return  np.max(np.abs(anal - num))
 
 plot_dir = 'AC_plots'
 if not os.path.exists(plot_dir):
@@ -198,7 +203,7 @@ y2 = y2 / y2[0] * L2[0]['err_L2']
 plt.loglog(dt,y2, label=r'${x^2}$')
 
 plt.grid(which='both')
-plt.xlabel('$\Delta t$')
+plt.xlabel('$\epsilon$')
 plt.ylabel('$L_2(\phi(t,dt), \phi(t,dt_{min})$')
 
 plt.legend()
