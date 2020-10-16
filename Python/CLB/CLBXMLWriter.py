@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 import lxml.etree as ET
 
 ## DECORATORS ##
@@ -179,13 +178,12 @@ def _set_by_kw(kw, name, default):
  'EvalIf',
  'CallPython',
  'VTK',
- 'RunR',
  'Log',
  'Andersen'
  ]        
 )
 class CLBConfigWriter:
-
+    version = 100
     def __init__(self, output="output/", sign=''):
         self.root = ET.Element('CLBConfig')
         if not sign == '':
@@ -382,7 +380,6 @@ class CLBConfigWriter:
         del kwargs['eval']
         return kwargs
     
-
     @addCDATA('eval')
     @rootElement
     def addRunR(self, **kwargs):
