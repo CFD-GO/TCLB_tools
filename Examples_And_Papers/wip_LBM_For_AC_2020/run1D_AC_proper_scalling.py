@@ -21,6 +21,7 @@ import re
 import CLB.VTIFile
 import pandas as pd
 import matplotlib.pyplot as plt
+
 def accoustic_scalling(dtn):
     return dtn
 
@@ -34,7 +35,7 @@ scalling = diffusive_scalling
 
 lambda_ph = 1E-3 # 1E-12 for pure diffusion
 tc = 50 # number of timesteps for dt=1 aka Time
-domain_size0=16
+domain_size0=32
 nsamples = 6 # number of resolutions
 ny = 3 #numebr of nodes in second dimension, min 2 for CPU, min 3 for GPU
 ################################################
@@ -69,12 +70,12 @@ for dtn in np.arange(0,nsamples)  : # (start, stop, num)
             CLBc.addGeomParam('ny', ny)
             
             
-            CLBc.addTRT_SOI()
+            CLBc.addTRT_M_SOI()
             CLBc.addBox()
             
             params = {
             		"diffusivity_phi": diffusivity,
-                "magic_parameter": 0.25,
+                    "magic_parameter": 0.25,
             		"lambda":lambda_ph*lbdt,
             		"Init_PhaseField":-1 ,	
             		"phase_field_smoothing_coeff":0.0,
@@ -105,8 +106,8 @@ for dtn in np.arange(0,nsamples)  : # (start, stop, num)
     d0 = getXML(clear=True)
     wdir = d0 + '/output'
     
-    os.system("cd %s && ~/projekty/TCLB/tools/sirun.sh d2q9_Allen_Cahn_SOI   ./run.xml"%d0)
-    #os.system(f"cd {d0} && ~/GITHUB/LBM/TCLB/CLB/d2q9_Allen_Cahn_SOI/main ./run.xml >/dev/null")
+    # os.system("cd %s && ~/projekty/TCLB/tools/sirun.sh d2q9_Allen_Cahn_SOI   ./run.xml"%d0)
+    os.system(f"cd {d0} && ~/GITHUB/LBM/TCLB/CLB/d2q9_Allen_Cahn_SOI/main ./run.xml >/dev/null")
     
     fname_base = "run_"    
     fconfig =  wdir + '/run_config_P00_00000000.xml'
@@ -211,7 +212,7 @@ plt.legend()
 plt.savefig('AC_LBM_2D_conv.png', dpi=200)
 #plt.close(fig)
 
-
+print("DONE.")
 
 # #####################################################
 

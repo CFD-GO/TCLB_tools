@@ -65,6 +65,22 @@ def get_vector_of_eq_central_moments(what: Symbol, Sigma2: Symbol) -> Matrix:
     ])
     return moments
 
+
+def get_vector_of_eq_moments(what: Symbol, Sigma2: Symbol) -> Matrix:
+    moments = Matrix([
+        what,
+        what * ux,
+        what * uy,
+        what * (ux2 + Sigma2),
+        what * (uy2 + Sigma2),
+        what * uxuy,
+        what * uy * (ux2 + Sigma2),
+        what * ux * (uy2 + Sigma2),
+        what * (ux2 * uy2 + Sigma2 * ux2 + Sigma2 * uy2 + Sigma2*Sigma2),
+    ])
+    return moments
+
+
 def round_and_simplify(stuff):
     simplified_stuff = simplify(stuff)
     rounded_stuff = simplified_stuff
