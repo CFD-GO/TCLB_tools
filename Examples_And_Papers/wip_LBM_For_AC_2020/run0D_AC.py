@@ -20,61 +20,69 @@ import CLB.VTIFile
 import pandas as pd
 import matplotlib.pyplot as plt
 
-idx = 0
-#R0 = 2.2  # Basic Reproduction Number - the number of secondary infections each infected individual produces.
-#T_rec = 5.3  # days to recovery
-T_rec = 1.
+################################################
+# CONFIG
 initial_phi = 0.10  
-lambda_ph = 0.1
+lambda_ph0 = 1E-2
+tc = 100
+magic_parameter = 0.25 # to control even relaxation rate in TRT model
+diffusivity0 = 1./6 #unimportant, no space variablitiy
 
+################################################
+plot_dir = f'AC_plots_0D'
+if not os.path.exists(plot_dir):
+    os.makedirs(plot_dir)
+    
 L2 = list()
+idx = 0
 for lbdt in 2.**-np.arange(1,9):
-    tc = 100
+    
+    lambda_ph = lambda_ph0*lbd
     def getXML(**kwars):
-            global idx
-            
-            idx = idx + 1
-            prefix = '/tmp/id%03d/'%idx
-            if 'clear' in kwars and kwars['clear']:
-                os.system('rm -r %s'%prefix)
-    
-            os.system('mkdir %s'%prefix)
+        global idx
         
-            CLBc = CLBXML.CLBConfigWriter( )
-            fname = prefix+"run"
-            CLBc.addGeomParam('nx', 16)
-            CLBc.addGeomParam('ny', 16)
-            
-            CLBc.addTRT_SOI()
-            CLBc.addBox()
-            
-            # CLBc.addSmoothing()
-            # CLBc.addBox()
-            
-            params = {
-            		"diffusivity_phi":0.1666666, #unimportant, no space variablitiy
-            		"lambda":lambda_ph*lbdt,
-                    "magic_parameter": 0.1666666,
-            		"Init_PhaseField":initial_phi ,	
-            		"phase_field_smoothing_coeff":0.1,
-            }
-            
-            CLBc.addModelParams(params)
-                     
-      
-            current = 0
-            #for stop in np.logspace(0, np.log10(tc/lbdt), 100):    
-            for stop in np.linspace(0, tc/lbdt, 101)[1:]:    
-                
-                CLBc.addSolve(iterations=stop-current)
-                CLBc.addVTK()
-                current = stop
-           
-            #CLBc.addSolve(iterations=tc/lbdt, vtk=50)
-            CLBc.write(fname+'.xml')
+        idx = idx + 1
+        prefix = '/tmp/id%03d/'%idx
+        if 'clear' in kwars and kwars['clear']:
+            os.system('rm -r %s'%prefix)
+
+        os.system('mkdir %s'%prefix)
     
-    
-            return prefix
+        CLBc = CLBXML.CLBConfigWriter( )
+        fname = prefix+"run"
+        CLBc.addGeomParam('nx', 16)
+        CLBc.addGeomParam('ny', 16)
+        
+        CLBc.addTRT_M_SOI()
+        CLBc.addBox()
+        
+        # CLBc.addSmoothing()
+        # CLBc.addBox()
+        
+        params = {
+        		"diffusivity_phi": diffusivity0, 
+        		"lambda":lambda_ph,
+                "magic_parameter": magic_parameter,
+        		"Init_PhaseField":initial_phi ,	
+        		"phase_field_smoothing_coeff":0.0,
+        }
+        
+        CLBc.addModelParams(params)
+                 
+  
+        current = 0
+        #for stop in np.logspace(0, np.log10(tc/lbdt), 100):    
+        for stop in np.linspace(0, tc/lbdt, 101)[1:]:    
+            
+            CLBc.addSolve(iterations=stop-current)
+            CLBc.addVTK()
+            current = stop
+       
+        #CLBc.addSolve(iterations=tc/lbdt, vtk=50)
+        CLBc.write(fname+'.xml')
+
+
+        return prefix
         
         
     
@@ -154,7 +162,7 @@ for lbdt in 2.**-np.arange(1,9):
     plt.ylim(initial_phi, 1.01)
     plt.legend()
     plt.grid(which='both')
-    plt.savefig( 'AC_LBM_0D__%.1e.png'%lbdt, dpi=200)
+    plt.savefig(f'{plot_dir}/AC_LBM_0D__{lbdt:.1e}.png', dpi=200)
     
     L2.append(
         {
@@ -173,6 +181,8 @@ for lbdt in 2.**-np.arange(1,9):
 
 #L2 = pd.DataFrame.from_records(L2)
 
+
+    
 plt.figure()
 reference = L2[-1]['LBM']
 
@@ -187,14 +197,21 @@ L2dr = pd.DataFrame.from_records(L2)
 plt.loglog(L2dr.LBMdt, L2dr.err, 'ko', 'LBM')
 
 dt = np.logspace(np.log10(L2[0]['LBMdt']), np.log10(L2[-1]['LBMdt']),100)
+
+y = dt**1
+y = y / y[0] * L2[0]['err']
+plt.loglog(dt,y, label=r'${x}$')
+
+
 y = dt**2
 y = y / y[0] * L2[0]['err']
-
 plt.loglog(dt,y, label=r'${x^2}$')
+
+
 plt.grid(which='both')
 plt.xlabel('$\Delta t$')
 plt.ylabel('$L_2(\phi(t,dt), \phi(t,dt_{min})$')
 
 plt.legend()
 
-plt.savefig( 'AC_LBM_0D_conv.png', dpi=200)
+plt.savefig(f'{plot_dir}/AC_LBM_0D_conv.png', dpi=200)
