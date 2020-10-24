@@ -51,18 +51,18 @@ idx = 0
 for n in np.arange(0,nsamples): # (start, stop, step=1)
 
     # MD version
-    # lbdt = 1./(2**n)
-    # domain_size = domain_size0 * 2**scalling(n)
-    # lbdx = domain_size/domain_size0
-    # diffusivity = diffusivity0 * (lbdt/lbdx**2)
-    # lambda_ph = lambda_ph0*lbdt
+    lbdt = 1./(2**n)
+    domain_size = domain_size0 * 2**scalling(n)
+    lbdx = domain_size/domain_size0
+    diffusivity = diffusivity0 * (lbdt/lbdx**2)
+    lambda_ph = lambda_ph0*lbdt
     # # end od MD version
     
-    domain_size = domain_size0 * 2**n
-    lbdt = 1./(2**scalling(n))
-    lbdx = 1./2**n
-    diffusivity = diffusivity0 * lbdt / lbdx**2
-    lambda_ph = lambda_ph0 * lbdt
+    # domain_size = domain_size0 * 2**n
+    # lbdt = 1./(2**scalling(n))
+    # lbdx = 1./2**n
+    # diffusivity = diffusivity0 * lbdt / lbdx**2
+    # lambda_ph = lambda_ph0 * lbdt
 
     Da = (lambda_ph *  domain_size**2) / diffusivity  
     print(f"running case {n}/{nsamples} Da = {Da:.2e} ; lbdt={lbdt}, lbdx={lbdx},  diffusivity={diffusivity:.2e} lambda_ph={lambda_ph:.2e}")
