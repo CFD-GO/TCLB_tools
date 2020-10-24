@@ -79,8 +79,9 @@ class CLBXMLHandler(xml.sax.ContentHandler):
             
         if name == "Param":
             a = dict()
-
             v = attrs['value']
+            if not 'name' in attrs.getNames():
+                return #this is unit
             a['name'] = attrs['name']
 
             if 'zone' in attrs.keys():
