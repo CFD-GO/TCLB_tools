@@ -1,0 +1,7 @@
+OPT = @CPPFLAGS@
+LD_OPT = @LDFLAGS@ 
+
+
+CPP = @CXX@
+
+
