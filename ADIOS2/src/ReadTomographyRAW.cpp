@@ -1,31 +1,12 @@
-/*
- * Distributed under the OSI-approved Apache License, Version 2.0.  See
- * accompanying file Copyright.txt for details.
- *
- * Write a global array from multiple processors.
- *
- * A global array is an N-dimensional array. A process can write a sub-array
- * into the global array by stating the N-dimensional offset and the size of
- * the sub-array. At reading, one can read back any portion of the array
- * regardless of how many processors wrote that data.
- *
- * Processes are NOT required
- * - to stay in the boundaries of the global dimensions. However, one will not
- * be able to read back data outside of the boundaries.
- * - to fill the whole global array, i.e. one can leave holes in it. At reading,
- * one will get the fill-value set for the array for those coordinates that
- * are not written by any process.
- *
- * The global dimensions of a global array MUST NOT change over time.
- * If they are, then the array should be handled as a local array. Of course, if
- * only a single output step is written to a file, that still shows up at
- * reading as a global array.
- *
- * The decomposition of the array across the processes, however, can change
- * between output steps.
- *
- * Created on: Jun 2, 2017
- *      Author: pnorbert
+/**
+ * Part of the github.com/CFD-GO/TCLB
+ * Example tomograph RAW reader intended for TCLB input - initial verison
+ * @author mdzik
+ * Example 
+ * input data: https://www.digitalrocksportal.org/projects/202/origin_data/728/
+ * call: ./ReadTomographyRAW ...../05_CC_K2_dry_vx_6x6x6_dim_734x734x425.raw ...../TCLB/example/adios/karman.adios.xml 734 734 425 32 1 0.500003
+ * set 425 to 5 to reduce size for few slices, XY leave unchanged
+ * see TCLB/example/adios for TCLB part example
  */
 
 #include <iostream>
@@ -37,28 +18,25 @@
 #include <mpi.h>
 #endif
 
-typedef std::int32_t DTYPE;
-
-
 typedef std::uint8_t FTYPE; //TODO: this should be char_to_bool to save A LOT memory
 
-int main(int argc, char *argv[])
-{
+template<typename DTYPE>
+int process(int argc, char*argv[]){
+    
+    unsigned long NX = atoi(argv[3]);
+    unsigned long NY = atoi(argv[4]);
+    unsigned long NZ = atoi(argv[5]);
 
+    std::cout << "Will read RAW file: " << argv[1] <<  std::endl;
+    std::cout << "Will read XML file: " << argv[2] <<  std::endl;
+    std::cout << "Expected RAW shape: (" << NX << ", " << NY << ", "<< NZ << ")" << std::endl;
+    
 
     int rank = 0, nproc = 1;
 
+    float threshold = atof(argv[8]);
 
-    unsigned long NX = 734;
-    unsigned long NY = 734;
-    unsigned long NZ = 100;
-    unsigned long NofBytes = 32;
-    bool IsSigned = true;
-    float threshold = 0.500002;
-
-
-
-    std::fstream rf("/home/mdzik/Pobrane/05_CC_K2_dry_vx_6x6x6_dim_734x734x425.raw", std::ios::in | std::ios::binary);
+    std::fstream rf(argv[1], std::ios::in | std::ios::binary);
     if(!rf) {
         std::cout << "Cannot open file!" << std::endl;
         return 1;
@@ -72,7 +50,7 @@ int main(int argc, char *argv[])
     std::vector<FTYPE> masked(NX*NY);
     
 
-    std::cout << "Bite size: " <<  sizeof(DTYPE) << std::endl;
+    std::cout << "Byte size: " <<  sizeof(DTYPE) << std::endl;
     std::cout << "Expected filesize: (ls -la) " <<  NX*NY*NZ*sizeof(DTYPE) << std::endl;
 
 
@@ -118,7 +96,7 @@ int main(int argc, char *argv[])
     const int NSTEPS = 5;
 
 #if ADIOS2_USE_MPI
-    adios2::ADIOS adios("./adios.xml", MPI_COMM_WORLD);
+    adios2::ADIOS adios(argv[2], MPI_COMM_WORLD);
 #else
     adios2::ADIOS adios;
 #endif
@@ -174,6 +152,8 @@ int main(int argc, char *argv[])
             rf.read((char*)buffer.data(), NX*NY*sizeof(DTYPE));
             if (!rf)
                 std::cout << "error: only " << rf.gcount() << " could be read" << std::endl;
+                writer.Close();
+                return 1;
 
 
             for (size_t i = 0; i < NX*NY;i++) {
@@ -227,5 +207,48 @@ int main(int argc, char *argv[])
 #endif
 
 
-    return 0;
+    return 0;    
 }
+
+
+
+
+int main(int argc, char *argv[])
+{
+
+    if (9 > argc) {
+        std::cout << "Usage: ReadTomographRAW path_to_filename.raw path_to_adios.xml NX NY NZ BYTES SIGNED(0 or 1) RelativeThreshold" << std::endl;
+        return 1;
+    } 
+    std::cout << "THIS IS EXPERIMENTAL/UNTESTED, DONT USE MPIRUN on IT!!" << std::endl;
+
+
+    unsigned long NofBytes = atoi(argv[6]);
+    bool IsSigned = atoi(argv[7]) == 1;
+    float threshold = atof(argv[8]);
+
+    std::cout << "Datatype: " << NofBytes << " bytes " << (IsSigned ? "signed":"unsigned") << std::endl;
+
+    if (IsSigned && (NofBytes == 32))
+        return process<std::int32_t>(argc, argv);
+
+    if (!IsSigned && (NofBytes == 32))
+        return process<std::uint32_t>(argc, argv);
+
+    if (IsSigned && (NofBytes == 16))
+        return process<std::int16_t>(argc, argv);
+
+    if (!IsSigned && (NofBytes == 16))
+        return process<std::uint16_t>(argc, argv);
+
+    if (IsSigned && (NofBytes == 8))
+        return process<std::int8_t>(argc, argv);
+
+    if (!IsSigned && (NofBytes == 8))
+        return process<std::uint8_t>(argc, argv);
+
+
+}
+
+
+
