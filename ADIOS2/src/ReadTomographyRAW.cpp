@@ -150,11 +150,11 @@ int process(int argc, char*argv[]){
             writer.Put<size_t>(var_step, &step);
 
             rf.read((char*)buffer.data(), NX*NY*sizeof(DTYPE));
-            if (!rf)
+            if (!rf){
                 std::cout << "error: only " << rf.gcount() << " could be read" << std::endl;
                 writer.Close();
                 return 1;
-
+            }
 
             for (size_t i = 0; i < NX*NY;i++) {
                 masked[i] = buffer[i] > threshold_dtyped;
