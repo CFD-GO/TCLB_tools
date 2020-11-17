@@ -10,4 +10,7 @@ configure:src/configure.ac
 
 ReadTomographyRAW: src/ReadTomographyRAW.cpp
 	$(CPP) -O3 $(OPT) $(LD_OPT) $^ -o $@
+
+ReadTomographyRAWswapX_Z: src/ReadTomographyRAWswapX_Z.cpp
+	$(CPP) -O3 $(OPT) $(LD_OPT) $^ -o $@
 	 
