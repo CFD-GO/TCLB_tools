@@ -151,9 +151,11 @@ def _set_by_kw(kw, name, default):
     ('Outlet','OutletElement'),
     ('Inlet','InletElement'),
     ])
+
 @addSimpleBCElements([
     'MRT',
-    'TRT_SOI',    
+    'SRT_M_SOI',
+    'TRT_M_SOI',    
     'Smoothing',
     'Cumulant',    
     'ESymmetry',
@@ -173,6 +175,7 @@ def _set_by_kw(kw, name, default):
     ('SolidBoundary2','SolidBoundary2Def'),
     ('SolidBoundary3','SolidBoundary3Def'),    
     ])
+
 @addRootElements(
 [   
  'EvalIf',

@@ -19,30 +19,30 @@ import CLB.VTIFile
 import pandas as pd
 import matplotlib.pyplot as plt
 
-idx = 0
-#R0 = 2.2  # Basic Reproduction Number - the number of secondary infections each infected individual produces.
-#T_rec = 5.3  # days to recovery
-T_rec = 1.
-initial_phi = 0.10  
-lambda_ph = 0.1
 
-L2 = list()
+################################################
+# CONFIG
 
+diffusivity0 = 1./6
+lambda_ph0 = 1E-1 # 1E-12 for pure diffusion
+tc = 1000 # number of timesteps for dt=1 aka Time
 domain_size=128
-box_size=50
+nsamples = 5 # number of resolutions
+box_size=domain_size/4
+np.random.seed(seed=1)
+magic_parameter = 0.25 # to control even relaxation rate in TRT model
+nrand = 1 # number of boxes, doesn't converge nice for nrand 100
+################################################
 
 blocks_up = list()
 blocks_down = list()
 
-np.random.seed(seed=1)
 
-nrand = 1 # doesn't converge nice for nrand 100
 for xi in range(nrand):
     x = np.random.randint(0,domain_size)
     y = np.random.randint(0,domain_size)
     blocks_up.append((x,y))
     # CLBc.addSmoothing()
-
 
 for xi in range(nrand):
     x = np.random.randint(0,domain_size)
@@ -59,77 +59,85 @@ for xi in range(nrand):
 # all_together = np.concatenate([x1,x2]) 
 # for lbdt in all_together: # (start, stop, num)
 
-
-for lbdt in  1./np.linspace(1, 10, 10)    : # (start, stop, num)
-    tc = 5000
-    def getXML(**kwars):
-            print(f"running case: lbdt={lbdt}")
-            global idx
-            
-            idx = idx + 1
-            prefix = '/tmp/id%03d/'%idx
-            if 'clear' in kwars and kwars['clear']:
-                print(f"removing {prefix}")
-                os.system('rm -r %s'%prefix)
+idx = 0
+L2 = list()
+# for lbdt in  1./np.linspace(1, 10, 5)    : # (start, stop, num)
+for n in np.arange(0,nsamples): # (start, stop, step=1)
+    lbdt = 1./(2**n)
+    diffusivity = diffusivity0*lbdt
+    lambda_ph = lambda_ph0*lbdt
     
-            os.system('mkdir %s'%prefix)
+    Da = (lambda_ph *  domain_size**2) / diffusivity  
+    print(f"running case {n}/{nsamples} Da = {Da:.2e} ; lbdt={lbdt},  diffusivity={diffusivity}")
+     
+    def getXML(**kwars):
+        print(f"running case: lbdt={lbdt}")
+        global idx
         
-            CLBc = CLBXML.CLBConfigWriter( )
-            fname = prefix+"run"
-            CLBc.addGeomParam('nx', domain_size)
-            CLBc.addGeomParam('ny', domain_size)
-            
-            
-            CLBc.addTRT_SOI()
-            # CLBc.addSRT_SOI()
-            CLBc.addBox()
-            
-            CLBc.addZoneBlock(name='up')
-           
-            for x,y in blocks_up:
-                CLBc.addBox(dx=x,dy=y,nx=box_size,ny=box_size)
-                # CLBc.addSmoothing()
-            
-            CLBc.addZoneBlock(name='down')
+        idx = idx + 1
+        prefix = '/tmp/id%03d/'%idx
+        if 'clear' in kwars and kwars['clear']:
+            print(f"removing {prefix}")
+            os.system('rm -r %s'%prefix)
 
-            for x,y in blocks_down:
-                CLBc.addBox(dx=x,dy=y,nx=box_size,ny=box_size)
+        os.system('mkdir %s'%prefix)
+    
+        CLBc = CLBXML.CLBConfigWriter( )
+        fname = prefix+"run"
+        CLBc.addGeomParam('nx', domain_size)
+        CLBc.addGeomParam('ny', domain_size)
         
-            params = {
-            		"diffusivity_phi":0.1666666*lbdt,
-                    "magic_parameter": 0.25,
-            		"lambda":lambda_ph*lbdt,
-            		"Init_PhaseField":0 ,	
-            		"phase_field_smoothing_coeff":0.1,
-            }
-            
-            CLBc.addModelParams(params)
-
-            CLBc.addModelParam("Init_PhaseField",0.9,'up' )
-            CLBc.addModelParam("Init_PhaseField",-0.9,'down' )
-                     
-            current = 0
-            #for stop in np.logspace(0, np.log10(tc/lbdt), 100):    
-            # for stop in np.linspace(1, tc/lbdt, 101): # watch out for fractions    
-            #     CLBc.addSolve(iterations=stop-current)
-            #     CLBc.addVTK()
-            #     current = stop
-
-            
-            #CLBc.addSolve(iterations=tc/lbdt, vtk=50)
-
-            CLBc.addSolve(iterations=tc/lbdt)
-            CLBc.addVTK()
-            
-            CLBc.write(fname+'.xml')
-            return prefix
         
+        CLBc.addTRT_M_SOI()
+        # CLBc.addSRT_SOI()
+        CLBc.addBox()
+        
+        CLBc.addZoneBlock(name='up')
+        
+        for x,y in blocks_up:
+            CLBc.addBox(dx=x,dy=y,nx=box_size,ny=box_size)
+            # CLBc.addSmoothing()
+        
+        CLBc.addZoneBlock(name='down')
+
+        for x,y in blocks_down:
+            CLBc.addBox(dx=x,dy=y,nx=box_size,ny=box_size)
+    
+        params = {
+                "diffusivity_phi": diffusivity,
+                "magic_parameter": magic_parameter,
+                "lambda": lambda_ph,
+                "Init_PhaseField":0 ,	
+                "phase_field_smoothing_coeff":0.1,
+        }
+        
+        CLBc.addModelParams(params)
+
+        CLBc.addModelParam("Init_PhaseField", 0.9,'up'  )
+        CLBc.addModelParam("Init_PhaseField",-0.9,'down')
+                    
+        current = 0
+        #for stop in np.logspace(0, np.log10(tc/lbdt), 100):    
+        # for stop in np.linspace(1, tc/lbdt, 101): # watch out for fractions    
+        #     CLBc.addSolve(iterations=stop-current)
+        #     CLBc.addVTK()
+        #     current = stop
+
+        
+        #CLBc.addSolve(iterations=tc/lbdt, vtk=50)
+
+        CLBc.addSolve(iterations=tc/lbdt)
+        CLBc.addVTK()
+        
+        CLBc.write(fname+'.xml')
+        return prefix
+    
     
     d0 = getXML(clear=True)
     wdir = d0 + '/output'
     
     # os.system("cd %s && ~/projekty/TCLB/tools/sirun.sh d2q9_Allen_Cahn_SOI   ./run.xml >/dev/null"%d0)
-    os.system(f"cd {d0} && ~/GITHUB/LBM/TCLB/CLB/d2q9_Allen_Cahn_SOI/main ./run.xml >/dev/null")
+    os.system(f"cd {d0} && ~/GITHUB/LBM/TCLB/CLB/d2q9_Allen_Cahn_SOI/main ./run.xml > log.txt")
     
     fname_base = "run_"    
     fconfig =  wdir + '/run_config_P00_00000000.xml'
@@ -179,7 +187,7 @@ def calc_L2(anal, num):
     # Eq. 4.57
     return np.sqrt(np.sum((anal - num) * (anal - num)) / np.sum(anal * anal))    
 
-plot_dir = 'AC_plots'
+plot_dir = 'AC_plots_2D_same_SI_time'
 if not os.path.exists(plot_dir):
     os.makedirs(plot_dir)
 
@@ -227,5 +235,7 @@ plt.ylabel('$L_2(\phi(t,dt), \phi(t,dt_{min})$')
 
 plt.legend()
 
-plt.savefig('AC_LBM_2D_conv.png', dpi=200)
+plt.savefig(f'{plot_dir}/AC_LBM_2D_conv.png', dpi=200)
 plt.close(fig)
+
+print("DONE.")
