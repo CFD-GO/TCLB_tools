@@ -33,7 +33,7 @@ def diffusive_scalling(n):
 nice_number = 32**2 * 6
 
 final_test_set = [
-    (diffusive_scalling, 0.001 , 0.25),
+    (diffusive_scalling, 1 / nice_numbe, 0.25),
     (accoustic_scalling, 1 / nice_number, 0.25),
 
     (diffusive_scalling, 1E-2 / nice_number, 0.25),
@@ -68,7 +68,7 @@ for scalling, lambda_ph0, magic_parameter in final_test_set:
     # domain_size0 = 16 # TODO nie dziala dla 16 operands could not be broadcast together with shapes (3,32) (3,16)
 
     
-    nsamples = 7          # number of resolutions
+    nsamples = 5          # number of resolutions
     ny = 3                  # number of nodes in second dimension, min 2 for CPU, min 3 for GPU
     
         
