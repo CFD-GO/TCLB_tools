@@ -201,7 +201,7 @@ for ux in [0, 0.1]:
 
 
                 assert lattice_size == domain_size_SI
-                gha = GaussianHillAnal2D(C0, X0, Sigma02, conductivities[g])
+                gha = GaussianHillAnal2D(C0, X0, Sigma02, conductivities[g], Matrix([0, 0]))
                 xx, yy, T_anal = prepare_anal_data_ADE_Gaussion_Hill(gha, ux, iterations[g], lattice_size, lattice_size, dump_file_path,
                                                                      shall_recalculate_results=False, reference_level=10.)
                 T_err_field = T_anal - T_num_slice

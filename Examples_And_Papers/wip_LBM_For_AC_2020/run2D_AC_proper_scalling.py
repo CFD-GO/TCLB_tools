@@ -39,17 +39,17 @@ def diffusive_scalling(n):
 # lambda_ph0 = 1E-3                # 1E-12 for pure diffusion
 # nsamples = 6                    # number of resolutions
 
-# scalling = acoustic_scalling 
-# diffusivity0 = 1./6. * 2*1E-2  # initial diffusivity
+scalling = acoustic_scalling 
+diffusivity0 = 1./6. * 2*1E-2  # initial diffusivity
 # lambda_ph0 = 1E-10             # 1E-12 for pure diffusion
-# # lambda_ph0 = 1E-3 # worse than 2nd order
-# nsamples = 6                   # number of resolutions
+lambda_ph0 = 1E-3 # worse than 2nd order
+nsamples = 5                   # number of resolutions
 
-scalling = diffusive_scalling 
-diffusivity0 = 1./6 * 2*1E-2  # initial diffusivity
-# lambda_ph0 = 1E-10           # 1E-12 for pure diffusion
-lambda_ph0 = 1E-3          # 1E-12 for pure diffusion
-nsamples = 5                # number of resolutions
+# scalling = diffusive_scalling 
+# diffusivity0 = 1./6 * 2*1E-2  # initial diffusivity
+# # lambda_ph0 = 1E-10           # 1E-12 for pure diffusion
+# lambda_ph0 = 1E-3          # 1E-12 for pure diffusion
+# nsamples = 5                # number of resolutions
 
 tc = 50                   # number of timesteps for dt=1 aka Time
 domain_size0 = 32           # initial size of the domain
@@ -83,9 +83,25 @@ for n in np.arange(0,nsamples): # (start, stop, step=1)
     
     domain_size = domain_size0 * 2**n
     lbdt = 1./(2**scalling(n))
+
+    # begin of acoustic digression
+    # todo: for acoustic scaling dt = (U_LB/U_si) * dx  -> or dx/dt = const... = e?
+    # we are going to stay on the same characteristic... but e used to be 1?
+    # coeff = 0.1
+    # there are infinitely many ways to match Da, let
+    # lbdt = coeff*1./(2**scalling(n))
+    # diffusivity = diffusivity0 * lbdt / lbdx**2
+    # lambda_ph = lambda_ph0 * lbdt
+    # alternatively
+    # lbdt = 1./(2**scalling(n))
+    #   k_lb = coeff* k_si * dt/ dx^2
+    #   Q_lb = coeff* Q_si*dt
+    # end of acoustic digression
+
+    lbdt = 1./(2**scalling(n))
     lbdx = 1./2**n
-    diffusivity = diffusivity0 * lbdt / lbdx**2
-    lambda_ph = lambda_ph0 * lbdt
+    diffusivity = coeff * diffusivity0 * lbdt / lbdx**2
+    lambda_ph = coeff *  lambda_ph0 * lbdt
     
     Da = (lambda_ph *  domain_size**2) / diffusivity  
     
