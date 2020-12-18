@@ -83,23 +83,22 @@ for n in np.arange(0,nsamples): # (start, stop, step=1)
     
     domain_size = domain_size0 * 2**n
     lbdt = 1./(2**scalling(n))
+    lbdx = 1./2**n
 
     # begin of acoustic digression
     # todo: for acoustic scaling dt = (U_LB/U_si) * dx  -> or dx/dt = const... = e?
     # we are going to stay on the same characteristic... but e used to be 1?
-    # coeff = 0.1
+    coeff = 1
     # there are infinitely many ways to match Da, let
     # lbdt = coeff*1./(2**scalling(n))
     # diffusivity = diffusivity0 * lbdt / lbdx**2
     # lambda_ph = lambda_ph0 * lbdt
     # alternatively
     # lbdt = 1./(2**scalling(n))
-    #   k_lb = coeff* k_si * dt/ dx^2
-    #   Q_lb = coeff* Q_si*dt
+    # diffusivity = coeff* diffusivity0 * dt/ dx^2
+    # lambda_ph = coeff* lambda_ph0*dt
     # end of acoustic digression
 
-    lbdt = 1./(2**scalling(n))
-    lbdx = 1./2**n
     diffusivity = coeff * diffusivity0 * lbdt / lbdx**2
     lambda_ph = coeff *  lambda_ph0 * lbdt
     
