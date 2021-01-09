@@ -41,7 +41,7 @@ inputs_as_str = symbols([str_tilde_phi, str_lambda, str_dt])
 ##
 # make plot to ensure that only real solutions are in the range of interest
 calc_numerical_solution = lambdify(
-    inputs_as_str, symbolic_solutions_as_matrix.subs(dict(zip(inputs_as_symbols, inputs_as_str))),modules="numpy")
+    inputs_as_str, symbolic_solutions_as_matrix.subs(dict(zip(inputs_as_symbols, inputs_as_str))), modules="numpy")
 
 calc_numerical_solution(2, 1, 0.5)  # tilde_phi, Lamda, DT
 extract_real_solution(calc_numerical_solution, 2, 1, 0.5)

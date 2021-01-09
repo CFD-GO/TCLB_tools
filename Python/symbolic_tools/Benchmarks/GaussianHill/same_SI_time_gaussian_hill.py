@@ -7,7 +7,7 @@ import re
 from fractions import Fraction
 from DataIO.VTIFile import VTIFile
 from DataIO.helpers import peel_the_skin_v2
-from Benchmarks.GaussianHill.GaussianHillAnal2D import GaussianHillAnal2D, prepare_anal_data_ADE_Gaussion_Hill
+from Benchmarks.GaussianHill.GaussianHillAnal import GaussianHillAnal, prepare_anal_data_ADE_Gaussion_Hill_2D
 
 from sympy.matrices import Matrix
 
@@ -20,35 +20,38 @@ home = pwd.getpwuid(os.getuid()).pw_dir
 # conductivity_SI = 2.0
 # iterations = 2*10*np.array([6, 10, 100, 1000, 10000])
 # main_dir = os.path.join(home, 'DATA_FOR_PLOTS', 'batch_GaussianHill_acoustic_scalling', '120-200000_iterations')
+# plot_dir = 'same_SI_time'+'2100-3500000_iterations'
 
-time_SI = 50
-conductivity_SI = 7.0
-iterations = 7*50*np.array([6, 10, 100, 1000, 10000])
-main_dir = os.path.join(home, 'DATA_FOR_PLOTS', 'batch_GaussianHill_acoustic_scalling', '2100-3500000_iterations')
+# time_SI = 50
+# conductivity_SI = 7.0
+# iterations = int(conductivity_SI*time_SI)*np.array([6, 10, 100, 1000, 10000, 10000])
+# main_dir = os.path.join(home, 'DATA_FOR_PLOTS', 'batch_GaussianHill_same_SI_time', f'{min(iterations)}-{max(iterations)}_iterations')
+# plot_dir = 'same_SI_time'+f'{min(iterations)}-{max(iterations)}_iterations'
+# domain_size_SI = 256.0
+# lattice_size = 256
 
-# time_SI = 100
-# conductivity_SI = 4.0
-# iterations = 4*100*np.array([6, 10, 100, 1000, 10000])
-# main_dir = os.path.join(home, 'DATA_FOR_PLOTS', 'batch_GaussianHill_acoustic_scalling', '2400-4000000_iterations')
-
+time_SI = 100
+conductivity_SI = 4.0
+# iterations = int(conductivity_SI*time_SI)*np.array([6, 10, 100, 1000])
+# iterations = int(conductivity_SI*time_SI)*np.array([6, 10, 100, 1000, 10000])
+iterations = int(conductivity_SI*time_SI)*np.array([6, 10, 100, 1000, 10000, 100000])
+main_dir = os.path.join(home, 'DATA_FOR_PLOTS', 'batch_GaussianHill_same_SI_time', f'{min(iterations)}-{max(iterations)}_iterations')
+plot_dir = 'same_SI_time'+f'{min(iterations)}-{max(iterations)}_iterations'
 domain_size_SI = 256.0
 lattice_size = 256
 
 dx = domain_size_SI/lattice_size
 conductivities = np.array((time_SI * conductivity_SI) / (iterations * dx * dx))
-str_conductivities = [re.sub(r"/", 'o', str(Fraction(conductivity).limit_denominator(max_denominator=100000))) for conductivity in conductivities]
+str_conductivities = [f"{conductivity:.2e}" for conductivity in conductivities]
+# str_conductivities = [re.sub(r"/", 'o', str(Fraction(conductivity).limit_denominator(max_denominator=100000))) for conductivity in conductivities]
 
 # Gaussian Hill coordinates
 C0 = 1.
 X0 = Matrix([lattice_size/2., lattice_size/2.])
 
-# for ux in [0, 0.1]:
-#     for Sigma02 in [50, 75, 100]:
 
-plot_dir = 't_convergence_plots'
 if not os.path.exists(plot_dir):
     os.makedirs(plot_dir)
-
 
 def plot_err_field(T_err_field, xx, yy, fig_name):
     plt.rcParams.update({'font.size': 24})
@@ -192,7 +195,7 @@ for ux in [0, 0.1]:
                 vti_reader = VTIFile(filepath_vtk)
                 T_num = vti_reader.get("T")
                 T_num_slice = T_num[:, :, 1]
-
+                # T_num_slice = T_num_slice[:, :250]  # <Geometry nx="250" ny="250" nz="3">  array is 250x256 - DO NOT DO THIS!
                 ySIZE, xSIZE = T_num_slice.shape
                 assert ySIZE == xSIZE == lattice_size
 
@@ -201,9 +204,9 @@ for ux in [0, 0.1]:
 
 
                 assert lattice_size == domain_size_SI
-                gha = GaussianHillAnal2D(C0, X0, Sigma02, conductivities[g], Matrix([0, 0]))
-                xx, yy, T_anal = prepare_anal_data_ADE_Gaussion_Hill(gha, ux, iterations[g], lattice_size, lattice_size, dump_file_path,
-                                                                     shall_recalculate_results=False, reference_level=10.)
+                gha = GaussianHillAnal(C0, X0, Sigma02, conductivities[g], Matrix([0, 0]), D=2)
+                xx, yy, T_anal = prepare_anal_data_ADE_Gaussion_Hill_2D(gha, ux, iterations[g], lattice_size, lattice_size, dump_file_path,
+                                                                        shall_recalculate_results=False, reference_level=10.)
                 T_err_field = T_anal - T_num_slice
 
                 # alternatively
@@ -227,9 +230,14 @@ for ux in [0, 0.1]:
                 print(f"{collision_type} T_L2={T_L2[g]:.5e} for k = {conductivities[g]}")
 
                 print("------------------------------------ PLOT err field------------------------------------")
-                fig_name = f'{plot_dir}/acoustic_scaling_GaussianHill_{collision_type}_ux={ux:.0e}_k_{str_conductivities[g]}_iterations_{iterations[g]}_sig={Sigma02}_time_SI={time_SI}_lattice={lattice_size}[lu]_err_field_contour.png'
+                fig_name = f'{plot_dir}/GaussianHill_{collision_type}_ux={ux:.0e}_k_{str_conductivities[g]}_iterations_{iterations[g]}_sig={Sigma02}_time_SI={time_SI}_lattice={lattice_size}[lu]_err_field_contour.png'
                 plot_err_field(T_err_field, xx, yy, fig_name)
 
+                fig_name = f'{plot_dir}/GaussianHill_{collision_type}_ux={ux:.0e}_k_{str_conductivities[g]}_iterations_{iterations[g]}_sig={Sigma02}_time_SI={time_SI}_lattice={lattice_size}[lu]_anal_field_contour.png'
+                plot_err_field(T_anal, xx, yy, fig_name)
+
+                fig_name = f'{plot_dir}/GaussianHill_{collision_type}_ux={ux:.0e}_k_{str_conductivities[g]}_iterations_{iterations[g]}_sig={Sigma02}_time_SI={time_SI}_lattice={lattice_size}[lu]_num_field_contour.png'
+                plot_err_field(T_num_slice, xx, yy, fig_name)
             return T_L2
             # return T_mse
 
@@ -240,7 +248,7 @@ for ux in [0, 0.1]:
         T_err_L2_CM_HIGHER = get_t_err(main_dir, 'CM_HIGHER')
         T_err_L2_Cumulants = get_t_err(main_dir, 'Cumulants')
         print("------------------------------------ PLOT t convergence------------------------------------")
-        fig_name = f'{plot_dir}/acoustic_scalling_GaussianHill_ux={ux:.0e}_sig={Sigma02}_time_SI={time_SI}_conductivity_SI_{conductivity_SI}_lattice={lattice_size}[lu]_t_convergence.png'
+        fig_name = f'{plot_dir}/GaussianHill_ux={ux:.0e}_sig={Sigma02}_time_SI={time_SI}_conductivity_SI_{conductivity_SI}_lattice={lattice_size}[lu]_t_convergence.png'
         plot_t_convergence_acoustic_scalling(conductivities, T_err_L2_BGK, T_err_L2_CM, T_err_L2_CM_HIGHER, T_err_L2_Cumulants, fig_name)
         # plot_t_convergence_acoustic_scalling(conductivities, T_err_L2_BGK, T_err_L2_BGK, T_err_L2_BGK, T_err_L2_BGK, fig_name)  # HACK:
 

@@ -44,3 +44,4 @@ ax1.axis((-2, 2, -2, 2))
 ax1.set_title('grid and contour (%d points, %d grid points)' %
               (npts, ngridx * ngridy))
 
+fig.show()

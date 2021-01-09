@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import os
 import pwd
 from DataIO.VTIFile import VTIFile
-from Benchmarks.GaussianHill.GaussianHillAnal2D import GaussianHillAnal2D, prepare_anal_data_ADE_Gaussion_Hill
+from Benchmarks.GaussianHill.GaussianHillAnal import GaussianHillAnal, prepare_anal_data_ADE_Gaussion_Hill_2D
 
 from sympy.matrices import Matrix
 
@@ -44,9 +44,9 @@ for CollisionType in ["CM", "CM_HIGHER"]:
         dump_file_path = os.path.join(main_folder, f'dumps',
                                       f'ux_{ux}_k_{k}_sigma_{Sigma02}_size_{lattice_size}_time_spot_{oldest}.npy')
 
-        gha = GaussianHillAnal2D(C0, X0, Sigma02, float(k))
-        xx, yy, T_anal = prepare_anal_data_ADE_Gaussion_Hill(gha, ux, oldest, ySIZE, xSIZE, dump_file_path,
-                                                             shall_recalculate_results=False)
+        gha = GaussianHillAnal(C0, X0, Sigma02, float(k), Matrix([0, 0]), D=2)
+        xx, yy, T_anal = prepare_anal_data_ADE_Gaussion_Hill_2D(gha, ux, oldest, ySIZE, xSIZE, dump_file_path,
+                                                                shall_recalculate_results=False)
 
         T_err_field = T_anal - T_num_slice
         T_L2 = calc_L2(T_anal, T_num_slice)

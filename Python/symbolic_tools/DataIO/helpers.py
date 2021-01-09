@@ -38,6 +38,7 @@ def eat_dots_for_texmaker(value):
     return s_value
 
 
+
 def strip_folder_name(some_folder):
     some_folder = some_folder.rstrip('0')  # remove all trailing zeros
     some_folder = some_folder.rstrip('.')
@@ -96,3 +97,7 @@ def calc_mse(anal, num):
 def calc_L2(anal, num):
     # Eq. 4.57
     return np.sqrt(np.sum((anal - num) * (anal - num)) / np.sum(anal * anal))
+
+
+def calc_L2_per_element(anal, num):
+    return np.sqrt((anal - num) * (anal - num) / (anal * anal))

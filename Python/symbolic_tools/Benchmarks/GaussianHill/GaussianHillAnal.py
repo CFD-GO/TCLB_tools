@@ -2,7 +2,8 @@
 See Advection-Diffusion of a Gaussian Hill Section 8.6.1  p322
 from 'Lattice Boltzmann Method Principles and Practise'
 """
-
+from joblib import Parallel, delayed
+import multiprocessing
 from sympy.matrices import Matrix, diag
 import numpy as np
 import sympy as sp
@@ -10,7 +11,7 @@ import os
 
 
 class GaussianHillAnal:
-    def __init__(self, C0, X0, Sigma2_0, k, U, D=2):
+    def __init__(self, C0, X0, Sigma2_0, k, U, D):
         """
         :param C0: initial concentration
         :param X0: initial position of the hill's centre = Matrix([x0, y0])
@@ -27,19 +28,20 @@ class GaussianHillAnal:
         self.dim = D
 
     def get_concentration_2D(self, X, t):
-        Sigma2_D = 2*self.k*t
-        L = X - self.X0 - self.U*t
-        C = self.C0 * self.Sigma2_0 / (self.Sigma2_0 + Sigma2_D)
-        C *= sp.exp(-(L.dot(L)) / (2 * (self.Sigma2_0 + Sigma2_D)))
-        return C
-
-    def get_concentration_3D(self, X, t):
         decay = 2*self.k*t
         L = X - self.X0 - self.U*t
         C = self.C0
-        C *= pow(2 * np.pi * self.Sigma2_0, self.dim / 2.)
-        C /= pow(2 * np.pi * (self.Sigma2_0 + decay), self.dim / 2.)
-        C *= sp.exp(-(L.dot(L)) / (2*(self.Sigma2_0 + decay)))
+        C *= self.Sigma2_0 / (self.Sigma2_0 + decay)
+        C *= sp.exp(-(L.dot(L)) / (2 * (self.Sigma2_0 + decay)))
+        return C
+
+    def get_concentration_3D(self, X, t):
+        decay = 2.*self.k*t
+        L = X - self.X0 - self.U*t
+        C = self.C0
+        C *= pow(2. * np.pi * self.Sigma2_0, self.dim / 2.)
+        C /= pow(2. * np.pi * (self.Sigma2_0 + decay), self.dim / 2.)
+        C *= sp.exp(-(L.dot(L)) / (2.*(self.Sigma2_0 + decay)))
         return C
 
 def prepare_anal_data_ADE_Gaussion_Hill_2D(gha: GaussianHillAnal, ux, time_spot, ySIZE, xSIZE, dump_file_path, shall_recalculate_results=False, reference_level=0):
@@ -93,6 +95,8 @@ def prepare_anal_data_ADE_Gaussion_Hill_3D(
         x_grid = np.linspace(0, xSIZE, xSIZE, endpoint=False) + 0.5
         y_grid = np.linspace(0, ySIZE, ySIZE, endpoint=False) + 0.5
         z_grid = np.linspace(0, zSIZE, zSIZE, endpoint=False) + 0.5
+        # z_grid = 127.5  # HACK:
+        # zSIZE = 1
         xx, yy, zz = np.meshgrid(x_grid, y_grid, z_grid)
 
         T_anal = np.zeros((ySIZE, xSIZE, zSIZE))
@@ -100,11 +104,16 @@ def prepare_anal_data_ADE_Gaussion_Hill_3D(
         for i in range(ySIZE):
             print(f"running i/ySIZE = {i}/{ySIZE}...")
             for j in range(xSIZE):
-                print(f"running j/xSIZE = {j}/{xSIZE}...")
+                if j % 50 == 0:
+                    print(f"\t\trunning j/xSIZE = {j}/{xSIZE}...")
+
                 for k in range(zSIZE):
                     point = Matrix([xx[i][j][k], yy[i][j][k], zz[i][j][k]])
                     value = reference_level + gha.get_concentration_3D(point, int(time_spot))
                     T_anal[i][j][k] = value
+
+        # num_cores = multiprocessing.cpu_count()
+        # result = Parallel(n_jobs=num_cores)(delayed(continuous_transformation)(row, fun) for row in moments_order)
 
         shift = ux * int(time_spot) % xSIZE
         if float(shift).is_integer():
