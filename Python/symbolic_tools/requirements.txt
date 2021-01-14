@@ -11,3 +11,4 @@ openpyxl
 vtk
 joblib
 lxml
+vedo

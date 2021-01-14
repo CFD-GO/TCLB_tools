@@ -4,7 +4,7 @@ from matplotlib.ticker import FormatStrFormatter
 from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 import os
-from Benchmarks.GaussianHill.GaussianHillAnal2D import GaussianHillAnal2D
+from Benchmarks.GaussianHill.GaussianHillAnal import GaussianHillAnal
 
 from sympy.matrices import Matrix
 
@@ -24,7 +24,7 @@ X0 = Matrix([lattice_size/2, lattice_size/2])
 U = Matrix([0.1, 0])
 Sigma02 = 4
 k = 0.166666
-gha = GaussianHillAnal2D(C0, X0, Sigma02, k, U)
+gha = GaussianHillAnal(C0, X0, Sigma02, k, U)
 
 
 
@@ -42,7 +42,7 @@ T_anal = np.zeros((ySIZE, xSIZE, total_time))
 
 for i in range(ySIZE):
     for j in range(xSIZE):
-        T_anal[i][j][0] = gha.get_concentration(Matrix([xx[i][j], yy[i][j]]), time_spot)  # lets cheat
+        T_anal[i][j][0] = gha.get_concentration_2D(Matrix([xx[i][j], yy[i][j]]), time_spot)  # lets cheat
         # for t in range(total_time):
             # T_anal[i][j][t] = gha.get_concentration(Matrix([xx[i][j], yy[i][j]]), t)
 

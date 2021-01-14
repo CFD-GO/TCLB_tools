@@ -22,7 +22,7 @@ class ContinuousCMTransforms:
         """
         :param dzeta: direction (x,y,z)
         :param u: velocity (x,y,z)
-        :param u: Force (x,y,z)
+        :param F: Force (x,y,z)
         :param rho: density (not necessarily m00, for instance in multiphase flows)
         :param cs2: variance of the distribution = (speed of sound)^2,
                     for isothermal LB cs2=1./3;

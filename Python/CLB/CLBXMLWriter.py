@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 import lxml.etree as ET
 
 ## DECORATORS ##
@@ -152,9 +151,11 @@ def _set_by_kw(kw, name, default):
     ('Outlet','OutletElement'),
     ('Inlet','InletElement'),
     ])
+
 @addSimpleBCElements([
     'MRT',
-    'TRT_SOI',    
+    'SRT_M_SOI',
+    'TRT_M_SOI',    
     'Smoothing',
     'Cumulant',    
     'ESymmetry',
@@ -174,18 +175,18 @@ def _set_by_kw(kw, name, default):
     ('SolidBoundary2','SolidBoundary2Def'),
     ('SolidBoundary3','SolidBoundary3Def'),    
     ])
+
 @addRootElements(
 [   
  'EvalIf',
  'CallPython',
  'VTK',
- 'RunR',
  'Log',
  'Andersen'
  ]        
 )
 class CLBConfigWriter:
-
+    version = 100
     def __init__(self, output="output/", sign=''):
         self.root = ET.Element('CLBConfig')
         if not sign == '':
@@ -379,6 +380,13 @@ class CLBConfigWriter:
     @geometryElement
     def addPythonInline(self, **kwargs):
         kwargs['_xml_node_name'] = 'PythonInline'
+        del kwargs['eval']
+        return kwargs
+    
+    @addCDATA('eval')
+    @rootElement
+    def addRunR(self, **kwargs):
+        kwargs['_xml_node_name'] = 'RunR'
         del kwargs['eval']
         return kwargs
 ##############
