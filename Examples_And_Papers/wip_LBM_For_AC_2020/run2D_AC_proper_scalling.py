@@ -40,8 +40,10 @@ def eat_dots_for_texmaker(value):
 
 ################################################
 # CONFIG
-tc = 512                     # number of timesteps for dt=1 aka Time
+tc = 32                    # number of timesteps for dt=1 aka Time
 domain_size0 = 32           # initial size of the domain
+nsamples = 6                 # number of resolutions
+diffusivity0 = 1./6. * 1E-2  # initial diffusivity
 
 # magic_parameter = 1./6     # best for pure diffusion   # to control even relaxation rate in TRT model
 magic_parameter = 1./12      # best for pure advection   # to control even relaxation rate in TRT model
@@ -49,25 +51,21 @@ magic_parameter = 1./12      # best for pure advection   # to control even relax
 np.random.seed(seed=1)           # same random sequence each run
 nrand = int(domain_size0/4)      # number of boxes, doesn't converge nice for nrand 100
 
-initialPe = 1*5E2
+initialPe = 0*1*5E2
 
-for initialDa in [1E-3, 1E0, 1E3]:
-# for initialDa in [1E3]:
+# for initialDa in [1E-3, 1E0, 1E3]:
+for initialDa in [5E2]:
     # diffusivity0 = 1./6. * 2* 1E-5  # initial diffusivity
     # lambda_ph0 = 1E-3               # worse than 2nd order, set 1E-12 for pure diffusion
-    # nsamples = 6                    # number of resolutions
+
     
     # scalling = reactive_scalling 
-    # scalling = acoustic_scalling 
-    scalling = diffusive_scalling 
+    scalling = acoustic_scalling 
+    # scalling = diffusive_scalling 
     
     
-    diffusivity0 = 1./6. * 1E-2  # initial diffusivity
     lambda_ph0 = initialDa*diffusivity0/domain_size0**2 
-    nsamples = 5                 # number of resolutions
-    
     Ux0 = initialPe*diffusivity0/domain_size0    # macroscopic advection velocity
-    
     
     # check Da, Pe
     Da0 = (lambda_ph0 *  domain_size0**2) / diffusivity0  # Damkohler similarity number
@@ -170,13 +168,13 @@ for initialDa in [1E-3, 1E0, 1E3]:
                         
             CLBc.addRunR(eval=\
                 """
-                        x = Solver$Geometry$X 
-                        x = (x - 0.5)/ ({domain_size}) * 2 * pi
-                        y = Solver$Geometry$Y
-                        y = (y - 0.5)/ ({domain_size}) * 4 * pi
-                        Solver$Fields$Init_PhaseField_External[] = exp(sin(x)) - 2*exp(sin(y)) # to benchmark diffusion & source term
-                        # Solver$Fields$Init_PhaseField_External[] = 0.1 # to benchmark the source term only
-                        Solver$Actions$InitFromFields()        
+                    x = Solver$Geometry$X 
+                    x = (x - 0.5)/ ({domain_size}) * 2 * pi
+                    y = Solver$Geometry$Y
+                    y = (y - 0.5)/ ({domain_size}) * 4 * pi
+                    # Solver$Fields$Init_PhaseField_External[] = exp(sin(x)) - 2*exp(sin(y)) # to benchmark diffusion & source term
+                    Solver$Fields$Init_PhaseField_External[] = 10 # to benchmark the source term only
+                    Solver$Actions$InitFromFields()        
                 """.format(domain_size=domain_size))
                 
             #CLBc.addSolve(iterations=n_iterations, vtk=50)
@@ -253,7 +251,14 @@ for initialDa in [1E-3, 1E0, 1E3]:
         
         
     reference = L2[-1]['LBM_field_all'][::2**n,::2**n]
-    
+        # single branch solution: positive IC and Lambda
+    def AC0D(t, lambda_phi, phi_0):
+        return np.sqrt(-1/(np.exp(-2*lambda_phi*t) - 1 - np.exp(-2*lambda_phi*t)/phi_0**2))
+
+
+    # reference =  AC0D(tc, lambda_ph0, 10)
+
+
     
     def calc_L2(anal, num):
         # Eq. 4.57
@@ -325,11 +330,12 @@ for initialDa in [1E-3, 1E0, 1E3]:
     plt.rcParams.update({'font.size': 30})
     
     
-    fig, axs = plt.subplots(nrows=1, ncols=1, figsize=(10, 10))    
-    # fig, axs = plt.subplots(nrows=1, ncols=2, figsize=(16, 10))
+    # fig, axs = plt.subplots(nrows=1, ncols=1, figsize=(10, 10))    
+    fig, axs = plt.subplots(nrows=1, ncols=2, figsize=(16, 10))
     
-    ax1 = axs
-    # ax2 = axs[1]
+    # ax1 = axs
+    ax1 = axs[0]
+    ax2 = axs[1]
     
     # prepare data
     L2dr = pd.DataFrame.from_records(L2[:-1])
@@ -361,23 +367,23 @@ for initialDa in [1E-3, 1E0, 1E3]:
     
     # y = np.sqrt(dt)
     # y = y / y[0] * L2[0]['err_L2']
-    # ax2.loglog(dx,y, label=r'${t^{1/2}}$')
+    # ax2.loglog(dt,y, label=r'${t^{1/2}}$')
     
-    # y = dt**1
-    # y = y / y[0] * L2[0]['err_L2']
-    # ax2.loglog(dx,y, label=r'${t}$')
+    y = dt**1
+    y = y / y[0] * L2[0]['err_L2']
+    ax2.loglog(dt,y, label=r'${t}$')
     
-    # y = dt**2
-    # y = y / y[0] * L2[0]['err_L2']
-    # ax2.loglog(dx,y, label=r'${t^2}$')
+    y = dt**2
+    y = y / y[0] * L2[0]['err_L2']
+    ax2.loglog(dt,y, label=r'${t^2}$')
     
     
     
-    # ax2.loglog(L2dr.LBMdt, L2dr.err_L2,  linestyle="", color='black', marker='x', markersize=10)
-    # ax2.set_xscale('log', base=2)
-    # ax2.legend()
-    # ax2.grid(True)
-    # ax2.set(xlabel=r'$\epsilon_t$', ylabel=r'$L_2(\phi(\delta t), \phi(\delta t_{min})$')
+    ax2.loglog(L2dr.LBMdt, L2dr.err_L2,  linestyle="", color='black', marker='x', markersize=10)
+    ax2.set_xscale('log', base=2)
+    ax2.legend()
+    ax2.grid(True)
+    ax2.set(xlabel=r'$\epsilon_t$', ylabel=r'$L_2(\phi(\delta t), \phi(\delta t_{min})$')
     
     fig.tight_layout()  # otherwise the right y-label is slightly clipped
     
