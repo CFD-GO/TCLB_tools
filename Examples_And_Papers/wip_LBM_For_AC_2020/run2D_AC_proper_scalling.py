@@ -3,7 +3,7 @@
 """
 Created on Sat Aug  1 12:10:10 2020
 
-@author: mdzik
+@author: mdzik & ggruszczynski
 """
 
 import CLB.CLBXMLWriter as CLBXML
@@ -40,9 +40,9 @@ def eat_dots_for_texmaker(value):
 
 ################################################
 # CONFIG
-tc = 32                    # number of timesteps for dt=1 aka Time
+tc = 16                    # number of timesteps for dt=1 aka Time
 domain_size0 = 32           # initial size of the domain
-nsamples = 6                 # number of resolutions
+nsamples = 5                 # number of resolutions
 diffusivity0 = 1./6. * 1E-2  # initial diffusivity
 
 # magic_parameter = 1./6     # best for pure diffusion   # to control even relaxation rate in TRT model
@@ -51,10 +51,12 @@ magic_parameter = 1./12      # best for pure advection   # to control even relax
 np.random.seed(seed=1)           # same random sequence each run
 nrand = int(domain_size0/4)      # number of boxes, doesn't converge nice for nrand 100
 
-initialPe = 0*1*5E2
+initialPe = 2*1*5E2
+
 
 # for initialDa in [1E-3, 1E0, 1E3]:
-for initialDa in [5E2]:
+# for initialDa in [5E2]:
+for initialDa in [1E0]:
     # diffusivity0 = 1./6. * 2* 1E-5  # initial diffusivity
     # lambda_ph0 = 1E-3               # worse than 2nd order, set 1E-12 for pure diffusion
 
@@ -172,8 +174,8 @@ for initialDa in [5E2]:
                     x = (x - 0.5)/ ({domain_size}) * 2 * pi
                     y = Solver$Geometry$Y
                     y = (y - 0.5)/ ({domain_size}) * 4 * pi
-                    # Solver$Fields$Init_PhaseField_External[] = exp(sin(x)) - 2*exp(sin(y)) # to benchmark diffusion & source term
-                    Solver$Fields$Init_PhaseField_External[] = 10 # to benchmark the source term only
+                    Solver$Fields$Init_PhaseField_External[] = exp(sin(x)) - 2*exp(sin(y)) # to benchmark diffusion & source term
+                    # Solver$Fields$Init_PhaseField_External[] = 10 # to benchmark the source term only
                     Solver$Actions$InitFromFields()        
                 """.format(domain_size=domain_size))
                 
@@ -251,13 +253,11 @@ for initialDa in [5E2]:
         
         
     reference = L2[-1]['LBM_field_all'][::2**n,::2**n]
-        # single branch solution: positive IC and Lambda
+    # single branch solution: positive IC and Lambda
     def AC0D(t, lambda_phi, phi_0):
         return np.sqrt(-1/(np.exp(-2*lambda_phi*t) - 1 - np.exp(-2*lambda_phi*t)/phi_0**2))
 
-
     # reference =  AC0D(tc, lambda_ph0, 10)
-
 
     
     def calc_L2(anal, num):
