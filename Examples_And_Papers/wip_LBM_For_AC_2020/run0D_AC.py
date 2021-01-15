@@ -160,8 +160,8 @@ plt.grid(which='both')
 
 plt.tight_layout()  # otherwise the right y-label is slightly clipped
 
-plt.savefig('0d-local.pdf', bbox_inches='tight', dpi=200)
-plt.savefig('0d-local.png', bbox_inches='tight', dpi=200) # for preview
+plt.savefig(os.path.join(plot_dir,'0d-local.pdf'), bbox_inches='tight', dpi=200)
+plt.savefig(os.path.join(plot_dir,'0d-local.png'), bbox_inches='tight', dpi=200) # for preview
 
 
 data['PointError_sq'] = (AC0D(data.Time,  lambda_ph0, initial_phi) - data.PhaseField)**2

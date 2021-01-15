@@ -19,16 +19,20 @@ import CLB.VTIFile
 import pandas as pd
 import math
 import matplotlib.pyplot as plt
+import time
+
+start = time.process_time()
+
 
 from numpy.testing import assert_almost_equal
 
-def reactive_scalling(n):
+def reactive_scaling(n):
     return 0
 
-def acoustic_scalling(n):
+def acoustic_scaling(n):
     return n
 
-def diffusive_scalling(n):
+def diffusive_scaling(n):
     return n*2
 
 
@@ -40,33 +44,28 @@ def eat_dots_for_texmaker(value):
 
 ################################################
 # CONFIG
-tc = 16                    # number of timesteps for dt=1 aka Time
+
+
+tc = 32                    # number of timesteps for dt=1 aka Time
 domain_size0 = 32           # initial size of the domain
-nsamples = 5                 # number of resolutions
+nsamples = 5                # number of resolutions
+
+initialPe = 1*5E2
+initialDa = 1E-3 # for initialDa in [1E-3, 1E0, 1E3]:
+
 diffusivity0 = 1./6. * 1E-2  # initial diffusivity
+lambda_ph0 = initialDa*diffusivity0/domain_size0**2 
 
 # magic_parameter = 1./6     # best for pure diffusion   # to control even relaxation rate in TRT model
 magic_parameter = 1./12      # best for pure advection   # to control even relaxation rate in TRT model
 
-np.random.seed(seed=1)           # same random sequence each run
-nrand = int(domain_size0/4)      # number of boxes, doesn't converge nice for nrand 100
 
-initialPe = 2*1*5E2
-
-
-# for initialDa in [1E-3, 1E0, 1E3]:
-# for initialDa in [5E2]:
-for initialDa in [1E0]:
-    # diffusivity0 = 1./6. * 2* 1E-5  # initial diffusivity
-    # lambda_ph0 = 1E-3               # worse than 2nd order, set 1E-12 for pure diffusion
-
+df_for_plots_part1 = pd.DataFrame()
+df_for_plots_part2 = pd.DataFrame()
     
-    # scalling = reactive_scalling 
-    scalling = acoustic_scalling 
-    # scalling = diffusive_scalling 
-    
-    
-    lambda_ph0 = initialDa*diffusivity0/domain_size0**2 
+for scaling in [acoustic_scaling, diffusive_scaling]:
+
+ 
     Ux0 = initialPe*diffusivity0/domain_size0    # macroscopic advection velocity
     
     # check Da, Pe
@@ -74,25 +73,9 @@ for initialDa in [1E0]:
     Pe0 = Ux0*domain_size0 / diffusivity0  # Peclet similarity number (similar to Reynolds, but refers to advection-diffusion eq)
     print(f"Initial Damköhler number: {Da0:.2e} \t Peclet number: {Pe0:.2e}")
     
-    dfObj = pd.DataFrame()
-    ################################################
-    # box_size0 = int(domain_size0/8)  # depreciated: prefer RunR # initial size of the box # 
-    # blocks_up0 = list()
-    # blocks_down0 = list()
-    # for xi in range(nrand):
-    #     x = np.random.randint(0,domain_size0)
-    #     y = np.random.randint(0,domain_size0)
-    #     blocks_up0.append((x,y))
-     
-    
-    # for xi in range(nrand):
-    #     x = np.random.randint(0,domain_size0)
-    #     y = np.random.randint(0,domain_size0)
-    #     blocks_down0.append((x,y))
-    
-    idx = 0
+    df_latex = pd.DataFrame()
     L2 = list()
-    
+
     for n in np.arange(0,nsamples): # (start, stop, step=1)
         
         domain_size = domain_size0 * 2**n
@@ -109,7 +92,7 @@ for initialDa in [1E0]:
         # lambda_ph = lambda_ph0 * lbdt
         
         # alternatively
-        lbdt = 1./(2**scalling(n))
+        lbdt = 1./(2**scaling(n))
         lbdx = 1./2**n
         diffusivity = coeff * diffusivity0 * lbdt / lbdx**2
         lambda_ph = coeff *  lambda_ph0 * lbdt
@@ -128,10 +111,10 @@ for initialDa in [1E0]:
         assert_almost_equal(math.modf(n_iterations)[0] , 0, decimal=4) # check decimal places
         
         def getXML(**kwars):        
-            global idx
+            # global idx
             
-            idx = idx + 1
-            prefix = '/tmp/id%03d/'%idx
+            # idx = idx + 1
+            prefix = '/tmp/id%03d/'%n
             if 'clear' in kwars and kwars['clear']:
                 print(f"removing {prefix}")
                 os.system('rm -r %s'%prefix)
@@ -147,15 +130,7 @@ for initialDa in [1E0]:
             CLBc.addTRT_M_SOI()
             # CLBc.addSRT_M_SOI()
             CLBc.addBox()
-            
-            # CLBc.addZoneBlock(name='up')
-            # for x,y in blocks_up:
-            #     CLBc.addBox(dx=x,dy=y,nx=box_size,ny=box_size)
-     
-            # CLBc.addZoneBlock(name='down')
-            # for x,y in blocks_down:
-            #     CLBc.addBox(dx=x,dy=y,nx=box_size,ny=box_size)
-    
+
     
             CLBc.addModelParams({
                     "diffusivity_phi":diffusivity,
@@ -165,8 +140,6 @@ for initialDa in [1E0]:
                     "Init_UX" : Ux
                     })
     
-            # CLBc.addModelParam("Init_PhaseField",0.9,'up' )
-            # CLBc.addModelParam("Init_PhaseField",-0.9,'down' )
                         
             CLBc.addRunR(eval=\
                 """
@@ -179,7 +152,7 @@ for initialDa in [1E0]:
                     Solver$Actions$InitFromFields()        
                 """.format(domain_size=domain_size))
                 
-            #CLBc.addSolve(iterations=n_iterations, vtk=50)
+
             CLBc.addVTK()
             CLBc.addSolve(iterations=n_iterations, vtk=int(n_iterations/10))
             CLBc.addVTK()
@@ -225,7 +198,10 @@ for initialDa in [1E0]:
         
         L2.append(
             {
-                'n': n,
+                'n':n,
+                'L': domain_size,
+                'scaling': f'{scaling.__name__}',
+                'Da':Da0,
                 'LBMdx': lbdx,
                 'LBMdt': lbdt,
                 'SI_time': data.Time,
@@ -234,24 +210,40 @@ for initialDa in [1E0]:
                 'LBM_Q_all': vti.get('Q'),    # not sliced, last iteration 
             }
           )
-        
-        tmp_df = pd.DataFrame({
+                
+        df_latex = df_latex.append(pd.DataFrame({
                'L': domain_size,
-               'n': int(n_iterations),
+               'n_iterations': int(n_iterations),
                # 'log2(LBMdx)': np.log2(lbdx),
                # 'log2(LBMdt)': np.log2(lbdt),
-               # r'$time_{SI}$': int(data.Time.iloc[-1]),
+                r'$time_{SI}$': int(data.Time.iloc[-1]),
                # r'$\Lambda$': magic_parameter,
                # 'Da': int(Da),
                # 'Pe': int(Pe0),
                r'U': Ux,
                'M':diffusivity,
                r'$\lambda$':lambda_ph,
-             }, index=[idx]) 
+             }, index=[n])) 
         
-        dfObj = dfObj.append(tmp_df) 
+        if n < nsamples-1:
+            df_for_plots_part1 = df_for_plots_part1.append(pd.DataFrame({
+                   'L': domain_size,
+                   'n_iterations': n_iterations,
+                   'Da':Da0,
+                   'Pe':Pe0,
+                   'MagicParameter':magic_parameter,
+                   'scaling': f'{scaling.__name__}',
+                   'SI_time':data.Time.iloc[-1],
+                   'LBMdx':lbdx,
+                   'LBMdt':lbdt,
+                   'U': Ux,
+                   'M':diffusivity,
+                   'M0':diffusivity0,
+                   'lambda':lambda_ph,
+                   'lambda0': lambda_ph0,
+                 }, index=[n]) ) 
         
-        
+
     reference = L2[-1]['LBM_field_all'][::2**n,::2**n]
     # single branch solution: positive IC and Lambda
     def AC0D(t, lambda_phi, phi_0):
@@ -266,7 +258,7 @@ for initialDa in [1E0]:
         #return  np.max(np.abs(anal - num))
         
         
-    plot_dir = f'AC_plots_2D_{scalling.__name__}'
+    plot_dir = f'AC_plots_2D_{scaling.__name__}'
     if not os.path.exists(plot_dir):
         os.makedirs(plot_dir)
     
@@ -286,6 +278,8 @@ for initialDa in [1E0]:
         # plt.close(fig)
         # plt.show()
         
+    #### PLOT FIELDS ####
+    
     last_snapshot = len(L2)-1
     plt.figure(figsize=(10, 10))
     plt.rcParams.update({'font.size': 20})
@@ -294,7 +288,7 @@ for initialDa in [1E0]:
     plt.colorbar()
     fig.tight_layout()  # otherwise the right y-label is slightly clipped
     plt.savefig(f"{plot_dir}/"
-                f"{scalling.__name__}_2D_phase_field_tc_{tc}"
+                f"{scaling.__name__}_2D_phase_field_tc_{tc}"
                 f"_Da_{eat_dots_for_texmaker(Da0)}"
                 f"_Pe_{eat_dots_for_texmaker(Pe0)}"
                 ".png", dpi=300)
@@ -307,20 +301,20 @@ for initialDa in [1E0]:
     plt.colorbar()
     fig.tight_layout()  # otherwise the right y-label is slightly clipped
     plt.savefig(f"{plot_dir}/"
-                f"{scalling.__name__}_2D_Q_tc_{tc}"
+                f"{scaling.__name__}_2D_Q_tc_{tc}"
                 f"_Da_{eat_dots_for_texmaker(Da0)}"
                 f"_Pe_{eat_dots_for_texmaker(Pe0)}"
                 ".png", dpi=300)
     plt.close(fig)
     
     
-    ##########################
+    #### PLOT FIELDS END ####
     
     # fig_name = os.path.join(plot_dir, f"{scalling.__name__}_2D_conv_Da_{eat_dots_for_texmaker(Da)}_diffusivity0_{diffusivity0:.2e}_lambda_ph0_{lambda_ph0:.2e}")
     
-    
+    #### PLOT CONVERGENCE #### 
     fig_name = os.path.join(plot_dir, 
-                            f"{scalling.__name__}_2D_"
+                            f"{scaling.__name__}_2D_"
                             f"_Da_{eat_dots_for_texmaker(Da0)}"
                             f"_Pe_{eat_dots_for_texmaker(Pe0)}"
                             f"_diffusivity0_{eat_dots_for_texmaker(diffusivity)}"
@@ -338,7 +332,7 @@ for initialDa in [1E0]:
     ax2 = axs[1]
     
     # prepare data
-    L2dr = pd.DataFrame.from_records(L2[:-1])
+    L2dr = pd.DataFrame.from_records(L2[:-1]) # all except last one
     
     dt = np.logspace(np.log10(L2[0]['LBMdt']), np.log10(L2[-1]['LBMdt']),100)
     dx = np.logspace(np.log10(L2[0]['LBMdx']), np.log10(L2[-1]['LBMdx']),100)
@@ -357,7 +351,7 @@ for initialDa in [1E0]:
     
     
     
-    ax1.loglog(L2dr.LBMdx, L2dr.err_L2, linestyle="", color='black', marker='o', markersize=10)
+    ax1.loglog(L2dr['LBMdx'], L2dr[:]['err_L2'], linestyle="", color='black', marker='o', markersize=10)
     ax1.set_xscale('log', base=2)
     ax1.legend()
     ax1.grid(True)
@@ -379,7 +373,7 @@ for initialDa in [1E0]:
     
     
     
-    ax2.loglog(L2dr.LBMdt, L2dr.err_L2,  linestyle="", color='black', marker='x', markersize=10)
+    ax2.loglog(L2dr['LBMdt'], L2dr['err_L2'],  linestyle="", color='black', marker='x', markersize=10)
     ax2.set_xscale('log', base=2)
     ax2.legend()
     ax2.grid(True)
@@ -393,28 +387,49 @@ for initialDa in [1E0]:
     # plt.show()
     plt.close(fig)  # close the figure
     
+    #### PLOT CONVERGENCE END #### 
     
+    tmp = pd.DataFrame.from_records(L2) # all except last one
+    # df_for_plots_part2['err_L2'] = L2dr['err_L2'].values
+    # df_for_plots_part2['LBMdx_check'] = L2dr['LBMdx'].values
     
+    df_for_plots_part2 = df_for_plots_part2.append(L2dr[['L','Da','scaling','err_L2']]) # create tmpdf from the interesting part of L2dr
     
     print(f"saved: {fig_name}")
     
     print(f"SUMMARY:")
-    print(dfObj.to_latex(index=False, escape=False, caption=f"Da = {Da0:.2e}, "+r"P{\'e}"+f" = {Pe0:.2e}"))
+    print(df_latex.to_latex(index=False, escape=False, caption=f"Da = {Da0:.2e}, "+r"P{\'e}"+f" = {Pe0:.2e}"))
     
     pd.set_option('display.float_format', '{:.2E}'.format)
     original_stdout = sys.stdout # Save a reference to the original standard output
-    with open(os.path.join(plot_dir, f"{scalling.__name__}_latex_table.txt"), 'a+') as f:
+    with open(os.path.join(plot_dir, f"{scaling.__name__}_latex_table.txt"), 'a+') as f:
         sys.stdout = f # Change the standard output to the file we created.
-        print(dfObj.to_latex(index=False, escape=False, caption=f"Da = {Da0:.2e}, "+r"P{\'e}"+f" = {Pe0:.2e}"))
+        print(df_latex.to_latex(index=False, escape=False, caption=f"Da = {Da0:.2e}, "+r"P{\'e}"+f" = {Pe0:.2e}"))
         sys.stdout = original_stdout # Reset the standard output to its original value
     
     with pd.ExcelWriter(f"{fig_name}.xlsx") as writer:  # doctest: +SKIP
-        # dfObj = dfObj.sort_values(by=['is3D', 'Collision_Kernel', 'D', 'BC_order'])
-        dfObj.to_excel(writer, sheet_name='EnhancedTable', index=False)
+        # df_latex = df_latex.sort_values(by=['is3D', 'Collision_Kernel', 'D', 'BC_order'])
+        df_latex.to_excel(writer, sheet_name='EnhancedTable', index=False)
         # legend_df.to_excel(writer, sheet_name='EnhancedTable', startrow=len(new_df) + 2, index=False)
     
 
-print(f"DONE.")
+
+# merged_inner = pd.merge(left=df1, right=df2, left_on='key1', right_on='key2')
+# pd.merge(a, b, on=['A', 'B'])
+df_for_plots_merged_inner = pd.merge(df_for_plots_part1, df_for_plots_part2, on=['L','Da','scaling'])
+
+
+
+# df_for_plots['err_L2'] = df_for_plots_part2['err_L2'].values
+# df_for_plots['LBMdx_check'] = df_for_plots_part2['LBMdx_check'].values
+
+# df_for_plots = df_for_plots.sort_values(by=['is3D', 'Collision_Kernel', 'D', 'BC_order'])
+df_for_plots_merged_inner.to_pickle("./pickled_df.pkl")
+print(df_for_plots_merged_inner)
+
+
+print('\n\n DONE in %s [s].' % str(time.process_time() - start))
+
 # According to chapter 10.7.2, eq 10.48, p429 from 'The Lattice Boltzmann Method: Principles and Practice'
 # by T. Krüger, H. Kusumaatmaja, A. Kuzmin, O. Shardt, G. Silva, E.M. Viggen
 # There are certain values of magic_parameter that show distinctive properties:
