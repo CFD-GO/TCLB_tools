@@ -46,14 +46,24 @@ def eat_dots_for_texmaker(value):
 # CONFIG
 
 
-tc = 32                    # number of timesteps for dt=1 aka Time
-domain_size0 = 32           # initial size of the domain
-nsamples = 5                # number of resolutions
+            
+domain_size0 = 256           # initial size of the domain
+nsamples = 4                # number of resolutions
 
 initialPe = 1*5E2
-initialDa = 1E-3 # for initialDa in [1E-3, 1E0, 1E3]:
+initialDa = 1E3 # for initialDa in [1E-3, 1E0, 1E3]:
 
-diffusivity0 = 1./6. * 1E-2  # initial diffusivity
+# diffusivity0 = 1./6. * 1E-2  # initial diffusivity
+
+# acousitic, 256
+tc = 4096                    # number of timesteps for dt=1 aka Time
+diffusivity0 = 1./75         
+
+# diffusive, 256
+# tc = 32768                 # number of timesteps for dt=1 aka Time
+# diffusivity0 =  1./6. * 1E-2  
+
+     
 lambda_ph0 = initialDa*diffusivity0/domain_size0**2 
 
 # magic_parameter = 1./6     # best for pure diffusion   # to control even relaxation rate in TRT model
@@ -63,9 +73,8 @@ magic_parameter = 1./12      # best for pure advection   # to control even relax
 df_for_plots_part1 = pd.DataFrame()
 df_for_plots_part2 = pd.DataFrame()
     
-for scaling in [acoustic_scaling, diffusive_scaling]:
-
- 
+#for scaling in [acoustic_scaling, diffusive_scaling]:
+for scaling in [acoustic_scaling]:
     Ux0 = initialPe*diffusivity0/domain_size0    # macroscopic advection velocity
     
     # check Da, Pe
@@ -76,8 +85,10 @@ for scaling in [acoustic_scaling, diffusive_scaling]:
     df_latex = pd.DataFrame()
     L2 = list()
 
-    for n in np.arange(0,nsamples): # (start, stop, step=1)
-        
+    #for n in np.arange(0,nsamples): # (start, stop, step=1)
+    # np.logspace(0, -1,  num=10, base=2) 
+    for n in -np.arange(0,nsamples): # (start, stop, step=1)
+        n = int(n) # https://github.com/numpy/numpy/issues/8917
         domain_size = domain_size0 * 2**n
     
         # begin of acoustic digression  
@@ -99,17 +110,13 @@ for scaling in [acoustic_scaling, diffusive_scaling]:
         # end of acoustic digression
         
         Ux = Pe0*diffusivity/domain_size
-        
-        # box_size = box_size0 * 2**n
-        # blocks_up   = [ (point[0] * 2**n, point[1] * 2**n)  for point in blocks_up0]
-        # blocks_down = [ (point[0] * 2**n, point[1] * 2**n)  for point in blocks_down0]
-        
+                
         n_iterations = tc/lbdt
         print(f"running case {n}/{nsamples}, lbdt={lbdt}, lbdx={lbdx}, Ux={Ux:.2e} diffusivity={diffusivity:.2e} lambda_ph={lambda_ph:.2e} ")
-        assert_almost_equal((lambda_ph *  domain_size**2) / diffusivity , Da0, decimal=4)
-        assert_almost_equal(Ux*domain_size/diffusivity, Pe0, decimal=4)
-        assert_almost_equal(math.modf(n_iterations)[0] , 0, decimal=4) # check decimal places
-        
+        assert_almost_equal((lambda_ph *  domain_size**2) / diffusivity, Da0, decimal=6)
+        assert_almost_equal(Ux*domain_size/diffusivity, Pe0, decimal=6)
+        assert_almost_equal(math.modf(n_iterations)[0] , 0, decimal=6) # check decimal places
+        assert_almost_equal(math.modf(domain_size)[0] , 0, decimal=6) # check decimal places
         def getXML(**kwars):        
             # global idx
             
@@ -154,7 +161,8 @@ for scaling in [acoustic_scaling, diffusive_scaling]:
                 
 
             CLBc.addVTK()
-            CLBc.addSolve(iterations=n_iterations, vtk=int(n_iterations/10))
+            # CLBc.addSolve(iterations=n_iterations, vtk=int(n_iterations/10))
+            CLBc.addSolve(iterations=n_iterations)
             CLBc.addVTK()
             
             CLBc.write(fname+'.xml')
@@ -187,14 +195,14 @@ for scaling in [acoustic_scaling, diffusive_scaling]:
             row = {}
             for field_name in ['PhaseField']:
                 # row[field_name] = vti.get(field_name)[50,50] # get point like (50, 50)
-                row[field_name] = vti.get(field_name)[::2**n,::2**n] # get each n-th point according to scalling
+                row[field_name] = vti.get(field_name)[::2**(nsamples + n +1),::2**(nsamples + n +1)] # get each n-th point according to scalling
             
-            row['Time'] = tmp*lbdt
+            row['iteration_x_lbdt'] = tmp*lbdt
         
             data.append(row)
             
         data = pd.DataFrame.from_records(data)
-        
+        SI_time = n_iterations/(domain_size*domain_size/diffusivity)
         
         L2.append(
             {
@@ -204,7 +212,7 @@ for scaling in [acoustic_scaling, diffusive_scaling]:
                 'Da':Da0,
                 'LBMdx': lbdx,
                 'LBMdt': lbdt,
-                'SI_time': data.Time,
+                'iteration_x_lbdt': data.iteration_x_lbdt,
                 'LBM_field_slice': data.PhaseField,        # slices from all iterations
                 'LBM_field_all': vti.get('PhaseField'),    # not sliced, last iteration 
                 'LBM_Q_all': vti.get('Q'),    # not sliced, last iteration 
@@ -212,20 +220,20 @@ for scaling in [acoustic_scaling, diffusive_scaling]:
           )
                 
         df_latex = df_latex.append(pd.DataFrame({
-               'L': domain_size,
+               'L': int(domain_size),
                'n_iterations': int(n_iterations),
                # 'log2(LBMdx)': np.log2(lbdx),
                # 'log2(LBMdt)': np.log2(lbdt),
-                r'$time_{SI}$': int(data.Time.iloc[-1]),
+                r'$time_{SI}$': SI_time,
                # r'$\Lambda$': magic_parameter,
                # 'Da': int(Da),
                # 'Pe': int(Pe0),
-               r'U': Ux,
-               'M':diffusivity,
-               r'$\lambda$':lambda_ph,
+               r'U': f'{Ux:.2e}',
+               'M': f'{diffusivity:.2e}',
+               r'$\lambda$': f'{lambda_ph:.2e}',
              }, index=[n])) 
         
-        if n < nsamples-1:
+        if n < 0:
             df_for_plots_part1 = df_for_plots_part1.append(pd.DataFrame({
                    'L': domain_size,
                    'n_iterations': n_iterations,
@@ -233,7 +241,7 @@ for scaling in [acoustic_scaling, diffusive_scaling]:
                    'Pe':Pe0,
                    'MagicParameter':magic_parameter,
                    'scaling': f'{scaling.__name__}',
-                   'SI_time':data.Time.iloc[-1],
+                   'SI_time': SI_time,
                    'LBMdx':lbdx,
                    'LBMdt':lbdt,
                    'U': Ux,
@@ -244,7 +252,7 @@ for scaling in [acoustic_scaling, diffusive_scaling]:
                  }, index=[n]) ) 
         
 
-    reference = L2[-1]['LBM_field_all'][::2**n,::2**n]
+    reference = L2[0]['LBM_field_all'][::2**(len(L2)-1),::2**(len(L2)-1)]
     # single branch solution: positive IC and Lambda
     def AC0D(t, lambda_phi, phi_0):
         return np.sqrt(-1/(np.exp(-2*lambda_phi*t) - 1 - np.exp(-2*lambda_phi*t)/phi_0**2))
@@ -258,13 +266,13 @@ for scaling in [acoustic_scaling, diffusive_scaling]:
         #return  np.max(np.abs(anal - num))
         
         
-    plot_dir = f'AC_plots_2D_{scaling.__name__}'
+    plot_dir = f'AC_plots_dense2sparse_2D_{scaling.__name__}'
     if not os.path.exists(plot_dir):
         os.makedirs(plot_dir)
     
     
-    for i in range(len(L2)-1):
-        final = L2[i]['LBM_field_all'][::2**L2[i]['n'],::2**L2[i]['n']]
+    for i in range(1, len(L2)):
+        final = L2[i]['LBM_field_all'][::2**(nsamples + L2[i]['n'] - 1),::2**(nsamples + L2[i]['n']  - 1 )]
     
         L2[i]['err_field'] = np.sqrt((final - reference)**2)
         L2[i]['err_L2'] = calc_L2(reference, final)
@@ -280,11 +288,12 @@ for scaling in [acoustic_scaling, diffusive_scaling]:
         
     #### PLOT FIELDS ####
     
-    last_snapshot = len(L2)-1
+    # last_snapshot = len(L2)-1
+    first_snapshot = 0 
     plt.figure(figsize=(10, 10))
     plt.rcParams.update({'font.size': 20})
     fig = plt.gcf()  # get current figure
-    plt.imshow(L2[last_snapshot]['LBM_field_all'], cmap='coolwarm')
+    plt.imshow(L2[first_snapshot]['LBM_field_all'], cmap='coolwarm')
     plt.colorbar()
     fig.tight_layout()  # otherwise the right y-label is slightly clipped
     plt.savefig(f"{plot_dir}/"
@@ -297,7 +306,7 @@ for scaling in [acoustic_scaling, diffusive_scaling]:
     plt.figure(figsize=(10, 10))
     plt.rcParams.update({'font.size': 20})
     fig = plt.gcf()  # get current figure
-    plt.imshow(L2[last_snapshot]['LBM_Q_all'], cmap='coolwarm')
+    plt.imshow(L2[first_snapshot]['LBM_Q_all'], cmap='coolwarm')
     plt.colorbar()
     fig.tight_layout()  # otherwise the right y-label is slightly clipped
     plt.savefig(f"{plot_dir}/"
@@ -332,21 +341,21 @@ for scaling in [acoustic_scaling, diffusive_scaling]:
     ax2 = axs[1]
     
     # prepare data
-    L2dr = pd.DataFrame.from_records(L2[:-1]) # all except last one
+    L2dr = pd.DataFrame.from_records(L2[1:]) # all except first one
     
-    dt = np.logspace(np.log10(L2[0]['LBMdt']), np.log10(L2[-1]['LBMdt']),100)
-    dx = np.logspace(np.log10(L2[0]['LBMdx']), np.log10(L2[-1]['LBMdx']),100)
+    dt = np.logspace(np.log10(L2[-1]['LBMdt']), np.log10(L2[0]['LBMdt']),100)
+    dx = np.logspace(np.log10(L2[-1]['LBMdx']), np.log10(L2[0]['LBMdx']),100)
     
     # y = np.sqrt(dx)
     # y = y / y[0] * L2[0]['err_L2']
     # ax1.loglog(dx,y, label=r'${x^{1/2}}$', linewidth=2)
     
     y = dx**1
-    y = y / y[0] * L2[0]['err_L2']
+    y = y / y[0] * L2[-1]['err_L2']
     ax1.loglog(dx,y, label=r'${x}$', linewidth=2)
     
     y = dx**2
-    y = y / y[0] * L2[0]['err_L2']
+    y = y / y[0] * L2[-1]['err_L2']
     ax1.loglog(dx,y, label=r'${x^2}$', linewidth=2)
     
     
@@ -364,11 +373,11 @@ for scaling in [acoustic_scaling, diffusive_scaling]:
     # ax2.loglog(dt,y, label=r'${t^{1/2}}$')
     
     y = dt**1
-    y = y / y[0] * L2[0]['err_L2']
+    y = y / y[0] * L2[-1]['err_L2']
     ax2.loglog(dt,y, label=r'${t}$')
     
     y = dt**2
-    y = y / y[0] * L2[0]['err_L2']
+    y = y / y[0] * L2[-1]['err_L2']
     ax2.loglog(dt,y, label=r'${t^2}$')
     
     
@@ -389,9 +398,8 @@ for scaling in [acoustic_scaling, diffusive_scaling]:
     
     #### PLOT CONVERGENCE END #### 
     
-    tmp = pd.DataFrame.from_records(L2) # all except last one
-    # df_for_plots_part2['err_L2'] = L2dr['err_L2'].values
-    # df_for_plots_part2['LBMdx_check'] = L2dr['LBMdx'].values
+    # tmp = pd.DataFrame.from_records(L2) # all except last one
+
     
     df_for_plots_part2 = df_for_plots_part2.append(L2dr[['L','Da','scaling','err_L2']]) # create tmpdf from the interesting part of L2dr
     
@@ -408,7 +416,7 @@ for scaling in [acoustic_scaling, diffusive_scaling]:
         sys.stdout = original_stdout # Reset the standard output to its original value
     
     with pd.ExcelWriter(f"{fig_name}.xlsx") as writer:  # doctest: +SKIP
-        # df_latex = df_latex.sort_values(by=['is3D', 'Collision_Kernel', 'D', 'BC_order'])
+   
         df_latex.to_excel(writer, sheet_name='EnhancedTable', index=False)
         # legend_df.to_excel(writer, sheet_name='EnhancedTable', startrow=len(new_df) + 2, index=False)
     
@@ -418,13 +426,8 @@ for scaling in [acoustic_scaling, diffusive_scaling]:
 # pd.merge(a, b, on=['A', 'B'])
 df_for_plots_merged_inner = pd.merge(df_for_plots_part1, df_for_plots_part2, on=['L','Da','scaling'])
 
-
-
-# df_for_plots['err_L2'] = df_for_plots_part2['err_L2'].values
-# df_for_plots['LBMdx_check'] = df_for_plots_part2['LBMdx_check'].values
-
 # df_for_plots = df_for_plots.sort_values(by=['is3D', 'Collision_Kernel', 'D', 'BC_order'])
-df_for_plots_merged_inner.to_pickle("./pickled_df.pkl")
+df_for_plots_merged_inner.to_pickle(f"./pickled_df_Da_{Da0:.2e}_dense2sparse_samples_{nsamples}.pkl")
 print(df_for_plots_merged_inner)
 
 

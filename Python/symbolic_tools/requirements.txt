@@ -12,3 +12,4 @@ vtk
 joblib
 lxml
 vedo
+k3d
