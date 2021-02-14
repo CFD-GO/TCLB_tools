@@ -227,6 +227,7 @@ for scaling in [acoustic_scaling, diffusive_scaling]:
             df_for_plots_part1 = df_for_plots_part1.append(pd.DataFrame({
                    'L': domain_size,
                    'n_iterations': n_iterations,
+                   'CPU_cost': domain_size*domain_size*n_iterations,
                    'Da':Da0,
                    'Pe':Pe0,
                    'MagicParameter':magic_parameter,

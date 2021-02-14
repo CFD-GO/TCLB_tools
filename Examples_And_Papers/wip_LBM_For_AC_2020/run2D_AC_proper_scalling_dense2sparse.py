@@ -47,8 +47,8 @@ def eat_dots_for_texmaker(value):
 
 
             
-domain_size0 = 256           # initial size of the domain
-nsamples = 4                # number of resolutions
+domain_size0 = 512           # initial size of the domain
+nsamples = 5                # number of resolutions
 
 initialPe = 1*5E2
 initialDa = 1E3 # for initialDa in [1E-3, 1E0, 1E3]:
@@ -56,14 +56,22 @@ initialDa = 1E3 # for initialDa in [1E-3, 1E0, 1E3]:
 # diffusivity0 = 1./6. * 1E-2  # initial diffusivity
 
 # acousitic, 256
-tc = 4096                    # number of timesteps for dt=1 aka Time
-diffusivity0 = 1./75         
+# tc = 4096                    # number of timesteps for dt=1 aka Time
+# diffusivity0 = 1./75         
 
 # diffusive, 256
 # tc = 32768                 # number of timesteps for dt=1 aka Time
+# diffusivity0 = 2E-3
 # diffusivity0 =  1./6. * 1E-2  
 
+# diffusive, 256
+# diffusivity0 =  4E-3
+# tc = 16384    
      
+# diffusive, 512
+tc = 65536
+diffusivity0 =  4E-3
+
 lambda_ph0 = initialDa*diffusivity0/domain_size0**2 
 
 # magic_parameter = 1./6     # best for pure diffusion   # to control even relaxation rate in TRT model
@@ -73,8 +81,8 @@ magic_parameter = 1./12      # best for pure advection   # to control even relax
 df_for_plots_part1 = pd.DataFrame()
 df_for_plots_part2 = pd.DataFrame()
     
-#for scaling in [acoustic_scaling, diffusive_scaling]:
-for scaling in [acoustic_scaling]:
+for scaling in [acoustic_scaling, diffusive_scaling]:
+# for scaling in [acoustic_scaling]:
     Ux0 = initialPe*diffusivity0/domain_size0    # macroscopic advection velocity
     
     # check Da, Pe
@@ -112,7 +120,8 @@ for scaling in [acoustic_scaling]:
         Ux = Pe0*diffusivity/domain_size
                 
         n_iterations = tc/lbdt
-        print(f"running case {n}/{nsamples}, lbdt={lbdt}, lbdx={lbdx}, Ux={Ux:.2e} diffusivity={diffusivity:.2e} lambda_ph={lambda_ph:.2e} ")
+        SI_time = n_iterations/(domain_size*domain_size/diffusivity)
+        print(f"running case {n}/{nsamples}, lbdt={lbdt}, lbdx={lbdx} SI_time={SI_time:.2e},  Ux={Ux:.2e} diffusivity={diffusivity:.2e} lambda_ph={lambda_ph:.2e} ")
         assert_almost_equal((lambda_ph *  domain_size**2) / diffusivity, Da0, decimal=6)
         assert_almost_equal(Ux*domain_size/diffusivity, Pe0, decimal=6)
         assert_almost_equal(math.modf(n_iterations)[0] , 0, decimal=6) # check decimal places
@@ -202,7 +211,7 @@ for scaling in [acoustic_scaling]:
             data.append(row)
             
         data = pd.DataFrame.from_records(data)
-        SI_time = n_iterations/(domain_size*domain_size/diffusivity)
+        
         
         L2.append(
             {
@@ -237,6 +246,7 @@ for scaling in [acoustic_scaling]:
             df_for_plots_part1 = df_for_plots_part1.append(pd.DataFrame({
                    'L': domain_size,
                    'n_iterations': n_iterations,
+                   'CPU_cost': domain_size*domain_size*n_iterations,
                    'Da':Da0,
                    'Pe':Pe0,
                    'MagicParameter':magic_parameter,

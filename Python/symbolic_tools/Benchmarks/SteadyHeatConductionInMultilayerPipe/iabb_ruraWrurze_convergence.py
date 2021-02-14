@@ -152,12 +152,9 @@ def make_plot_for_given_conductivity(_k):
         os.makedirs('plots')
     fig_name = f'plots/grid_convergence_{collision_type}_iabb_ruraWrurze_anal_vs_lbm_k{eat_dots_for_texmaker(conductivities[_k])}.{output_format}'
 
-    params = {'legend.fontsize': 'xx-large',
-              'figure.figsize': (14, 8),
-              'axes.labelsize': 'xx-large',
-              'axes.titlesize': 'xx-large',
-              'xtick.labelsize': 'xx-large',
-              'ytick.labelsize': 'xx-large'}
+    params = {'figure.figsize': (12, 8),
+              'font.size': 20,
+              }
     pylab.rcParams.update(params)
 
     initial_error_05st = 0.070
@@ -169,7 +166,7 @@ def make_plot_for_given_conductivity(_k):
         # initial_error_1st = 0.5*(max(T_eq_L2[_k, :]) + max(T_abb_L2[_k, :]))
         y_1st = eff_pipe_diam.min()*initial_error_1st/eff_pipe_diam
         # initial_error_2nd = 0.05
-        initial_error_2nd = 0.85 * min((max(T_iabb_L2[_k, :]), max(T_abb_L2[_k, :])))
+        initial_error_2nd = 1.4 * min((max(T_iabb_L2[_k, :]), max(T_abb_L2[_k, :])))
         # initial_error_2nd = 0.85 * max((max(uz_ibb_L2[_v, :]), max(uz_bb_L2[_v, :])))
         y_2nd = eff_pipe_diam.min()*eff_pipe_diam.min()*initial_error_2nd/(eff_pipe_diam*eff_pipe_diam)
     elif solver == 'walberla':
@@ -180,8 +177,7 @@ def make_plot_for_given_conductivity(_k):
         initial_error_2nd = 0.9 * max(T_iabb_L2[_k, :])
         y_2nd = eff_pipe_diam.min()*eff_pipe_diam.min()*initial_error_2nd/(eff_pipe_diam*eff_pipe_diam)
 
-    fig1, ax1 = plt.subplots(figsize=(14, 8))
-    plt.rcParams.update({'font.size': 14})
+    fig1, ax1 = plt.subplots()
 
     ax1.plot(eff_pipe_diam, T_iabb_L2[_k, :],
              color="black", marker="x", markevery=1, markersize=8, linestyle="", linewidth=2,
@@ -211,9 +207,9 @@ def make_plot_for_given_conductivity(_k):
     ax1.get_xaxis().set_major_formatter(matplotlib.ticker.ScalarFormatter())
     # plt.title(f'Pipe within pipe Benchmark - Grid Convergence Study\n '
     #           r'$k$=' + f'{k} \t')
-    plt.xlabel(r'$D_{outer}$ [lu]', fontsize=18)
-    plt.ylabel(r'$T: \; L_2 \, error \, norm $', fontsize=18)
-    plt.tick_params(axis='both', which='major', labelsize=14)
+    plt.xlabel(r'$D_{outer}$ [lu]', fontsize=20)
+    plt.ylabel(r'$T: \; L_2 \, error \, norm $', fontsize=20)
+    plt.tick_params(axis='both', which='major', labelsize=20)
     plt.tick_params(axis='both', which='minor', labelsize=1E-16)
     plt.legend()
     plt.grid(True,  which="both")
