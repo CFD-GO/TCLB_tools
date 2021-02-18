@@ -103,7 +103,7 @@ for lbdt in 2.**-np.arange(1,11):
     #os.system("cd %s && ~/projekty/TCLB/tools/sirun.sh d2q9_AllenCahn_BGK   ./run.xml >/dev/null "%d0)
 
     # os.system("cd ~/GITHUB/LBM/TCLB && CLB/d2q9_Allen_Cahn_SOI/main example/experimental/d2q9_Allen_Cahn_SOI.xml")
-    os.system("cd %s && ~/GITHUB/LBM/TCLB/CLB/d2q9_Allen_Cahn_SOI/main ./run.xml >/dev/null"%d0)
+    os.system("cd %s && ~/GITHUB/LBM/TCLB/CLB/d2q9_SourceTerm_SOI_AllenCahn/main ./run.xml >/dev/null"%d0)
     fname_base = "run_"    
     fconfig =  wdir + '/run_config_P00_00000000.xml'
     d = wdir

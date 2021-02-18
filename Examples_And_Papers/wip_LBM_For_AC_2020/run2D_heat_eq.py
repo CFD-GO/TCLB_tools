@@ -1,16 +1,19 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Sat Aug  1 12:10:10 2020
+Created on Mon Feb 15 15:57:59 2021
 
-@author: mdzik & ggruszczynski
+@author: grzegorz
 """
+
 
 import CLB.CLBXMLWriter as CLBXML
 import CLB.CLBXMLHandler
 import CLB.VTIFile
 import os, sys
 import numpy as np
+from numpy.testing import assert_almost_equal
+from numpy.fft import fft2, fftshift, ifft2 # Python DFT
 import scipy.optimize as so
 import scipy.integrate as sint
 import glob
@@ -20,9 +23,92 @@ import pandas as pd
 import math
 import matplotlib.pyplot as plt
 import time
-from numpy.testing import assert_almost_equal
 
 start = time.process_time()
+
+####
+# Show plots in the notebook (don't use it in Python scripts)
+# %matplotlib inline 
+
+# WATCH OUT: the implementation of DFT is not 'normalized'
+# https://docs.scipy.org/doc/scipy-1.1.0/reference/tutorial/fftpack.html
+# https://numpy.org/doc/stable/reference/routines.fft.html#module-numpy.fft
+
+# https://www.unioviedo.es/compnum/labs/PYTHON/lab06_Fourier2D.html
+
+
+
+def prepare_DFT_solution(L,time,diffusivity, lambda_ph=0):
+    # Mesh on the square [0,L)x[0,L)
+    x = np.linspace(0, L-1, L) + 0.5     # columns (Width)
+    y = np.linspace(0, L-1, L) + 0.5     # rows (Height)
+    [X,Y] = np.meshgrid(x,y)
+    
+    xnorm = (X-0.5) / L * 2 * np.pi
+    ynorm = (Y-0.5) / L * 4 * np.pi
+    initial_condition = np.exp(np.sin(xnorm)) - 2*np.exp(np.sin(ynorm))
+    
+    plt.figure(figsize=(10, 10))
+    
+    plt.imshow(initial_condition, cmap = 'gray') # coolwarm
+    fig = plt.gcf()  # get current figure
+    plt.colorbar()
+    plt.close(fig)
+    
+    F = fft2(initial_condition)   
+    ################ some tests... ################
+    
+    ################ check FFT
+                       
+    Fshift = fftshift(F) # center it in the origin
+    Fshift = Fshift/(L*L)  # normalize by the area
+    P = np.abs(Fshift) 
+    # P = np.real(Fshift)  
+    # P = np.imag(Fshift)   
+     
+    plt.figure(figsize=(10, 10))                        
+    plt.imshow(P, extent = [-L,L,-L,L]);
+    fig = plt.gcf()  # get current figure
+    plt.colorbar()    
+    plt.close(fig)    
+        
+        
+    ################ check inverse FFT
+    yinv = ifft2(F)
+    # P = np.abs(yinv)    
+    P = np.real(yinv)  # TODO: czemu to?
+    # P = np.imag(yinv)   
+    
+    plt.figure(figsize=(10, 10))     
+    plt.imshow(P, cmap = 'gray') # it is wise to check: P-initial_condition
+    fig = plt.gcf()  # get current figure
+    plt.colorbar()    
+    plt.close(fig)    
+        
+    ################ end of tests... ################
+       
+        
+    decay=np.zeros((L,L))
+    for m in range(L):
+        # print(f"calculating decay-m: {m}")
+        for n in range(L):
+            tmp = -(diffusivity**2)*(np.pi**2) * (((m/L)**2)+((n/L)**2)) * time
+            decay[m,n] = np.exp(tmp)
+        
+    # https://stackoverflow.com/questions/40034993/how-to-get-element-wise-matrix-multiplication-hadamard-product-in-numpy
+    # dummy_decay  = np.ones(decay.shape)
+    yinv = ifft2(np.multiply(F,decay))
+    # P = np.abs(yinv)  
+    P = np.real(yinv)   # TODO: czemu to?
+    # P = np.imag(yinv)   
+    plt.figure(figsize=(10, 10))     
+    plt.imshow(P, cmap = 'gray') # it is wise to check: P-IC
+    fig = plt.gcf()  # get current figure
+    plt.colorbar()  
+    plt.close(fig)      
+    # 
+    return P
+
 
 
 def reactive_scaling(n):
@@ -45,14 +131,18 @@ def eat_dots_for_texmaker(value):
 # CONFIG
 
 
-tc = 512                    # number of timesteps for dt=1 aka Time
-domain_size0 = 32           # initial size of the domain
-nsamples = 4                # number of resolutions
+tc = 2*512                    # number of timesteps for dt=1 aka Time
+domain_size0 = 4*32           # initial size of the domain
+nsamples = 1                # number of resolutions
 
-initialPe = 1*5E2
-initialDa = 1E3 # for initialDa in [1E-3, 1E0, 1E3]:
+# initialPe = 1*5E2
+initialPe = 0*5E2
+# initialDa = 1E3 # for initialDa in [1E-3, 1E0, 1E3]:
+initialDa = 1E-1 # for initialDa in [1E-3, 1E0, 1E3]:
 
-diffusivity0 = 1./6. * 1E-2  # initial diffusivity
+# diffusivity0 = 1./6. * 1E-2  # initial diffusivity
+# diffusivity0 = 1./6. * 1E-1  # initial diffusivity
+diffusivity0 = 1./6.  # initial diffusivity
 lambda_ph0 = initialDa*diffusivity0/domain_size0**2 
 
 # magic_parameter = 1./6     # best for pure diffusion   # to control even relaxation rate in TRT model
@@ -161,7 +251,7 @@ for scaling in [acoustic_scaling]:
         wdir = d0 + '/output'
         
         # os.system("cd %s && ~/projekty/TCLB/tools/sirun.sh d2q9_Allen_Cahn_SOI   ./run.xml >/dev/null"%d0)
-        os.system(f"cd {d0} && ~/GITHUB/LBM/TCLB/CLB/d2q9_SourceTerm_SOI_AllenCahn/main ./run.xml > log.txt")
+        os.system(f"cd {d0} && ~/GITHUB/LBM/TCLB/CLB/d2q9_SourceTerm_SOI_ExpotentialDecay/main ./run.xml > log.txt")
         
         fname_base = "run_"    
         fconfig =  wdir + '/run_config_P00_00000000.xml'
@@ -242,14 +332,16 @@ for scaling in [acoustic_scaling]:
                  }, index=[n]) ) 
         
 
-    reference = L2[-1]['LBM_field_all'][::2**n,::2**n]
+    # reference = L2[-1]['LBM_field_all'][::2**n,::2**n] # use LBM results
     # single branch solution: positive IC and Lambda
     def AC0D(t, lambda_phi, phi_0):
         return np.sqrt(-1/(np.exp(-2*lambda_phi*t) - 1 - np.exp(-2*lambda_phi*t)/phi_0**2))
 
     # reference =  AC0D(tc, lambda_ph0, 10)
-
     
+
+    full_reference = prepare_DFT_solution(domain_size,n_iterations,diffusivity, lambda_ph=0)
+    reference = full_reference[::2**n,::2**n]
     def calc_L2(anal, num):
         # Eq. 4.57
         return np.sqrt(np.sum((anal - num) * (anal - num)) / np.sum(anal * anal))    
@@ -261,20 +353,41 @@ for scaling in [acoustic_scaling]:
         os.makedirs(plot_dir)
     
     
-    for i in range(len(L2)-1):
+    for i in range(len(L2)):
         final = L2[i]['LBM_field_all'][::2**L2[i]['n'],::2**L2[i]['n']]
     
         L2[i]['err_field'] = np.sqrt((final - reference)**2)
         L2[i]['err_L2'] = calc_L2(reference, final)
     
         
-    
-        # plt.figure()
-        # fig = plt.gcf()  # get current figure
-        # plt.imshow(L2[i]['err_field'])
-        # plt.savefig(f'{plot_dir}/AC_LBM_2D_err_field_{i}_{L2[i][r"LBMdt"]:.1e}_diffusivity0_{diffusivity0:.2e}_lambda_ph0_{lambda_ph0:.2e}.png', dpi=300)
-        # plt.close(fig)
-        # plt.show()
+        if i == len(L2)-1:
+            plt.figure(figsize=(10, 10))
+            plt.rcParams.update({'font.size': 20})
+            fig = plt.gcf()  # get current figure
+            plt.imshow(L2[i]['err_field'], cmap='coolwarm')
+            plt.colorbar()
+            fig.tight_layout()  # otherwise the right y-label is slightly clipped
+            plt.savefig(f"{plot_dir}/"
+                        f"AC_LBM_2D_err_field_{i}"
+                        f"_diffusivity0_{diffusivity0:.2e}"
+                        f"_lambda_ph0_{lambda_ph0:.2e}.png", dpi=300)
+            plt.show()
+            plt.close(fig)
+            
+            
+            plt.figure(figsize=(10, 10))
+            plt.rcParams.update({'font.size': 20})
+            fig = plt.gcf()  # get current figure
+            plt.imshow(full_reference, cmap='coolwarm')
+            plt.colorbar()
+            fig.tight_layout()  # otherwise the right y-label is slightly clipped
+            plt.savefig(f"{plot_dir}/"
+                        f"full_reference_solution"
+                        f"_diffusivity0_{diffusivity0:.2e}"
+                        f"_lambda_ph0_{lambda_ph0:.2e}.png", dpi=300)
+            plt.show()
+            plt.close(fig)
+        
         
     #### PLOT FIELDS ####
     
@@ -286,7 +399,7 @@ for scaling in [acoustic_scaling]:
     plt.colorbar()
     fig.tight_layout()  # otherwise the right y-label is slightly clipped
     plt.savefig(f"{plot_dir}/"
-                f"{scaling.__name__}_2D_phase_field_tc_{tc}"
+                f"{scaling.__name__}_2D_field_last_tc_{tc}"
                 f"_Da_{eat_dots_for_texmaker(Da0)}"
                 f"_Pe_{eat_dots_for_texmaker(Pe0)}"
                 ".png", dpi=300)

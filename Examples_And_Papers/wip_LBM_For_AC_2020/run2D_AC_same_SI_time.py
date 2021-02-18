@@ -137,7 +137,7 @@ for n in np.arange(0,nsamples): # (start, stop, step=1)
     wdir = d0 + '/output'
     
     # os.system("cd %s && ~/projekty/TCLB/tools/sirun.sh d2q9_Allen_Cahn_SOI   ./run.xml >/dev/null"%d0)
-    os.system(f"cd {d0} && ~/GITHUB/LBM/TCLB/CLB/d2q9_Allen_Cahn_SOI/main ./run.xml > log.txt")
+    os.system(f"cd {d0} && ~/GITHUB/LBM/TCLB/CLB/d2q9_SourceTerm_SOI_AllenCahn/main ./run.xml > log.txt")
     
     fname_base = "run_"    
     fconfig =  wdir + '/run_config_P00_00000000.xml'
