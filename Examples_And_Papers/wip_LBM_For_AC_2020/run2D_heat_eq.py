@@ -86,14 +86,22 @@ def prepare_DFT_solution(L,time,diffusivity, lambda_ph=0):
     plt.close(fig)    
         
     ################ end of tests... ################
-       
+    n = L
+    x2 = np.array([ float(i) if i < n/2 else float(-(n-i)) for i in range(0,n)])
+    k2, k1 = np.meshgrid(x2, x2)
+    
+    k1 *= 2.*np.pi/L
+    k2 *= 2.*np.pi/L
+    tmp = -diffusivity0 * tc* (k1**2+ k2**2)
+    decay = np.exp(tmp)
+
         
-    decay=np.zeros((L,L))
-    for m in range(L):
-        # print(f"calculating decay-m: {m}")
-        for n in range(L):
-            tmp = -(diffusivity**2)*(np.pi**2) * (((m/L)**2)+((n/L)**2)) * time
-            decay[m,n] = np.exp(tmp)
+    # decay=np.zeros((L,L))
+    # for m in range(L):
+    #     # print(f"calculating decay-m: {m}")
+    #     for n in range(L):
+    #         tmp = -(diffusivity)*(np.pi**2) * (((m/L)**2)+((n/L)**2)) * time
+    #         decay[m,n] = np.exp(tmp)
         
     # https://stackoverflow.com/questions/40034993/how-to-get-element-wise-matrix-multiplication-hadamard-product-in-numpy
     # dummy_decay  = np.ones(decay.shape)
@@ -131,18 +139,17 @@ def eat_dots_for_texmaker(value):
 # CONFIG
 
 
-tc = 2*512                    # number of timesteps for dt=1 aka Time
-domain_size0 = 4*32           # initial size of the domain
-nsamples = 1                # number of resolutions
+tc = 512                    # number of timesteps for dt=1 aka Time
+domain_size0 = 2*32           # initial size of the domain
+nsamples = 4                # number of resolutions
 
 # initialPe = 1*5E2
 initialPe = 0*5E2
 # initialDa = 1E3 # for initialDa in [1E-3, 1E0, 1E3]:
-initialDa = 1E-1 # for initialDa in [1E-3, 1E0, 1E3]:
+initialDa = 1E0 # for initialDa in [1E-3, 1E0, 1E3]:
 
-# diffusivity0 = 1./6. * 1E-2  # initial diffusivity
-# diffusivity0 = 1./6. * 1E-1  # initial diffusivity
-diffusivity0 = 1./6.  # initial diffusivity
+diffusivity0 = 1./6. * 1E-2  # initial diffusivity
+
 lambda_ph0 = initialDa*diffusivity0/domain_size0**2 
 
 # magic_parameter = 1./6     # best for pure diffusion   # to control even relaxation rate in TRT model
@@ -340,7 +347,7 @@ for scaling in [acoustic_scaling]:
     # reference =  AC0D(tc, lambda_ph0, 10)
     
 
-    full_reference = prepare_DFT_solution(domain_size,n_iterations,diffusivity, lambda_ph=0)
+    full_reference = prepare_DFT_solution(domain_size,n_iterations,diffusivity, lambda_ph=lambda_phi)
     reference = full_reference[::2**n,::2**n]
     def calc_L2(anal, num):
         # Eq. 4.57
@@ -348,7 +355,7 @@ for scaling in [acoustic_scaling]:
         #return  np.max(np.abs(anal - num))
         
         
-    plot_dir = f'AC_plots_sparse2dense_2D_{scaling.__name__}'
+    plot_dir = f'heat_plots_sparse2dense_2D_{scaling.__name__}'
     if not os.path.exists(plot_dir):
         os.makedirs(plot_dir)
     
@@ -360,49 +367,54 @@ for scaling in [acoustic_scaling]:
         L2[i]['err_L2'] = calc_L2(reference, final)
     
         
+    
+        plt.figure(figsize=(10, 10))
+        plt.rcParams.update({'font.size': 20})
+        fig = plt.gcf()  # get current figure
+        plt.imshow(L2[i]['err_field'], cmap='coolwarm')
+        plt.colorbar()
+        plt.title(f'err_field') 
+        fig.tight_layout()  # otherwise the right y-label is slightly clipped
+        plt.savefig(f"{plot_dir}/"
+                    f"heat_LBM_2D_err_field_{i}"
+                    f"_diffusivity0_{diffusivity0:.2e}"
+                    f"_lambda_ph0_{lambda_ph0:.2e}.png", dpi=300)
+        plt.show()
+        plt.close(fig)
+        
         if i == len(L2)-1:
-            plt.figure(figsize=(10, 10))
-            plt.rcParams.update({'font.size': 20})
-            fig = plt.gcf()  # get current figure
-            plt.imshow(L2[i]['err_field'], cmap='coolwarm')
-            plt.colorbar()
-            fig.tight_layout()  # otherwise the right y-label is slightly clipped
-            plt.savefig(f"{plot_dir}/"
-                        f"AC_LBM_2D_err_field_{i}"
-                        f"_diffusivity0_{diffusivity0:.2e}"
-                        f"_lambda_ph0_{lambda_ph0:.2e}.png", dpi=300)
-            plt.show()
-            plt.close(fig)
-            
-            
             plt.figure(figsize=(10, 10))
             plt.rcParams.update({'font.size': 20})
             fig = plt.gcf()  # get current figure
             plt.imshow(full_reference, cmap='coolwarm')
             plt.colorbar()
             fig.tight_layout()  # otherwise the right y-label is slightly clipped
+            plt.title(f'reference solution') 
             plt.savefig(f"{plot_dir}/"
                         f"full_reference_solution"
                         f"_diffusivity0_{diffusivity0:.2e}"
                         f"_lambda_ph0_{lambda_ph0:.2e}.png", dpi=300)
             plt.show()
             plt.close(fig)
-        
+            
         
     #### PLOT FIELDS ####
     
     last_snapshot = len(L2)-1
+    
     plt.figure(figsize=(10, 10))
     plt.rcParams.update({'font.size': 20})
     fig = plt.gcf()  # get current figure
     plt.imshow(L2[last_snapshot]['LBM_field_all'], cmap='coolwarm')
     plt.colorbar()
     fig.tight_layout()  # otherwise the right y-label is slightly clipped
+    plt.title(f'LBM solution') 
     plt.savefig(f"{plot_dir}/"
                 f"{scaling.__name__}_2D_field_last_tc_{tc}"
                 f"_Da_{eat_dots_for_texmaker(Da0)}"
                 f"_Pe_{eat_dots_for_texmaker(Pe0)}"
                 ".png", dpi=300)
+    plt.show()
     plt.close(fig)
         
     plt.figure(figsize=(10, 10))

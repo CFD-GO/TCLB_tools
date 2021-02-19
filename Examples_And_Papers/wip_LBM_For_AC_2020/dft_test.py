@@ -39,23 +39,43 @@ import time
 
 
 
-L = 128
-diffusivity0 = 1./6. * 1E-1
-tc = 100*32*512. # time count
+# L = 128
+diffusivity0 = 1
+tc = 0.01
 
-
+L = 2
+n = 100+1
 ################ END OF SETUP ################
 
 
 # Mesh on the square [0,L)x[0,L)
 
-x = np.linspace(0, L-1, L) + 0.5     # columns (Width)
-y = np.linspace(0, L-1, L) + 0.5     # rows (Height)
-[X,Y] = np.meshgrid(x,y)
+# x = np.linspace(0, L-1, L) + 0.5     # columns (Width)
+# y = np.linspace(0, L-1, L) + 0.5     # rows (Height)
+# [X,Y] = np.meshgrid(x,y)
 
-xnorm = (X-0.5) / L * 2 * np.pi
-ynorm = (Y-0.5) / L * 4 * np.pi
-initial_condition = np.exp(np.sin(xnorm)) - 2*np.exp(np.sin(ynorm))
+# xnorm = (X-0.5) / L * 2 * np.pi
+# ynorm = (Y-0.5) / L * 4 * np.pi
+# initial_condition = np.exp(np.sin(xnorm)) - 2*np.exp(np.sin(ynorm))
+
+
+x = np.linspace(0, L, n, endpoint=True) 
+y = np.linspace(0, L, n, endpoint=True)
+xx, yy = np.meshgrid(x, y)
+
+initial_condition = np.zeros((n, n))
+
+
+def get_r_from_xy(x, y, x0=0, y0=0):
+    r = np.sqrt(pow(x0 - x, 2) + pow(y0 - y, 2))
+    return r
+
+for i in range(n):
+    for j in range(n):
+        r = get_r_from_xy(xx[i][j], yy[i][j], L/2., L/2.)
+        if r < 0.25:
+            initial_condition[i, j] = 1
+
 
 plt.figure(figsize=(10, 10))
 plt.title(f'initial_condition')
@@ -98,14 +118,23 @@ plt.show()
     
 ################ end of tests... ################
    
-    
-decay=np.zeros((L,L))
-for m in range(L):
-    # print(f"calculating decay-m: {m}")
-    for n in range(L):
-        # print(f"calculating decay-n: {n}")
-        tmp = -diffusivity0*diffusivity0 * tc* ((m*np.pi/L)**2+(n*np.pi/L)**2)
-        decay[m,n] = np.exp(tmp)
+x2 = np.array([ float(i) if i < n/2. else float(-(n-i)) for i in range(0,n)])
+k2, k1 = np.meshgrid(x2, x2)
+
+k1 *= 2.*np.pi/L
+k2 *= 2.*np.pi/L
+tmp = -diffusivity0 * tc* (k1**2+ k2**2)
+decay = np.exp(tmp)
+
+# decay=np.zeros((n,n))
+# for m in range(L):
+#     # print(f"calculating decay-m: {m}")
+#     for n in range(L):
+#         # print(f"calculating decay-n: {n}")
+#         k1 *= m*2*np.pi/L
+#         k2 *= n*2*np.pi/L
+#         tmp = -diffusivity0 * tc* (k1**2+ k2**2)
+#         decay[m,n] = np.exp(tmp)
     
     
 # https://stackoverflow.com/questions/40034993/how-to-get-element-wise-matrix-multiplication-hadamard-product-in-numpy
