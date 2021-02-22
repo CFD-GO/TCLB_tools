@@ -38,7 +38,7 @@ start = time.process_time()
 
 
 
-def prepare_DFT_solution(L,time,diffusivity, lambda_ph=0):
+def prepare_DFT_solution(L,time,diffusivity, lambda_phi):
     # Mesh on the square [0,L)x[0,L)
     x = np.linspace(0, L-1, L)      # columns (Width)
     y = np.linspace(0, L-1, L)      # rows (Height)
@@ -47,7 +47,7 @@ def prepare_DFT_solution(L,time,diffusivity, lambda_ph=0):
     xnorm = X / L * 2 * np.pi
     ynorm = Y / L * 4 * np.pi
     initial_condition = np.exp(np.sin(xnorm)) - 2*np.exp(np.sin(ynorm))
-    
+    # initial_condition = np.cos(xnorm *0) 
     plt.figure(figsize=(10, 10))
     
     plt.imshow(initial_condition, cmap = 'gray') # coolwarm
@@ -88,27 +88,34 @@ def prepare_DFT_solution(L,time,diffusivity, lambda_ph=0):
     ################ end of tests... ################
     n = L
     x2 = np.array([ float(i) if i < n/2 else float(-(n-i)) for i in range(0,n)])
-    k1, k2 = np.meshgrid(x2, x2)
+    k2, k1 = np.meshgrid(x2, x2)
     
     k1 *= 2.*np.pi/L
     k2 *= 2.*np.pi/L
-    tmp = -diffusivity * time* (k1**2+ k2**2)
+    tmp = -time*(diffusivity*(k1**2+ k2**2 ) + lambda_phi)
     decay = np.exp(tmp)
 
     # https://stackoverflow.com/questions/40034993/how-to-get-element-wise-matrix-multiplication-hadamard-product-in-numpy
     # dummy_decay  = np.ones(decay.shape)
     yinv = ifft2(np.multiply(F,decay))
     # P = np.abs(yinv)  
-    P = np.real(yinv)
-    # P = np.imag(yinv)   # ignore artifacts
+    P = np.real(yinv) # ignore imaginary artifacts
+    # P = np.imag(yinv)   
+    
+   # test with analytical solutions
+    # k=1 # 2*np.pi*0.001
+    # tmp = -time*(diffusivity*(k**2) + lambda_phi)
+    # P = np.cos(xnorm *k) * np.exp(tmp)
+    
     
     plt.figure(figsize=(10, 10))     
     plt.imshow(P, cmap = 'gray') # it is wise to check: P-IC
     fig = plt.gcf()  # get current figure
     plt.colorbar()  
     plt.close(fig)      
-
     
+    
+
     return P
 
 
@@ -135,14 +142,14 @@ def eat_dots_for_texmaker(value):
 # CONFIG
 
 
-tc = 512                    # number of timesteps for dt=1 aka Time
+tc = 256                    # number of timesteps for dt=1 aka Time
 domain_size0 = 32           # initial size of the domain
 nsamples = 4               # number of resolutions
 
 # initialPe = 1*5E2
 initialPe = 0*5E2
 # initialDa = 1E3 # for initialDa in [1E-3, 1E0, 1E3]:
-initialDa = 1E0 # for initialDa in [1E-3, 1E0, 1E3]:
+initialDa = 1E3 # for initialDa in [1E-3, 1E0, 1E3]:
 
 diffusivity0 = 1./6. * 1E-2  # initial diffusivity
 
@@ -237,6 +244,10 @@ for scaling in [acoustic_scaling]:
                     y = (y - 0.5)/ ({domain_size}) * 4 * pi
                     Solver$Fields$Init_PhaseField_External[] = exp(sin(x)) - 2*exp(sin(y)) # to benchmark diffusion & source term
                     # Solver$Fields$Init_PhaseField_External[] = 10 # to benchmark the source term only
+                    
+                    # k=0
+                    # Solver$Fields$Init_PhaseField_External[] = cos(x*k) # benchmark with analytical HT
+                  
                     Solver$Actions$InitFromFields()        
                 """.format(domain_size=domain_size))
                 
@@ -334,7 +345,7 @@ for scaling in [acoustic_scaling]:
                    'lambda0': lambda_ph0,
                  }, index=[n]) ) 
         
-        L2[n]['dft_full_reference'] = prepare_DFT_solution(domain_size,n_iterations,diffusivity, lambda_ph=lambda_ph)
+        L2[n]['dft_full_reference'] = prepare_DFT_solution(domain_size,n_iterations,diffusivity, lambda_phi=lambda_ph)
         
         
     # reference = L2[-1]['LBM_field_all'][::2**n,::2**n] # use LBM results
@@ -371,6 +382,10 @@ for scaling in [acoustic_scaling]:
         # final = L2[i]['LBM_field_all']
         # reference = L2[i]['dft_full_reference']
         
+        # LBM vs finest LBM
+        # final = L2[i]['LBM_field_all'][::2**L2[i]['n'],::2**L2[i]['n']]
+        # reference = L2[-1]['LBM_field_all'][::2**n,::2**n]
+        
         # USE THIS: LBM vs finest DFT
         final = L2[i]['LBM_field_all'][::2**L2[i]['n'],::2**L2[i]['n']]
         reference = L2[-1]['dft_full_reference'][::2**n,::2**n]
@@ -396,23 +411,18 @@ for scaling in [acoustic_scaling]:
         
         
         
-        # linie
-        x_axis = np.arange(L2[i]["L"])
-        fig, ax = plt.subplots(figsize=(10, 10))    
-        ax.plot(x_axis,L2[i]['LBM_field_all'][int(L2[i]["L"]/2),:], label=r'LBM', marker="o", linewidth=0)
-        # ax.plot(x_axis,reference[int(L2[i]["L"]/2),:], label=r'DFT', marker="x", linewidth=0)
-        ax.plot(x_axis,L2[i]['dft_full_reference'][int(L2[i]["L"]/2),:], label=r'DFT', marker="x", linewidth=0)
-        
-        
-        ax.legend()
-        ax.grid(True)
-        plt.title(f"Slice for L={L2[i]['L']}") 
-        ax.set(xlabel=r'$[lu]$', ylabel=r'$\phi$')
-        fig.tight_layout()
-        plt.show()
-        plt.close(fig)
-        
-        
+        # SLICE
+        # x_axis = np.arange(L2[i]["L"])
+        # fig, ax = plt.subplots(figsize=(10, 10))    
+        # ax.plot(x_axis,L2[i]['LBM_field_all'][int(L2[i]["L"]/2),:], label=r'LBM', marker="o", linewidth=0)
+        # ax.plot(x_axis,L2[i]['dft_full_reference'][int(L2[i]["L"]/2),:], label=r'DFT', marker="x", linewidth=0)
+        # ax.legend()
+        # ax.grid(True)
+        # plt.title(f"Slice for L={L2[i]['L']}") 
+        # ax.set(xlabel=r'$[lu]$', ylabel=r'$\phi$')
+        # fig.tight_layout()
+        # plt.show()
+        # plt.close(fig)
         
         if i == len(L2)-1:
             plt.figure(figsize=(10, 10))
@@ -489,7 +499,8 @@ for scaling in [acoustic_scaling]:
     ax2 = axs[1]
     
     # prepare data
-    L2dr = pd.DataFrame.from_records(L2[:-1]) # all except last one
+    # L2dr = pd.DataFrame.from_records(L2[:-1]) # all except last one
+    L2dr = pd.DataFrame.from_records(L2) 
     
     dt = np.logspace(np.log10(L2[0]['LBMdt']), np.log10(L2[-1]['LBMdt']),100)
     dx = np.logspace(np.log10(L2[0]['LBMdx']), np.log10(L2[-1]['LBMdx']),100)
