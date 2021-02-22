@@ -40,12 +40,12 @@ start = time.process_time()
 
 def prepare_DFT_solution(L,time,diffusivity, lambda_ph=0):
     # Mesh on the square [0,L)x[0,L)
-    x = np.linspace(0, L-1, L) + 0.5     # columns (Width)
-    y = np.linspace(0, L-1, L) + 0.5     # rows (Height)
+    x = np.linspace(0, L-1, L)      # columns (Width)
+    y = np.linspace(0, L-1, L)      # rows (Height)
     [X,Y] = np.meshgrid(x,y)
-    
-    xnorm = (X-0.5) / L * 2 * np.pi
-    ynorm = (Y-0.5) / L * 4 * np.pi
+        
+    xnorm = X / L * 2 * np.pi
+    ynorm = Y / L * 4 * np.pi
     initial_condition = np.exp(np.sin(xnorm)) - 2*np.exp(np.sin(ynorm))
     
     plt.figure(figsize=(10, 10))
@@ -60,63 +60,59 @@ def prepare_DFT_solution(L,time,diffusivity, lambda_ph=0):
     
     ################ check FFT
                        
-    Fshift = fftshift(F) # center it in the origin
-    Fshift = Fshift/(L*L)  # normalize by the area
-    P = np.abs(Fshift) 
-    # P = np.real(Fshift)  
-    # P = np.imag(Fshift)   
+    # Fshift = fftshift(F) # center it in the origin
+    # Fshift = Fshift/(L*L)  # normalize by the area
+    # P = np.abs(Fshift) 
+    # # P = np.real(Fshift)  
+    # # P = np.imag(Fshift)   
      
-    plt.figure(figsize=(10, 10))                        
-    plt.imshow(P, extent = [-L,L,-L,L]);
-    fig = plt.gcf()  # get current figure
-    plt.colorbar()    
-    plt.close(fig)    
+    # plt.figure(figsize=(10, 10))                        
+    # plt.imshow(P, extent = [-L,L,-L,L]);
+    # fig = plt.gcf()  # get current figure
+    # plt.colorbar()    
+    # plt.close(fig)    
         
         
-    ################ check inverse FFT
-    yinv = ifft2(F)
-    # P = np.abs(yinv)    
-    P = np.real(yinv)  # TODO: czemu to?
-    # P = np.imag(yinv)   
+    # ################ check inverse FFT
+    # yinv = ifft2(F)
+    # # P = np.abs(yinv)    
+    # P = np.real(yinv)  # TODO: czemu to?
+    # # P = np.imag(yinv)   
     
-    plt.figure(figsize=(10, 10))     
-    plt.imshow(P, cmap = 'gray') # it is wise to check: P-initial_condition
-    fig = plt.gcf()  # get current figure
-    plt.colorbar()    
-    plt.close(fig)    
+    # plt.figure(figsize=(10, 10))     
+    # plt.imshow(P, cmap = 'gray') # it is wise to check: P-initial_condition
+    # fig = plt.gcf()  # get current figure
+    # plt.colorbar()    
+    # plt.close(fig)    
         
     ################ end of tests... ################
     n = L
     x2 = np.array([ float(i) if i < n/2 else float(-(n-i)) for i in range(0,n)])
-    k2, k1 = np.meshgrid(x2, x2)
+    k1, k2 = np.meshgrid(x2, x2)
     
     k1 *= 2.*np.pi/L
     k2 *= 2.*np.pi/L
-    tmp = -diffusivity0 * tc* (k1**2+ k2**2)
+    tmp = -diffusivity * time* (k1**2+ k2**2)
     decay = np.exp(tmp)
 
-        
-    # decay=np.zeros((L,L))
-    # for m in range(L):
-    #     # print(f"calculating decay-m: {m}")
-    #     for n in range(L):
-    #         tmp = -(diffusivity)*(np.pi**2) * (((m/L)**2)+((n/L)**2)) * time
-    #         decay[m,n] = np.exp(tmp)
-        
     # https://stackoverflow.com/questions/40034993/how-to-get-element-wise-matrix-multiplication-hadamard-product-in-numpy
     # dummy_decay  = np.ones(decay.shape)
     yinv = ifft2(np.multiply(F,decay))
     # P = np.abs(yinv)  
-    P = np.real(yinv)   # TODO: czemu to?
-    # P = np.imag(yinv)   
+    P = np.real(yinv)
+    # P = np.imag(yinv)   # ignore artifacts
+    
     plt.figure(figsize=(10, 10))     
     plt.imshow(P, cmap = 'gray') # it is wise to check: P-IC
     fig = plt.gcf()  # get current figure
     plt.colorbar()  
     plt.close(fig)      
-    # 
+
+    
     return P
 
+
+    
 
 
 def reactive_scaling(n):
@@ -140,8 +136,8 @@ def eat_dots_for_texmaker(value):
 
 
 tc = 512                    # number of timesteps for dt=1 aka Time
-domain_size0 = 2*32           # initial size of the domain
-nsamples = 4                # number of resolutions
+domain_size0 = 32           # initial size of the domain
+nsamples = 4               # number of resolutions
 
 # initialPe = 1*5E2
 initialPe = 0*5E2
@@ -338,7 +334,9 @@ for scaling in [acoustic_scaling]:
                    'lambda0': lambda_ph0,
                  }, index=[n]) ) 
         
-
+        L2[n]['dft_full_reference'] = prepare_DFT_solution(domain_size,n_iterations,diffusivity, lambda_ph=lambda_ph)
+        
+        
     # reference = L2[-1]['LBM_field_all'][::2**n,::2**n] # use LBM results
     # single branch solution: positive IC and Lambda
     def AC0D(t, lambda_phi, phi_0):
@@ -347,8 +345,8 @@ for scaling in [acoustic_scaling]:
     # reference =  AC0D(tc, lambda_ph0, 10)
     
 
-    full_reference = prepare_DFT_solution(domain_size,n_iterations,diffusivity, lambda_ph=lambda_phi)
-    reference = full_reference[::2**n,::2**n]
+    # full_reference_dft = prepare_DFT_solution(domain_size,n_iterations,diffusivity, lambda_ph=lambda_ph)
+    # reference = full_reference_dft[::2**n,::2**n]
     def calc_L2(anal, num):
         # Eq. 4.57
         return np.sqrt(np.sum((anal - num) * (anal - num)) / np.sum(anal * anal))    
@@ -361,8 +359,22 @@ for scaling in [acoustic_scaling]:
     
     
     for i in range(len(L2)):
+        # DFT benchmark - self convergence --> numerical precision
+        # final = L2[i]['dft_full_reference'][::2**L2[i]['n'],::2**L2[i]['n']]
+        # reference = L2[-1]['dft_full_reference'][::2**n,::2**n]
+        
+        # LBM vs DFT - same mesh, selected points - 2nd convergence
+        # final = L2[i]['LBM_field_all'][::2**L2[i]['n'],::2**L2[i]['n']]
+        # reference = L2[i]['dft_full_reference'][::2**L2[i]['n'],::2**L2[i]['n']]
+        
+        # LBM vs DFT - same mesh, all points - 2nd convergence
+        # final = L2[i]['LBM_field_all']
+        # reference = L2[i]['dft_full_reference']
+        
+        # USE THIS: LBM vs finest DFT
         final = L2[i]['LBM_field_all'][::2**L2[i]['n'],::2**L2[i]['n']]
-    
+        reference = L2[-1]['dft_full_reference'][::2**n,::2**n]
+        
         L2[i]['err_field'] = np.sqrt((final - reference)**2)
         L2[i]['err_L2'] = calc_L2(reference, final)
     
@@ -382,11 +394,31 @@ for scaling in [acoustic_scaling]:
         plt.show()
         plt.close(fig)
         
+        
+        
+        # linie
+        x_axis = np.arange(L2[i]["L"])
+        fig, ax = plt.subplots(figsize=(10, 10))    
+        ax.plot(x_axis,L2[i]['LBM_field_all'][int(L2[i]["L"]/2),:], label=r'LBM', marker="o", linewidth=0)
+        # ax.plot(x_axis,reference[int(L2[i]["L"]/2),:], label=r'DFT', marker="x", linewidth=0)
+        ax.plot(x_axis,L2[i]['dft_full_reference'][int(L2[i]["L"]/2),:], label=r'DFT', marker="x", linewidth=0)
+        
+        
+        ax.legend()
+        ax.grid(True)
+        plt.title(f"Slice for L={L2[i]['L']}") 
+        ax.set(xlabel=r'$[lu]$', ylabel=r'$\phi$')
+        fig.tight_layout()
+        plt.show()
+        plt.close(fig)
+        
+        
+        
         if i == len(L2)-1:
             plt.figure(figsize=(10, 10))
             plt.rcParams.update({'font.size': 20})
             fig = plt.gcf()  # get current figure
-            plt.imshow(full_reference, cmap='coolwarm')
+            plt.imshow(L2[i]['dft_full_reference'], cmap='coolwarm')
             plt.colorbar()
             fig.tight_layout()  # otherwise the right y-label is slightly clipped
             plt.title(f'reference solution') 
@@ -396,6 +428,9 @@ for scaling in [acoustic_scaling]:
                         f"_lambda_ph0_{lambda_ph0:.2e}.png", dpi=300)
             plt.show()
             plt.close(fig)
+            
+            
+
             
         
     #### PLOT FIELDS ####
