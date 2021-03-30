@@ -144,7 +144,7 @@ def eat_dots_for_texmaker(value):
 
 tc = 256                    # number of timesteps for dt=1 aka Time
 domain_size0 = 32           # initial size of the domain
-nsamples = 4               # number of resolutions
+nsamples = 4                # number of resolutions
 
 # initialPe = 1*5E2
 initialPe = 0*5E2

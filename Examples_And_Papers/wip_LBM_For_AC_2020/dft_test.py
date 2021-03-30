@@ -106,7 +106,7 @@ plt.show()
     
 # ############### check inverse FFT
 # yinv = ifft2(F)
-# # P = np.abs(yinv)    
+# P = np.abs(yinv)    
 # P = np.real(yinv)  # TODO: czemu to?
 # # P = np.imag(yinv)   
 

@@ -44,23 +44,23 @@ ax3 = axs[2]
 dx = np.logspace(np.log10(1./df['L'].min()), np.log10(0.5*1./df['L'].max()), 100)
 y = dx**1
 y = y / y[0] * df['err_L2'].max()
-l1 = ax1.loglog(dx,y, label=r'$\mathcal{O}(n)$', linewidth=2, color='black', linestyle="--")
+l1 = ax1.loglog(dx,y, label=r'$\mathcal{O}(\Delta x)$', linewidth=2, color='black', linestyle="--")
 
 y = dx**2
 y = y / y[0] * df['err_L2'].max()
-l2 = ax1.loglog(dx,y, label=r'$\mathcal{O}(n^2)$', linewidth=2, color='black', linestyle="-")
+l2 = ax1.loglog(dx,y, label=r'$\mathcal{O}(\Delta x^2)$', linewidth=2, color='black', linestyle="-")
 
 
 dt = np.logspace(np.log10(1./df['n_iterations'].min()), np.log10(0.25*1./df['n_iterations'].max()), 100)
 y = dt**1
 y = y / y[0] * df['err_L2'].max()
-ax2.loglog(dt,y, label=r'$\mathcal{O}(n)$', linewidth=2, color='black', linestyle="--")
+ax2.loglog(dt,y, label=r'$\mathcal{O}(\Delta t)$', linewidth=2, color='black', linestyle="--")
 
 dt = np.logspace(np.log10(1./df[(df['scaling'] == 'acoustic_scaling')]['n_iterations'].min()), 
                  1.5* np.log10(1./df[(df['scaling'] == 'acoustic_scaling')]['n_iterations'].max()), 100)
 y = dt**2
 y = y / y[0] * df['err_L2'].max()
-ax2.loglog(dt,y, label=r'$\mathcal{O}(n^2)$', linewidth=2, color='black', linestyle="-")
+ax2.loglog(dt,y, label=r'$\mathcal{O}(\Delta t^2)$', linewidth=2, color='black', linestyle="-")
 
 
 
