@@ -47,11 +47,11 @@ def eat_dots_for_texmaker(value):
 
 
             
-domain_size0 = 512           # initial size of the domain
-nsamples = 5                # number of resolutions
+domain_size0 = 512             # initial size of the domain
+nsamples = 5                   # number of resolutions
 
 initialPe = 1*5E2
-initialDa = 1E3 # for initialDa in [1E-3, 1E0, 1E3]:
+initialDa = 1E-3 # for initialDa in [1E-3, 1E0, 1E3]:
 
 # diffusivity0 = 1./6. * 1E-2  # initial diffusivity
 
@@ -68,8 +68,8 @@ initialDa = 1E3 # for initialDa in [1E-3, 1E0, 1E3]:
 # diffusivity0 =  4E-3
 # tc = 16384    
      
-# diffusive, 512
-tc = 65536
+# tc = 16
+tc = 65536 # diffusive, 512
 diffusivity0 =  4E-3
 
 lambda_ph0 = initialDa*diffusivity0/domain_size0**2 
@@ -163,12 +163,14 @@ for scaling in [acoustic_scaling, diffusive_scaling]:
                     x = (x - 0.5)/ ({domain_size}) * 2 * pi
                     y = Solver$Geometry$Y
                     y = (y - 0.5)/ ({domain_size}) * 4 * pi
-                    Solver$Fields$Init_PhaseField_External[] = exp(sin(x)) - 2*exp(sin(y)) # to benchmark diffusion & source term
+                    # Solver$Fields$Init_PhaseField_External[] = ( exp(sin(x)) - exp(sin(y))  ) / abs(exp(1)-exp(-1)) # this makes ugly squares
+                    Solver$Fields$Init_PhaseField_External[] = ( exp(sin(x)) - 2*exp(sin(y))  ) / abs(exp(-1)-2*exp(1)) 
+                    
+                    # Solver$Fields$Init_PhaseField_External[] = exp(sin(x)) - 2*exp(sin(y)) # to benchmark diffusion & source term
                     # Solver$Fields$Init_PhaseField_External[] = 10 # to benchmark the source term only
                     Solver$Actions$InitFromFields()        
                 """.format(domain_size=domain_size))
                 
-
             CLBc.addVTK()
             # CLBc.addSolve(iterations=n_iterations, vtk=int(n_iterations/10))
             CLBc.addSolve(iterations=n_iterations)
@@ -298,12 +300,13 @@ for scaling in [acoustic_scaling, diffusive_scaling]:
         
     #### PLOT FIELDS ####
     
-    # last_snapshot = len(L2)-1
-    first_snapshot = 0 
+    first_sample = 0  # dense lattice
+    last_sample = len(L2)-1  # coarse lattice
+
     plt.figure(figsize=(10, 10))
     plt.rcParams.update({'font.size': 20})
     fig = plt.gcf()  # get current figure
-    plt.imshow(L2[first_snapshot]['LBM_field_all'], cmap='coolwarm')
+    plt.imshow(L2[first_sample]['LBM_field_all'], cmap='coolwarm', vmin=-1.0, vmax=1.0)
     plt.colorbar()
     fig.tight_layout()  # otherwise the right y-label is slightly clipped
     plt.savefig(f"{plot_dir}/"
@@ -316,7 +319,7 @@ for scaling in [acoustic_scaling, diffusive_scaling]:
     plt.figure(figsize=(10, 10))
     plt.rcParams.update({'font.size': 20})
     fig = plt.gcf()  # get current figure
-    plt.imshow(L2[first_snapshot]['LBM_Q_all'], cmap='coolwarm')
+    plt.imshow(L2[first_sample]['LBM_Q_all'], cmap='coolwarm')
     plt.colorbar()
     fig.tight_layout()  # otherwise the right y-label is slightly clipped
     plt.savefig(f"{plot_dir}/"
@@ -325,7 +328,6 @@ for scaling in [acoustic_scaling, diffusive_scaling]:
                 f"_Pe_{eat_dots_for_texmaker(Pe0)}"
                 ".png", dpi=300)
     plt.close(fig)
-    
     
     #### PLOT FIELDS END ####
     

@@ -18,8 +18,8 @@ def eat_dots_for_texmaker(value):
     s_value = re.sub(r"\.", 'o', s_value)
     return s_value
 
-df = pd.read_pickle("./pickled_df_Da_1.00e+03_dense2sparse_samples_5.pkl")
-# df = pd.read_pickle("./pickled_df_Da_1.00e-03_dense2sparse_samples_5.pkl")
+# df = pd.read_pickle("./pickled_df_Da_1.00e+03_dense2sparse_samples_5.pkl")
+df = pd.read_pickle("./pickled_df_Da_1.00e-03_dense2sparse_samples_5.pkl")
 
 plot_dir = 'AC_plots_2D_epsx_epst_dense2sparse'
 if not os.path.exists(plot_dir):
@@ -92,7 +92,7 @@ ax1.set_xlim([1E-3, 1E-1])
 ax1.set_xticks([1E-3, 1E-2, 1E-1])
 ax1.set_ylim([1E-4,1E-1])
 # ax1.get_xaxis().set_major_formatter(matplotlib.ticker.ScalarFormatter())
-ax1.set(xlabel=r'$\Delta x$', ylabel=r'$L_2(\phi(\delta x), \phi(\delta x_{min})$')
+ax1.set(xlabel=r'$\Delta x$', ylabel=r'$\mathcal{L}_2 \left(\phi(\Delta x, \Delta t), \phi_{fine} \right)$')
 ax1.legend(loc='lower left', shadow=False,  bbox_to_anchor=(0.525,0.01))
 ax1.grid(which='major')
 
