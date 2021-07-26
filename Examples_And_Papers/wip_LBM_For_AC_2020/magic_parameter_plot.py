@@ -61,7 +61,7 @@ plt.ylabel('$\omega_{even} $')
 
 plt.legend()
 
-plt.savefig(f'magic_plot.png', dpi=200)
+plt.savefig(f'magic_plot.pdf', dpi=200)
 
 plt.show()
 # plt.close(fig)

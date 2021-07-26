@@ -9,27 +9,30 @@ import matplotlib.pylab as pylab
 from scipy.integrate import solve_ivp
 
 
-def SIR(t, z, R_0, T_rec, N):
+def SIR(t, z, beta, gamma, N):
     """
      # Susceptible → Infected → Removed
     :param t: time [days]
     :param z: Susceptible, Exposed, Infected, Removed
-    :param R_0: Basic Reproduction Number. Measure of contagiousness: the number of secondary infections each infected individual produces.
-    :param T_rec: days to recovery.
-    For example, if the average duration of infection is three days, then, on average, one-third of the currently infected population recovers each day.
+    :param beta: average number of contacts per day for each infected individual
+    :param gamma: Between I and R, the transition rate is γ
+    (simply the frequency of recoveries, that is, number of recovered or dead during one day
+    divided by the total number of infected on that same day, supposing "day" is the time unit).
+    If the duration of the infection is denoted D, then γ = 1/D.
     :return: derivatives [dS, dI, dR]
     """
 
     S, I, R = z
-    dS = -R_0*I*S/N
-    dI = R_0*I*S/N - I/T_rec
-    dR = I/T_rec
-    return [dS, dI, dR]
+    dSdt = -beta*I*S/N
+    dIdt = beta*I*S/N - I*gamma
+    dRdt = I*gamma
+    return [dSdt, dIdt, dRdt]
 
 
 # CONSTANTS
-R0 = 2.2  # Basic Reproduction Number - the number of secondary infections each infected individual produces.
-T_rec = 5.3  # days to recovery
+beta = 0.71  # number of contacts per day
+gamma = 1/3.2  # 1 over days to recovery
+
 N = 1e6  # Size of population [no of people].
 
 # INITIAL CONDItIONS
@@ -38,12 +41,12 @@ initial_infections = 0.01*N  # initial number of infected individuals in populat
 initial_removed = 0  # initial number of removed (recovered) individuals in population.
 IC = np.array([initial_susceptible, initial_infections, initial_removed])
 
-days_to_simulate = 25
+days_to_simulate = 30
 sol = solve_ivp(SIR,
                 [0, days_to_simulate],
                 IC,
                 method='RK45',
-                args=[R0, T_rec, N],
+                args=[beta, gamma, N],
                 dense_output=True)
 
 t = np.linspace(0, days_to_simulate, 1000)
@@ -77,3 +80,4 @@ plt.title('SIR Epidemic Calculator')
 plt.legend()
 plt.grid()
 plt.show()
+

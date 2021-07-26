@@ -53,11 +53,11 @@ q_num = lambda_num * phi_num * (1 - phi_num*phi_num)
 
 if not os.path.exists('plots'):
     os.makedirs('plots')
-fig_name = f'plots/phi_and_Q_lambda_num{lambda_num}.png'
+fig_name = f'plots/phi_and_Q_lambda_num{lambda_num}'
 
 # -------------------- make dummy plot --------------------
 plt.rcParams.update({'font.size': 28})
-plt.figure(figsize=(14, 8))
+plt.figure(figsize=(12, 8))
 
 axes = plt.gca()
 plt.plot(x, phi_num,
@@ -74,7 +74,7 @@ plt.grid()
 fig = plt.gcf()  # get current figure
 fig.tight_layout()  # otherwise the right y-label is slightly clipped
 plt.pause(1e-9)  # there is a race condition somewhere in the matplotlib code.
-fig.savefig(fig_name, bbox_inches='tight')
+fig.savefig(fig_name + '.pdf', bbox_inches='tight', dpi=200)
 plt.show()
 
 # for inp, dum in zip(inputs_as_symbols, inputs_as_str):
