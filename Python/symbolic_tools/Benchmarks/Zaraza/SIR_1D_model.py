@@ -19,61 +19,68 @@ R_IC = np.zeros(nx)
 
 N = S_IC + I_IC + R_IC
 
-
-pyplot.plot(xspace, S_IC, color="green", label='Susceptible', marker='x', markevery=2)
-pyplot.plot(xspace, I_IC, color="red", label='Infected')
-pyplot.plot(xspace, R_IC, color="purple", label='Recovered')
-pyplot.plot(xspace, N, color="black", label='Total population')
-
-pyplot.legend()
-pyplot.title('Initial Condition')
-pyplot.show()
+#
+# pyplot.plot(xspace, S_IC, color="green", label='Susceptible', marker='x', markevery=2)
+# pyplot.plot(xspace, I_IC, color="red", label='Infected')
+# pyplot.plot(xspace, R_IC, color="purple", label='Recovered')
+# pyplot.plot(xspace, N, color="black", label='Total population')
+#
+# pyplot.legend()
+# pyplot.title('Initial Condition')
+# pyplot.show()
 
 
 def calc_diffusion_FD(S_IC, I_IC, R_IC, nx, r0, beta_sir, gamma_sir, total_time):
     S = S_IC.copy()
-    Sn = S_IC.copy()  # our placeholder array, un, to advance the solution in time
+    # Sn = S_IC.copy()  # our placeholder array, un, to advance the solution in time
 
     I = I_IC.copy()
-    In = I_IC.copy()  # our placeholder array, un, to advance the solution in time
+    # In = I_IC.copy()  # our placeholder array, un, to advance the solution in time
 
     R = R_IC.copy()
-    Rn = R_IC.copy()  # our placeholder array, un, to advance the solution in time
+    # Rn = R_IC.copy()  # our placeholder array, un, to advance the solution in time
 
     C0 = beta_sir * r0 * r0 / 8.
     Courant = 0.2  # the condition is: dt =< dx*dx/(2 * nu)
     #     dt = sigma * dx**2 / nu
 
-    dt = 1e-4
-    nt = int(total_time/dt)
-    # nt = 10000
+    dt = 1e-6
+    # nt = int(total_time/dt)
+    nt = 10000
     # qSI_spatial = np.zeros(nx)  # placeholder for coupling terms
     # qSI = np.zeros(nx)
 
-    ind = np.arange(0, nx)
-    # circ_ind = np.insert(ind, nx, 0)
-    # circ_ind = np.insert(circ_ind, nx+1, nx-1)
-
+    c_ind = np.arange(0, nx)
+    l_ind = np.roll(c_ind, -1)
+    r_ind = np.roll(c_ind, 1)
 
     for n in range(nt):  # iterate through time
         In = I.copy()  # copy the existing values of I into In
         Sn = S.copy()
-        Rn = R.copy()
+        # # Rn = R.copy()
 
+        qSI = dt * beta_sir * Sn * In / N
 
+        C = C0 * Sn * dt / N
+        lap_I = (In[l_ind] - 2 * In[c_ind] + In[r_ind]) / dx ** 2
+        qSI_spatial = C * lap_I
 
-        for i in range(0, nx - 1):
-            qSI = dt * beta_sir * Sn[i] * In[i] / N[i]
-            # qSI[i] = 0
+        S = S - qSI - qSI_spatial
+        I = I + qSI + qSI_spatial
+        R = R + dt * gamma_sir * I
 
-            lap_I = (In[i - 1] - 2*In[i] + In[i + 1])/dx**2
-            C = C0 * Sn[i] * dt /N[i]
-            qSI_spatial = C * lap_I
-            # qSI_spatial[i] = 0
-
-            S[i] = S[i] - qSI - qSI_spatial
-            I[i] = I[i] + qSI + qSI_spatial
-            R[i] = R[i] + dt * gamma_sir * I[i]
+        # for i in range(0, nx - 1): # the slow way - (and bad BC)
+        #     qSI = dt * beta_sir * Sn[i] * In[i] / N[i]
+        #     # qSI[i] = 0
+        #
+        #     lap_I = (In[i - 1] - 2*In[i] + In[i + 1])/dx**2
+        #     C = C0 * Sn[i] * dt /N[i]
+        #     qSI_spatial = C * lap_I
+        #     # qSI_spatial[i] = 0
+        #
+        #     S[i] = S[i] - qSI - qSI_spatial
+        #     I[i] = I[i] + qSI + qSI_spatial
+        #     R[i] = R[i] + dt * gamma_sir * I[i]
 
     return S, I, R
 
