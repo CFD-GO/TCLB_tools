@@ -9,7 +9,7 @@ import matplotlib.pylab as pylab
 from scipy.integrate import solve_ivp
 
 
-def SIR(t, z, beta, gamma, N):
+def SIR_0D(t, z, beta, gamma, N):
     """
      # Susceptible → Infected → Removed
     :param t: time [days]
@@ -42,7 +42,7 @@ initial_removed = 0  # initial number of removed (recovered) individuals in popu
 IC = np.array([initial_susceptible, initial_infections, initial_removed])
 
 days_to_simulate = 30
-sol = solve_ivp(SIR,
+sol = solve_ivp(SIR_0D,
                 [0, days_to_simulate],
                 IC,
                 method='RK45',
