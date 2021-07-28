@@ -18,7 +18,7 @@ initial_infections = 0.01*N  # initial number of infected individuals in populat
 initial_removed = 0  # initial number of removed (recovered) individuals in population.
 
 initial_W = 0
-beta_LLW = 1e2
+beta_W = 1e2
 
 IC = np.array([initial_susceptible, initial_infections, initial_removed])
 
@@ -43,7 +43,7 @@ sol = solve_ivp(WSIR_0D,
                 [0, days_to_simulate],
                 ICw,
                 method='RK45',
-                args=[beta, gamma, beta_LLW, N],
+                args=[beta, gamma, beta_W, N],
                 dense_output=True)
 zw = sol.sol(t)
 Sw, Iw, Rw, Ww = zw

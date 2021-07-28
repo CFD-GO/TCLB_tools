@@ -17,7 +17,7 @@ r0 = 15.5  # infectious radius
 beta_sir = 3.01  # the average number of contacts per person per time
 gamma_sir = 1/3.2  # 1 over days to recovery
 
-beta_LLW = 1e4
+beta_W = 1e4
 
 total_time = 1e0
 dt = 1e-7
@@ -35,7 +35,7 @@ start = time.process_time()
 S, I, R = SIR_1D_FD(S_IC, I_IC, R_IC, nx, dx, r0, beta_sir, gamma_sir, ntimesteps, dt)
 # plotuj_wsira_1D(S, I, R, xspace, nt, dt, 'SIR 1D')
 
-Sw, Iw, Rw, Ww = WSIR_1D_FD(S_IC, I_IC, R_IC, nx, dx, r0, beta_sir, gamma_sir, ntimesteps, dt, beta_LLW)
+Sw, Iw, Rw, Ww = WSIR_1D_FD(S_IC, I_IC, R_IC, nx, dx, r0, beta_sir, gamma_sir, ntimesteps, dt, beta_W)
 # plotuj_wsira_1D(Sw, Iw, Rw, xspace, nt, dt, 'WSIR 1D', Ww)
 
 params = {'legend.fontsize': 'xx-large',
@@ -61,12 +61,12 @@ axes.set_ylim([-0.05, 1.05])
 
 pyplot.legend()
 pyplot.title(f'SIR vs WSIR \n'
-             f'@ ntimesteps={ntimesteps:.2e}     dt={dt:.2e}     beta_W={beta_LLW:.2}')
+             f'@ ntimesteps={ntimesteps:.2e}     dt={dt:.2e}     beta_W={beta_W:.2}')
 
 
 if not os.path.exists('plots'):
     os.makedirs('plots')
-fig_name = f'plots/SIRvsWSIR_beta{beta_LLW:.2e}.png'
+fig_name = f'plots/SIRvsWSIR_beta{beta_W:.2e}.png'
 fig = pyplot.gcf()  # get current figure
 fig.savefig(fig_name, bbox_inches='tight')
 pyplot.show()

@@ -66,7 +66,7 @@ def SIR_1D_FD(S_IC, I_IC, R_IC, nx, dx, r0, beta_sir, gamma_sir, nt, dt):
 
 
 @jit(cache=True, nopython=True)
-def WSIR_1D_FD(S_IC, I_IC, R_IC, nx, dx, r0, beta_sir, gamma_sir, nt, dt, beta_LLW=1e2):
+def WSIR_1D_FD(S_IC, I_IC, R_IC, nx, dx, r0, beta_sir, gamma_sir, nt, dt, beta_W=1e2):
     S = S_IC.copy()  # our placeholder array, to advance the solution in time
     I = I_IC.copy()
     R = R_IC.copy()
@@ -82,7 +82,7 @@ def WSIR_1D_FD(S_IC, I_IC, R_IC, nx, dx, r0, beta_sir, gamma_sir, nt, dt, beta_L
         qW_spatial = (r0 * r0 / 8.)*lap_W
         # qW_spatial = np.zeros(nx)
 
-        qW = dt * beta_LLW * (qW_spatial + (I - W))
+        qW = dt * beta_W * (qW_spatial + (I - W))
         qS2I = dt * beta_sir * S * W/N
         qI2R = dt * gamma_sir * I
 

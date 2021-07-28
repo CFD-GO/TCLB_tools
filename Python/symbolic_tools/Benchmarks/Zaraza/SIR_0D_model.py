@@ -58,7 +58,7 @@ def SIR_0D(t, z, beta, gamma, N):
     return [dSdt, dIdt, dRdt]
 
 
-def WSIR_0D(t, z, beta, gamma, beta_LLW, N):
+def WSIR_0D(t, z, beta, gamma, beta_W, N):
     """
      # Susceptible → Infected → Removed
     :param t: time [days]
@@ -73,7 +73,7 @@ def WSIR_0D(t, z, beta, gamma, beta_LLW, N):
 
     S, I, R, W = z
 
-    dWdt = beta_LLW * (I-W)
+    dWdt = beta_W * (I - W)
     dSdt = -beta*W*S/N
     dIdt = beta*W*S/N - I*gamma
     dRdt = I*gamma
