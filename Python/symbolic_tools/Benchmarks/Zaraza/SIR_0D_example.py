@@ -3,7 +3,7 @@ import numpy as np
 from scipy.integrate import solve_ivp
 
 from Benchmarks.Zaraza.SIR_0D_model import SIR_0D, WSIR_0D
-from Benchmarks.Zaraza.SIR_0D_model import plotuj_wsira_0D
+from Benchmarks.Zaraza.SIR_0D_model import make_wsir_plot_0D
 
 
 # CONSTANTS
@@ -35,7 +35,7 @@ sol = solve_ivp(SIR_0D,
 z = sol.sol(t)
 S, I, R = z
 
-plotuj_wsira_0D(S, I, R, t, 'SIR Epidemic Calculator', w=None)
+make_wsir_plot_0D(S, I, R, t, 'SIR Epidemic Calculator', w=None)
 
 
 ICw = np.array([initial_susceptible, initial_infections, initial_removed, initial_W])
@@ -47,6 +47,6 @@ sol = solve_ivp(WSIR_0D,
                 dense_output=True)
 zw = sol.sol(t)
 Sw, Iw, Rw, Ww = zw
-plotuj_wsira_0D(Sw, Iw, Rw, t, 'WSIR Epidemic Calculator', w=Ww)
+make_wsir_plot_0D(Sw, Iw, Rw, t, 'WSIR Epidemic Calculator', w=Ww)
 
 print("Done.")

@@ -4,8 +4,7 @@ from matplotlib import pyplot    #and the useful plotting library
 import matplotlib.pylab as pylab
 import os
 from Benchmarks.Zaraza.SIR_1D_model import SIR_1D_FD, WSIR_1D_FD
-from Benchmarks.Zaraza.SIR_1D_model import plotuj_wsira_1D
-
+from Benchmarks.Zaraza.SIR_1D_model import make_wsir_plot_1D
 
 
 nx = 128
@@ -15,11 +14,11 @@ xspace = np.linspace(0, domain_length, nx)
 
 r0 = 15.5  # infectious radius
 beta_sir = 3.01  # the average number of contacts per person per time
-gamma_sir = 1/3.2  # 1 over days to recovery
+gamma_sir = 1/2.8  # 1 over days to recovery
 
 beta_W = 1e4
 
-total_time = 1e0
+total_time = 1e-0
 dt = 1e-7
 ntimesteps = int(total_time / dt)
 
@@ -29,14 +28,14 @@ S_IC = np.ones(nx) - I_IC
 R_IC = np.zeros(nx)
 
 N = S_IC + I_IC + R_IC
-# plotuj_wsira(S_IC, I_IC, R_IC, xspace, time_spot=0)
+# make_wsir_plot_1D(S_IC, I_IC, R_IC, xspace, 0, 0, 'SIR IC')
 start = time.process_time()
 
 S, I, R = SIR_1D_FD(S_IC, I_IC, R_IC, nx, dx, r0, beta_sir, gamma_sir, ntimesteps, dt)
-# plotuj_wsira_1D(S, I, R, xspace, nt, dt, 'SIR 1D')
+# make_wsir_plot_1D(S, I, R, xspace, ntimesteps, dt, 'SIR 1D')
 
 Sw, Iw, Rw, Ww = WSIR_1D_FD(S_IC, I_IC, R_IC, nx, dx, r0, beta_sir, gamma_sir, ntimesteps, dt, beta_W)
-# plotuj_wsira_1D(Sw, Iw, Rw, xspace, nt, dt, 'WSIR 1D', Ww)
+# make_wsir_plot_1D(Sw, Iw, Rw, xspace, ntimesteps, dt, 'WSIR 1D', Ww)
 
 params = {'legend.fontsize': 'xx-large',
           'figure.figsize': (16, 10),
@@ -57,6 +56,9 @@ pyplot.plot(xspace, Iw, color="red", linewidth=2, linestyle="",  marker='o', mar
 pyplot.plot(xspace, Rw, color="purple", linewidth=2, linestyle="",  marker='o', markersize=4, markevery=3, label='R*')
 pyplot.plot(xspace, Ww, color="blue", linewidth=2, linestyle="",  marker='o', markersize=4, markevery=3, label='W*')
 
+pyplot.xlabel(r'$x$')
+pyplot.ylabel(r'No of people')
+
 axes.set_ylim([-0.05, 1.05])
 
 pyplot.legend()
@@ -66,7 +68,7 @@ pyplot.title(f'SIR vs WSIR \n'
 
 if not os.path.exists('plots'):
     os.makedirs('plots')
-fig_name = f'plots/SIRvsWSIR_beta{beta_W:.2e}.png'
+fig_name = f'plots/SIRvsWSIR_betaW{beta_W:.2e}.png'
 fig = pyplot.gcf()  # get current figure
 fig.savefig(fig_name, bbox_inches='tight')
 pyplot.show()

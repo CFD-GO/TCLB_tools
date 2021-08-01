@@ -18,8 +18,7 @@ def eat_dots_for_texmaker(value):
     s_value = re.sub(r"\.", 'o', s_value)
     return s_value
 
-df = pd.read_pickle("./pickled_df_Da_1E-3.pkl")
-# df = pd.read_pickle("./pickled_df_Da_1E3.pkl")
+df = pd.read_pickle("./pickled_df_Da_1.00e+03_sparse2dense_samples_4.pkl")
 
 plot_dir = 'AC_plots_2D_epsx_epst'
 if not os.path.exists(plot_dir):

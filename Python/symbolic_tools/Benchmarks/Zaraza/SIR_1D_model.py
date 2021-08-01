@@ -6,7 +6,7 @@ import matplotlib.pylab as pylab
 from numba import vectorize, float64
 # from Benchmarks.Zaraza.SIR_0D_model import SIR_0D
 
-def plotuj_wsira_1D(s, i, r, x, nt, dt, title, w=None ):
+def make_wsir_plot_1D(s, i, r, x, nt, dt, title, w=None):
     params = {'legend.fontsize': 'xx-large',
               'figure.figsize': (14, 8),
              'axes.labelsize': 'xx-large',
@@ -19,6 +19,9 @@ def plotuj_wsira_1D(s, i, r, x, nt, dt, title, w=None ):
     pyplot.plot(x, i, color="red", linewidth=2, label='Infected')
     pyplot.plot(x, r, color="purple", linewidth=2, label='Recovered')
     pyplot.plot(x, s + i + r, color="black", linewidth=2, label='Total population')
+
+    pyplot.xlabel(r'$x$')
+    pyplot.ylabel(r'No of people')
 
     if w is not None:
         pyplot.plot(x, w, color="blue", linewidth=2, linestyle=":", label='W')

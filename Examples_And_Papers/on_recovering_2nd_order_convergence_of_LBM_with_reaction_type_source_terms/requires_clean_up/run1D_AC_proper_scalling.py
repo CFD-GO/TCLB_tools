@@ -38,7 +38,7 @@ lambda_ph0 = 1E-10       # 1E-12 for pure diffusion, source term strength
 domain_size0 = 32      # initial size of the domain
 # domain_size0 = 16 # TODO nie dziala dla 16 operands could not be broadcast together with shapes (3,32) (3,16)
 tc = 50                 # number of timesteps for dt=1 aka Time
-nsamples = 6            # number of resolutions
+nsamples = 5            # number of resolutions
 ny = 3                  # number of nodes in second dimension, min 2 for CPU, min 3 for GPU
 magic_parameter = 0.25  # to control even relaxation rate in TRT model
 

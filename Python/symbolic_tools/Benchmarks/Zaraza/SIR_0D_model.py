@@ -6,7 +6,7 @@ import matplotlib.pylab as pylab
 
 
 import numpy as np
-def plotuj_wsira_0D(s, i, r, t, title, w=None):
+def make_wsir_plot_0D(s, i, r, t, title, w=None):
     params = {'legend.fontsize': 'xx-large',
               'figure.figsize': (14, 8),
               'axes.labelsize': 'xx-large',
