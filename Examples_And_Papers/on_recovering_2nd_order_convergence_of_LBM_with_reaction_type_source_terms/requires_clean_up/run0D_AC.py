@@ -35,7 +35,6 @@ diffusivity0 = 1./6 #unimportant, no space variablitiy
 def AC0D(t, lambda_phi, phi_0):
     return np.sqrt(-1/(np.exp(-2*lambda_phi*t) - 1 - np.exp(-2*lambda_phi*t)/phi_0**2))
 
-
 plot_dir = f'AC_plots_0D'
 if not os.path.exists(plot_dir):
     os.makedirs(plot_dir)
@@ -44,7 +43,7 @@ L2 = list()
 idx = 0
 data = list()
 for lbdt in 2.**-np.arange(1,11):
-    
+
     lambda_ph = lambda_ph0*lbdt
     def getXML(**kwars):
         global idx
@@ -70,12 +69,10 @@ for lbdt in 2.**-np.arange(1,11):
         # CLBc.addBox()
         
         params = {
-        		"diffusivity_phi": diffusivity0, 
-        		"lambda":lambda_ph,
+            "diffusivity_phi": diffusivity0, 
+            "lambda":lambda_ph,
             "magic_parameter": magic_parameter,
-        		"Init_PhaseField":initial_phi - lambda_ph*initial_phi*(1-initial_phi**2)/2 ,	
-            #"Init_PhaseField":initial_phi,
-        		#"phase_field_smoothing_coeff":0.0,
+            "Init_PhaseField":initial_phi,
         }
         
         CLBc.addModelParams(params)
@@ -88,12 +85,11 @@ for lbdt in 2.**-np.arange(1,11):
             CLBc.addSolve(iterations=stop-current)
             CLBc.addVTK()
             current = stop
-        
+
         CLBc.addSolve(iterations=1)
-        CLBc.addVTK()   
+        CLBc.addVTK()
         #CLBc.addSolve(iterations=tc/lbdt, vtk=50)
         CLBc.write(fname+'.xml')
-
 
         return prefix
         
@@ -103,11 +99,11 @@ for lbdt in 2.**-np.arange(1,11):
     
     wdir = d0 +'output'
     
-    os.system("cd %s && ~/projekty/TCLB/tools/sirun.sh d2q9_Allen_Cahn_SOI   ./run.xml >/dev/null"%d0)
+    # os.system("cd %s && ~/projekty/TCLB/tools/sirun.sh d2q9_Allen_Cahn_SOI   ./run.xml >/dev/null"%d0)
     #os.system("cd %s && ~/projekty/TCLB/tools/sirun.sh d2q9_AllenCahn_BGK   ./run.xml >/dev/null "%d0)
 
     # os.system("cd ~/GITHUB/LBM/TCLB && CLB/d2q9_Allen_Cahn_SOI/main example/experimental/d2q9_Allen_Cahn_SOI.xml")
-    #os.system("cd %s && ~/GITHUB/LBM/TCLB/CLB/d2q9_Allen_Cahn_SOI/main ./run.xml >/dev/null"%d0)
+    os.system("cd %s && ~/GITHUB/LBM/TCLB/CLB/d2q9_SourceTerm_SOI_AllenCahn/main ./run.xml >/dev/null"%d0)
     fname_base = "run_"    
     fconfig =  wdir + '/run_config_P00_00000000.xml'
     d = wdir
@@ -117,17 +113,9 @@ for lbdt in 2.**-np.arange(1,11):
         
     CLBc, CLBcf, CLBCn = CLB.CLBXMLHandler.parseConfig(fconfig,time=1E8)
     
-    
-    
     tmp = glob.glob(d + '/%sVTK_P00*.pvti'%fname_base)
-    
     tmp = np.sort([ int(re.findall('[0-9]+',s)[-1]) for s in tmp])
-    
-    
-    
-    
     for f in tmp:
-    
         fvti = d + '/%sVTK_P00_%08d.pvti'% (fname_base, f)
         vti = CLB.VTIFile.VTIFile(fvti, True)
         
@@ -153,7 +141,7 @@ for lbdt, ldata in data.groupby(by='lbdt_pow'):
     
 local_error = pd.DataFrame.from_records(local_error)
 
-plt.plot(ldata.Time, AC0D(ldata.Time, lambda_ph0, initial_phi)   ) 
+plt.plot(ldata.Time, AC0D(ldata.Time, lambda_ph0, initial_phi)   )
 plt.legend()
 
 
@@ -172,8 +160,8 @@ plt.grid(which='both')
 
 plt.tight_layout()  # otherwise the right y-label is slightly clipped
 
-plt.savefig('0d-local.pdf', bbox_inches='tight', dpi=200)
-plt.savefig('0d-local.png', bbox_inches='tight', dpi=200) # for preview
+plt.savefig(os.path.join(plot_dir,'0d-local.pdf'), bbox_inches='tight', dpi=200)
+plt.savefig(os.path.join(plot_dir,'0d-local.png'), bbox_inches='tight', dpi=200) # for preview
 
 
 data['PointError_sq'] = (AC0D(data.Time,  lambda_ph0, initial_phi) - data.PhaseField)**2
@@ -190,7 +178,7 @@ plt.legend()
 L2 = data.groupby(by='lbdt_pow')[['PointError_sq']].sum().reset_index()
 L2['dt'] = 2**L2.lbdt_pow
 L2['L2'] = np.sqrt(ldata.PointError_sq)
- 
+
 
 # plt.figure()
 y2 = L2.dt**2

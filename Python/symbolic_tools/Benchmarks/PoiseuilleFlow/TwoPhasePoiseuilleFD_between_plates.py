@@ -8,7 +8,7 @@ def get_tanh_profile(y, h, phi_h, phi_l, W=1):
     :param h: # distance from the center to the channel walls
     :param phi_h: quantity of interest - higher part of the channel
     :param phi_l: quantity of interest - lower part of the channel
-    :param W: inteface thickness
+    :param W: interface thickness
     :return:
     """
     y_shifted = y + h  # shift y: bottom y=0, top y=2h

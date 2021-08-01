@@ -146,3 +146,20 @@ class MatrixGenerator:
 
         cm_ = self.__matrix_maker(get_row)
         return Matrix(cm_)
+
+    def get_raw_x_shift_moments_matrix(self):
+        """
+        :param ex_: lattice vector
+        :param ey_:
+        :param ez_:
+        :return: transformation matrix from DF to central moments
+        """
+        d, q = self._check_dimensions()
+
+        def get_row(m, n, o):
+            row = [pow((self.ex[i] - ux), m) * pow((self.ey[i] - uy), n) * pow((self.ez[i] - uz), o) for i in range(0, q)]
+            row = [round_and_simplify(r) for r in row]
+            return row
+
+        m_ = self.__matrix_maker(get_row)
+        return Matrix(m_)

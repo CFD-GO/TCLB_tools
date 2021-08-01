@@ -2,6 +2,7 @@ from sympy import symbols, Eq, Matrix, solve, lambdify, ccode, cse, Add
 import numpy as np
 import re
 
+
 def extract_real_solution(calc_numerical_solution, *x):
     tmp = calc_numerical_solution(*x)
     for i in range(3):

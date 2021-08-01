@@ -70,6 +70,9 @@ mom_bc = get_mom_vector_from_discrete_def(lambda i: Symbol('H') * dcmt.get_heat_
 
 print_as_vector(mom_bc, 'dcm_heat_flux_cht_bc', raw_output=False)
 #
+
+
+
 print("\n\n ---- continuous raw moments: heat flux bc ---")
 #
 # print("\n\n continuous raw moments: concentration bc")

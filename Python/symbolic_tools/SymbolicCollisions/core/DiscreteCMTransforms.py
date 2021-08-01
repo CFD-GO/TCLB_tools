@@ -83,9 +83,15 @@ class DiscreteCMTransforms:
         gamma = self.w[i] * (Matrix([1]) + eu * eu / (2 * self.cs2 * self.cs2) - u2 / (2 * self.cs2))
         return 2*gamma[0]
 
+    def get_separation_flux(self, i):
+        # eqs 46-48
+        # Conservative phase-field lattice Boltzmann model for interface tracking equation
+        en = self.e[i, :].dot(Matrix([Symbol('nx', positive=True), Symbol('ny', positive=True)]))
+        term = Symbol('B', positive=True) * self.w[i] * en
+        return term
+
     def get_heat_flux_bc(self, i):
         # TODO: check it
-
         # eu_dot_f = (self.e[i, :] - self.u.transpose()).dot(self.F)
         # pop_eq = m00 * self.get_gamma(i)
         # result = pop_eq * eu_dot_f / ( self.cs2)

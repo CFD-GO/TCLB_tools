@@ -7,3 +7,10 @@
 .idea/*
 *.png
 *.pdf
+Python/.idea/*
+Python/symbolic_tools/venv/*
+.spyproject/*
+Examples_And_Papers/.idea/*
+Python/symbolic_tools/.idea/*
+*.nbc
+*.nbi
