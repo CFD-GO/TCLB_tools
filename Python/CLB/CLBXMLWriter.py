@@ -156,6 +156,7 @@ def _set_by_kw(kw, name, default):
     'MRT',
     'SRT_M_SOI',
     'TRT_M_SOI',    
+    'SRT_DF_SOI',    
     'Smoothing',
     'Cumulant',    
     'ESymmetry',
