@@ -15,7 +15,8 @@ import warnings
 from fractions import Fraction
 
 home = pwd.getpwuid(os.getuid()).pw_dir
-local_logs_folder = os.path.join(home, 'DATA_FOR_PLOTS', 'batch_square_advection')
+# local_logs_folder = os.path.join(home, 'DATA_FOR_PLOTS', 'batch_square_advection')
+local_logs_folder = os.path.join(home, 'DATA_FOR_PLOTS', 'batch_square_advection_cm_prob')
 
 #
 # wd = os.getcwd()

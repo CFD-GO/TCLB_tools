@@ -55,6 +55,16 @@ class ContinuousCMTransforms:
         df_gamma = self.get_Maxwellian_DF(psi=1, u=self.u, sigma2=self.cs2)
         return df_p + df_gamma
 
+    def get_incompressible_DF_part_p(self):
+        df_p = self.get_Maxwellian_DF(psi=(m00 - 1), u=Matrix([0, 0, 0]))
+        # df_gamma = self.get_Maxwellian_DF(psi=1, u=self.u, sigma2=self.cs2)
+        return df_p
+
+    def get_incompressible_DF_part_gamma(self):
+        # df_p = self.get_Maxwellian_DF(psi=(m00 - 1), u=Matrix([0, 0, 0]))
+        df_gamma = self.get_Maxwellian_DF(psi=1, u=self.u, sigma2=self.cs2)
+        return df_gamma
+
     def get_Maxwellian_DF(self, psi=m00, u=None, sigma2=None):
         """
         :param u: velocity (x,y,z) i.e., mean of the distribution

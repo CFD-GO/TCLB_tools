@@ -266,6 +266,36 @@ hardcoded_cm_eq_cht_D3Q27 = Matrix([
 ])
 
 hardcoded_m_eq_cht_D3Q27 = Matrix([
+    H,
+    H * ux,
+    H * uy,
+    H * uz,
+    H * uxuy,
+    H * uxuz,
+    H * uyuz,
+    H * (Sigma2asSymbol + ux2),
+    H * (Sigma2asSymbol + uy2),
+    H * (Sigma2asSymbol + uz2),
+    H * ux * (Sigma2asSymbol + uy2),
+    H * ux * (Sigma2asSymbol + uz2),
+    H * uy * (Sigma2asSymbol + ux2),
+    H * uz * (Sigma2asSymbol + ux2),
+    H * uy * (Sigma2asSymbol + uz2),
+    H * uz * (Sigma2asSymbol + uy2),
+    H * uxuy * uz,
+    H * (Sigma2asSymbol * Sigma2asSymbol + Sigma2asSymbol * ux2 + Sigma2asSymbol * uy2 + ux2 * uy2),
+    H * (Sigma2asSymbol * Sigma2asSymbol + Sigma2asSymbol * ux2 + Sigma2asSymbol * uz2 + ux2 * uz2),
+    H * (Sigma2asSymbol * uz2 + Sigma2asSymbol * uy2 + Sigma2asSymbol * Sigma2asSymbol + uy2 * uz2),
+    H * uyuz * (Sigma2asSymbol + ux2),
+    H * uxuz * (Sigma2asSymbol + uy2),
+    H * uxuy * (Sigma2asSymbol + uz2),
+    H * ux * (Sigma2asSymbol * uz2 + Sigma2asSymbol * uy2 + Sigma2asSymbol * Sigma2asSymbol + uy2 * uz2),
+    H * uy * (Sigma2asSymbol * Sigma2asSymbol + Sigma2asSymbol * ux2 + Sigma2asSymbol * uz2 + ux2 * uz2),
+    H * uz * (Sigma2asSymbol * Sigma2asSymbol + Sigma2asSymbol * ux2 + Sigma2asSymbol * uy2 + ux2 * uy2),
+    H * (Sigma2asSymbol*Sigma2asSymbol*Sigma2asSymbol + Sigma2asSymbol*Sigma2asSymbol*ux2 + Sigma2asSymbol*Sigma2asSymbol*uy2 + Sigma2asSymbol*Sigma2asSymbol*uz2 + Sigma2asSymbol*ux2*uy2 + Sigma2asSymbol*ux2*uz2 + Sigma2asSymbol*uy2*uz2 + ux2*uy2*uz2),
+])
+
+hardcoded_m_eq_cht_D3Q27_expanded = Matrix([
     T*cp*rho,
     T*cp*rho*ux,
     T*cp*rho*uy,

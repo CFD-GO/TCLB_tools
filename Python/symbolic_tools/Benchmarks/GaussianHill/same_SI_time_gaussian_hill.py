@@ -98,26 +98,26 @@ def plot_err_field(T_err_field, xx, yy, fig_name):
 
 
 def plot_t_convergence_acoustic_scalling(conductivities, T_err_L2_BGK, T_err_L2_CM, T_err_L2_CM_HIGHER, T_err_L2_Cumulants, fig_name):
-    plt.rcParams.update({'font.size': 20})
-    plt.figure(figsize=(14, 8))
+    plt.rcParams.update({'font.size': 26})
+    plt.figure(figsize=(12, 8))
     # '{:.0e}'.format(x)
     axes = plt.gca()
 
     plt.plot(conductivities, T_err_L2_BGK,
-             color="black", marker="^", markevery=1, markersize=7, linestyle="", linewidth=2,
-             label=f'BGK')
+             color="black", marker="^", markevery=1, markersize=12, linestyle="", linewidth=2,
+             label=f'CM-SRT')
 
     plt.plot(conductivities, T_err_L2_CM,
-             color="black", marker="v", markevery=1, markersize=7, linestyle="", linewidth=2,
-             label=f'CM')
+             color="black", marker="v", markevery=1, markersize=12, linestyle="", linewidth=2,
+             label=r'CM-$1^{st}$')
 
     plt.plot(conductivities, T_err_L2_CM_HIGHER,
-             color="black", marker="o", markevery=1, markersize=5, linestyle="", linewidth=2,
-             label=f'CM TRT')
+             color="black", marker="o", markevery=1, markersize=12, linestyle="", linewidth=2,
+             label=f'CM-TRT')
 
     plt.plot(conductivities, T_err_L2_Cumulants,
-             color="black", marker="x", markevery=1, markersize=7, linestyle="", linewidth=2,
-             label=f'Cumulants')
+             color="black", marker="x", markevery=1, markersize=12, linestyle="", linewidth=2,
+             label=r'Cumulants-$1^{st}$')
 
     # ------ format y axis ------ #
     # yll = T_err_CM_HIGHER.min()
@@ -162,10 +162,8 @@ def plot_t_convergence_acoustic_scalling(conductivities, T_err_L2_BGK, T_err_L2_
     # y2 = min(dk) * min(dk) * initial_error_2nd / (dk * dk)
     # plt.loglog(dk, y2, label=r'${-(x^2)}$')
 
-
-
-    plt.xlabel(r'$k$', fontsize=22)
-    plt.ylabel(r'$T: \; L_2 \, error \, norm $', fontsize=22)
+    plt.xlabel(r'$k$', fontsize=26)
+    plt.ylabel(r'$T: \; L_2 \, error \, norm $', fontsize=26)
     plt.legend()
     plt.grid()
 
@@ -229,15 +227,15 @@ for ux in [0, 0.1]:
                 # print(f"T_mse={T_mse[g]:.2e} for grid {xSIZE} x {xSIZE} [lu]")
                 print(f"{collision_type} T_L2={T_L2[g]:.5e} for k = {conductivities[g]}")
 
-                print("------------------------------------ PLOT err field------------------------------------")
-                fig_name = f'{plot_dir}/GaussianHill_{collision_type}_ux={ux:.0e}_k_{str_conductivities[g]}_iterations_{iterations[g]}_sig={Sigma02}_time_SI={time_SI}_lattice={lattice_size}[lu]_err_field_contour.png'
-                plot_err_field(T_err_field, xx, yy, fig_name)
-
-                fig_name = f'{plot_dir}/GaussianHill_{collision_type}_ux={ux:.0e}_k_{str_conductivities[g]}_iterations_{iterations[g]}_sig={Sigma02}_time_SI={time_SI}_lattice={lattice_size}[lu]_anal_field_contour.png'
-                plot_err_field(T_anal, xx, yy, fig_name)
-
-                fig_name = f'{plot_dir}/GaussianHill_{collision_type}_ux={ux:.0e}_k_{str_conductivities[g]}_iterations_{iterations[g]}_sig={Sigma02}_time_SI={time_SI}_lattice={lattice_size}[lu]_num_field_contour.png'
-                plot_err_field(T_num_slice, xx, yy, fig_name)
+                # print("------------------------------------ PLOT err field------------------------------------")
+                # fig_name = f'{plot_dir}/GaussianHill_{collision_type}_ux={ux:.0e}_k_{str_conductivities[g]}_iterations_{iterations[g]}_sig={Sigma02}_time_SI={time_SI}_lattice={lattice_size}[lu]_err_field_contour.png'
+                # plot_err_field(T_err_field, xx, yy, fig_name)
+                #
+                # fig_name = f'{plot_dir}/GaussianHill_{collision_type}_ux={ux:.0e}_k_{str_conductivities[g]}_iterations_{iterations[g]}_sig={Sigma02}_time_SI={time_SI}_lattice={lattice_size}[lu]_anal_field_contour.png'
+                # plot_err_field(T_anal, xx, yy, fig_name)
+                #
+                # fig_name = f'{plot_dir}/GaussianHill_{collision_type}_ux={ux:.0e}_k_{str_conductivities[g]}_iterations_{iterations[g]}_sig={Sigma02}_time_SI={time_SI}_lattice={lattice_size}[lu]_num_field_contour.png'
+                # plot_err_field(T_num_slice, xx, yy, fig_name)
             return T_L2
             # return T_mse
 
