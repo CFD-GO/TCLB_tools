@@ -1,3 +1,5 @@
+**Paper under review**
+
 # On recovering the second-order convergence of the lattice Boltzmann method with reaction-type source terms
 
 July 2021
