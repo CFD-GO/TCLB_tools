@@ -70,3 +70,12 @@ print('\n// cm_eq_both_parts - central moments after relaxation')
 print_as_vector(S_relax_hydro_D2Q9 * cm_eq_both_parts.transpose(), 'cm_eq_both_parts_relaxation', output_order_of_moments=moments_dict[lattice])
 
 print(f'\n\n Done in {time.process_time() - start} [s].')
+
+
+print('\n\n\n// --------------- more EXPERIMENTS ------------------------')
+print('\n// cm_eq_p_new')
+cm_eq_p_new = get_mom_vector_from_discrete_def(lambda i: dcmt.get_EDF_p_with_u(i),
+                                          discrete_transform=dcmt.get_cm,
+                                          moments_order=moments_dict[lattice])
+print_as_vector(cm_eq_p_new, 'cm_eq_p_new', output_order_of_moments=moments_dict[lattice])
+
