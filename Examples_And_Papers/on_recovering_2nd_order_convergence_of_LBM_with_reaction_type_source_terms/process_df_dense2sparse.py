@@ -18,8 +18,9 @@ def eat_dots_for_texmaker(value):
     s_value = re.sub(r"\.", 'o', s_value)
     return s_value
 
-# df = pd.read_pickle("./pickled_df_Da_1.00e+03_dense2sparse_samples_5.pkl")
-df = pd.read_pickle("./pickled_df_Da_1.00e-03_dense2sparse_samples_5.pkl")
+# df = pd.read_pickle("./pickled_df_Da_1.00e+00_dense2sparse_samples_5.pkl")
+df = pd.read_pickle("./pickled_df_Da_1.00e+03_dense2sparse_samples_5.pkl")
+# df = pd.read_pickle("./pickled_df_Da_1.00e-03_dense2sparse_samples_5.pkl")
 
 plot_dir = 'AC_plots_2D_epsx_epst_dense2sparse'
 if not os.path.exists(plot_dir):
@@ -88,26 +89,26 @@ for scaling, marker in zip(scalings, markers):
     l5 = ax3.loglog(filtered_df['CPU_cost'], filtered_df['err_L2'],  linestyle="", color='black', marker=marker, markersize=10, label=scaling)
 
 
-ax1.set_xlim([1E-3, 1E-1])
-ax1.set_xticks([1E-3, 1E-2, 1E-1])
-ax1.set_ylim([1E-4,1E-1])
-# ax1.get_xaxis().set_major_formatter(matplotlib.ticker.ScalarFormatter())
+# ax1.set_xlim([1E-3, 1E-1])
+# ax1.set_xticks([1E-3, 1E-2, 1E-1])
+# ax1.set_ylim([1E-4,1E-1])
+########## ax1.get_xaxis().set_major_formatter(matplotlib.ticker.ScalarFormatter())
 ax1.set(xlabel=r'$\Delta x$', ylabel=r'$\mathcal{L}_2 \left(\phi(\Delta x, \Delta t), \phi_{fine} \right)$')
 ax1.legend(loc='lower left', shadow=False,  bbox_to_anchor=(0.525,0.01))
 ax1.grid(which='major')
 
-ax2.set_xticks([1E-5, 1E-4, 1E-3, 1E-2])
-ax2.set_xlim([1E-5, 1E-2])
-ax2.set_ylim([1E-4,1E-1])
+# ax2.set_xticks([1E-5, 1E-4, 1E-3, 1E-2])
+# ax2.set_xlim([1E-5, 1E-2])
+# ax2.set_ylim([1E-4,1E-1])
 ax2.set(xlabel=r'$\Delta t$') #, ylabel=r'$L_2(\phi(\delta t), \phi(\delta t_{min})$')
 ax2.legend(loc='lower left', shadow=False,  bbox_to_anchor=(0.525,0.01))
 ax2.grid(which='major')
 ax2.set_yticklabels([]) # Turn off tick labels
 
 
-ax3.set_xlim([1E5, 1E10])
-ax3.set_xticks([1E5, 1E6, 1E7, 1E8, 1E9, 1E10])
-ax3.set_ylim([1E-4,1E-1])
+# ax3.set_xlim([1E5, 1E10])
+# ax3.set_xticks([1E5, 1E6, 1E7, 1E8, 1E9, 1E10])
+# ax3.set_ylim([1E-4,1E-1])
 ax3.set(xlabel=r'$CPU\; cost$')#, ylabel=r'$L_2(\phi(\delta t), \phi(\delta t_{min})$')
 ax3.legend(loc='lower left', shadow=False, bbox_to_anchor=(0.001,0.01))
 ax3.grid(which='major')
