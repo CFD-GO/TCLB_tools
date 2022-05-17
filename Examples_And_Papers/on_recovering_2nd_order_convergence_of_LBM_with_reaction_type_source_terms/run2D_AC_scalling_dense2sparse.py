@@ -51,12 +51,25 @@ def eat_dots_for_texmaker(value):
 domain_size0 = 512             # initial size of the domain
 nsamples = 5                   # number of resolutions
 
+
 initialPe = 1*5E2
-initialDa = 1E-3  # for initialDa in [1E-3, 1E0, 1E3]:
+initialDa = 1E3  # for initialDa in [1E-3, 1E0, 1E3]:
+initialFo = 1E-3
+
+tc = int(65536/1) # number of timesteps, tc = 65536 --> diffusivity0 = 4E-3
+diffusivity0 = initialFo*(domain_size0**2)/tc 
 
 
-tc = 65536  # number of timesteps for dt=1 aka Time
-diffusivity0 = 4E-3
+##################### testy
+
+# diffusivity0 = 1E-2
+# initialPe = 0*5E2
+# initialDa = 1E1  # for initialDa in [1E-3, 1E0, 1E3]:
+# initialFo = 1E-2
+
+print(f"diffusivity0 = {diffusivity0:.2e}")
+##################### 
+
 
 lambda_ph0 = initialDa*diffusivity0/domain_size0**2
 
@@ -68,17 +81,15 @@ magic_parameter = 1./12
 df_for_plots_part1 = pd.DataFrame()
 df_for_plots_part2 = pd.DataFrame()
 
+def calc_sim_numbers(lambda_phi, L, M, Ux, n_iter):
+    Da = (lambda_phi * L**2) / M  # Damkohler similarity number
+    Pe = Ux*L / M                 # Peclet similarity number (similar to Reynolds, but refers to advection-diffusion eq)
+    Fo = M*n_iter/(L**2)          # Fourier similarity number
+    
+    return Da,Pe,Fo
+    
 for scaling in [acoustic_scaling, diffusive_scaling]:
 # for scaling in [acoustic_scaling]:
-    Ux0 = initialPe*diffusivity0/domain_size0    # macroscopic advection velocity
-
-    # check Da, Pe
-    Da0 = (lambda_ph0 * domain_size0**2) / \
-        diffusivity0  # Damkohler similarity number
-    # Peclet similarity number (similar to Reynolds, but refers to advection-diffusion eq)
-    Pe0 = Ux0*domain_size0 / diffusivity0
-    print(f"Initial Damköhler number: {Da0:.2e} \t Peclet number: {Pe0:.2e}")
-
     df_latex = pd.DataFrame()
     L2 = list()
 
@@ -106,19 +117,22 @@ for scaling in [acoustic_scaling, diffusive_scaling]:
         lambda_ph = coeff * lambda_ph0 * lbdt
         # end of acoustic digression
 
-        Ux = Pe0*diffusivity/domain_size
+        Ux = initialPe*diffusivity/domain_size
 
         n_iterations = tc/lbdt
-        SI_time = n_iterations/(domain_size*domain_size/diffusivity)
-        print(f"running case {n}/{nsamples}, lbdt={lbdt}, lbdx={lbdx} SI_time={SI_time:.2e},  Ux={Ux:.2e} diffusivity={diffusivity:.2e} lambda_ph={lambda_ph:.2e} ")
-        assert_almost_equal((lambda_ph * domain_size**2) /
-                            diffusivity, Da0, decimal=6)
-        assert_almost_equal(Ux*domain_size/diffusivity, Pe0, decimal=6)
-        assert_almost_equal(math.modf(n_iterations)[
-                            0], 0, decimal=6)  # check decimal places
+        # SI_time = n_iterations/(domain_size*domain_size/diffusivity) # this is just the Fo
+        
+        # # check Da, Pe, Fo
+        Da, Pe, Fo = calc_sim_numbers(lambda_ph, domain_size, diffusivity, Ux, n_iterations)
+        print(f"\n=== Damköhler number: {Da:.2e} \t Peclet number: {Pe:.2e} \t Fourier number  {Fo:.2e} ===\n")
+        
+        print(f"running case {n}/{nsamples}, lbdt={lbdt}, lbdx={lbdx},  Ux={Ux:.2e} diffusivity={diffusivity:.2e} lambda_ph={lambda_ph:.2e} ")
+        assert_almost_equal((lambda_ph * domain_size**2) / diffusivity, Da, decimal=6)
+        assert_almost_equal(Ux*domain_size/diffusivity, Pe, decimal=6)
+        assert_almost_equal(math.modf(n_iterations)[0], 0, decimal=6)  # check decimal places
         # check decimal places
         assert_almost_equal(math.modf(domain_size)[0], 0, decimal=6)
-
+        
         def getXML(**kwars):
             # global idx
 
@@ -209,7 +223,7 @@ for scaling in [acoustic_scaling, diffusive_scaling]:
                 'n': n,
                 'L': domain_size,
                 'scaling': f'{scaling.__name__}',
-                'Da': Da0,
+                'Da': Da,
                 'LBMdx': lbdx,
                 'LBMdt': lbdt,
                 'iteration_x_lbdt': data.iteration_x_lbdt,
@@ -225,7 +239,7 @@ for scaling in [acoustic_scaling, diffusive_scaling]:
             'n_iterations': int(n_iterations),
             # 'log2(LBMdx)': np.log2(lbdx),
             # 'log2(LBMdt)': np.log2(lbdt),
-            r'$time_{SI}$': SI_time,
+            r'$Fo$': Fo,
             # r'$\Lambda$': magic_parameter,
             # 'Da': int(Da),
             # 'Pe': int(Pe0),
@@ -239,11 +253,11 @@ for scaling in [acoustic_scaling, diffusive_scaling]:
                 'L': domain_size,
                 'n_iterations': n_iterations,
                 'CPU_cost': domain_size*domain_size*n_iterations,
-                'Da': Da0,
-                'Pe': Pe0,
+                'Da': Da,
+                'Pe': Pe,
+                'Fo': Fo,
                 'MagicParameter': magic_parameter,
                 'scaling': f'{scaling.__name__}',
-                'SI_time': SI_time,
                 'LBMdx': lbdx,
                 'LBMdt': lbdt,
                 'U': Ux,
@@ -298,8 +312,8 @@ for scaling in [acoustic_scaling, diffusive_scaling]:
     fig.tight_layout()  # otherwise the right y-label is slightly clipped
     plt.savefig(f"{plot_dir}/"
                 f"{scaling.__name__}_2D_phase_field_tc_{tc}"
-                f"_Da_{eat_dots_for_texmaker(Da0)}"
-                f"_Pe_{eat_dots_for_texmaker(Pe0)}"
+                f"_Da_{eat_dots_for_texmaker(Da)}"
+                f"_Pe_{eat_dots_for_texmaker(Pe)}"
                 ".png", dpi=300)
     plt.close(fig)
 
@@ -311,8 +325,8 @@ for scaling in [acoustic_scaling, diffusive_scaling]:
     fig.tight_layout()  # otherwise the right y-label is slightly clipped
     plt.savefig(f"{plot_dir}/"
                 f"{scaling.__name__}_2D_Q_tc_{tc}"
-                f"_Da_{eat_dots_for_texmaker(Da0)}"
-                f"_Pe_{eat_dots_for_texmaker(Pe0)}"
+                f"_Da_{eat_dots_for_texmaker(Da)}"
+                f"_Pe_{eat_dots_for_texmaker(Pe)}"
                 ".png", dpi=300)
     plt.close(fig)
 
@@ -323,8 +337,8 @@ for scaling in [acoustic_scaling, diffusive_scaling]:
     #### PLOT CONVERGENCE ####
     fig_name = os.path.join(plot_dir,
                             f"{scaling.__name__}_2D_"
-                            f"_Da_{eat_dots_for_texmaker(Da0)}"
-                            f"_Pe_{eat_dots_for_texmaker(Pe0)}"
+                            f"_Da_{eat_dots_for_texmaker(Da)}"
+                            f"_Pe_{eat_dots_for_texmaker(Pe)}"
                             f"_diffusivity0_{eat_dots_for_texmaker(diffusivity)}"
                             f"_lambda_ph0_{eat_dots_for_texmaker(lambda_ph0)}"
                             )
@@ -405,14 +419,14 @@ for scaling in [acoustic_scaling, diffusive_scaling]:
 
     print(f"SUMMARY:")
     print(df_latex.to_latex(index=False, escape=False,
-                            caption=f"Da = {Da0:.2e}, "+r"P{\'e}"+f" = {Pe0:.2e}"))
+                            caption=f"Da = {Da:.2e}, "+r"P{\'e}"+f" = {Pe:.2e}" + f"Fo = {Fo:.2e}" ))
 
     pd.set_option('display.float_format', '{:.2E}'.format)
     original_stdout = sys.stdout  # Save a reference to the original standard output
     with open(os.path.join(plot_dir, f"{scaling.__name__}_latex_table.txt"), 'a+') as f:
         sys.stdout = f  # Change the standard output to the file we created.
         print(df_latex.to_latex(index=False, escape=False,
-                                caption=f"Da = {Da0:.2e}, "+r"P{\'e}"+f" = {Pe0:.2e}"))
+                                caption=f"Da = {Da:.2e}, "+r"P{\'e}"+f" = {Pe:.2e}" + f"Fo = {Fo:.2e}"))
         sys.stdout = original_stdout  # Reset the standard output to its original value
 
     with pd.ExcelWriter(f"{fig_name}.xlsx") as writer:  # doctest: +SKIP
@@ -428,7 +442,7 @@ df_for_plots_merged_inner = pd.merge(
 
 # df_for_plots = df_for_plots.sort_values(by=['is3D', 'Collision_Kernel', 'D', 'BC_order'])
 df_for_plots_merged_inner.to_pickle(
-    f"./pickled_df_Da_{Da0:.2e}_dense2sparse_samples_{nsamples}.pkl")
+    f"./pickled_df_Da_{Da:.2e}_dense2sparse_samples_{nsamples}.pkl")
 print(df_for_plots_merged_inner)
 
 
