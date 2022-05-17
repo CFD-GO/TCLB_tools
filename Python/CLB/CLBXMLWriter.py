@@ -182,6 +182,7 @@ def _set_by_kw(kw, name, default):
  'EvalIf',
  'CallPython',
  'VTK',
+ 'HDF5',
  'Log',
  'Andersen'
  ]        
